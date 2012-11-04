@@ -1,0 +1,40 @@
+<div class="page-header">
+    <h1>Options</h1>
+</div>
+<div>
+    <form class="form-horizontal">
+        <div class="control-group">
+            <label class="control-label" for="inputHost">Redmine Host</label>
+            <div class="controls">
+                <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
+            <div class="controls">
+                <input type="password" id="inputApiKey" required placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
+            <div class="controls">
+                <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
+            </div>
+        </div>
+        <div class="control-group" data-ng-show="useHttpAuth">
+            <label class="control-label" for="httpUser">HTTP Username</label>
+            <div class="controls">
+                <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
+            </div>
+        </div>
+        <div class="control-group" data-ng-show="useHttpAuth">
+            <label class="control-label" for="httpPass">HTTP Password</label>
+            <div class="controls">
+                <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+        </div>
+    </form>
+</div>

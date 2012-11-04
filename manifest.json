@@ -1,0 +1,26 @@
+{
+    "name": "Redmine Issue Tracker",
+    "version": "0.1",
+    "manifest_version": 2,
+    "description": "This extension will help to work with Redmine issue tracker",
+    "minimum_chrome_version": "22",
+    
+    "icons": {
+        "16": "icon/icon-16.png",
+        "48": "icon/icon-48.png",
+        "128": "icon/icon-128.png"
+    },
+    "browser_action": {
+        "default_icon": "icon/icon-16.png",
+        "default_title": "Redmine Issue Tracker"
+    },
+    "background": {
+        "scripts": ["js/background.js"],
+        "persistent": false
+    },
+    "permissions": [
+        "alarms",
+        "tabs",
+        "*://*/*"
+    ]
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html data-ng-app="issues" data-ng-csp>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <div data-ng-controller="Main">
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <div class="nav-collapse collapse">
+                            <ul class="nav">
+                                <li>
+                                    <a href="#/home">Home</a>
+                                </li>
+                                <li class="divider-vertical"></li>
+                                <li>
+                                    <a href="#/options">Options</a>
+                                </li>
+                            </ul>
+                            <ul class="nav pull-right">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        My projects
+                                        <b class="caret"></b>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li data-ng-show="projects.length < 1">
+                                            <a href="#/home">No projects</a>
+                                        </li>
+                                        <li data-ng-repeat="project in projects">
+                                            <a href="#/project/{{project.identifier}}">{{project.name}}</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="" data-ng-click="updateProjects()">
+                                                <i class="icon-refresh"></i>&nbsp;Update project list
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="alert alert-error" style="margin-top: 40px;" data-ng-show="xhrError">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <strong>Warning!</strong> Server response error ! <a href="#/options">Update options ?</a>
+                </div>
+            </div>
+        </div>
+        <div id="wrap">
+            <div class="container">
+                <div data-ng-view></div>
+            </div>
+        </div>
+        <div id="footer">
+            <div class="container">
+                <p class="muted credit">
+                    All enchantment you could send to my email: <a href="mailto:konstantin.zolotarev.work@gmail.com" target="_blank">Konstantin Zolotarev</a>
+                    <a href="#/options" class="pull-right">Extension Options</a>
+                </p>
+            </div>
+        </div>
+        <script type="text/javascript" src="../js/lib/jquery.min.js"></script>
+        <script type="text/javascript" src="../js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="../js/lib/angular.min.js"></script>
+        <script type="text/javascript" src="../js/main.js"></script>
+        <script type="text/javascript" src="../js/mainControllers.js"></script>
+    </body>
+</html>

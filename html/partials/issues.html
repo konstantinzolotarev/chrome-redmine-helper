@@ -1,0 +1,26 @@
+<div>
+    <div class="alert alert-danger" data-ng-show="options.isEmpty()">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>Warning!</strong> No options defined ! <a href="#/options">Define</a>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="offset4 span4 alert alert-info center" data-ng-show="loading">
+        <img src="/img/ajax-loader.gif" alt="Loading..." />
+        <strong>Loading...</strong>
+    </div>
+</div>
+
+<div class="page-header">
+    <h3>Issues list</h3>
+</div>
+<div class="row-fluid">
+    <div class="span10">
+        &nbsp;
+    </div>
+    <div class="span2">
+        <select class="pull-right">
+            <option value="0">Please select project</option>
+        </select>
+    </div>
+</div>
