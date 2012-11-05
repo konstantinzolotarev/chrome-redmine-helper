@@ -77,11 +77,19 @@ function Options($scope) {
 
 function Home($scope) {
     $scope.options = config;
-    $scope.issues = BG.getIssues().issues;
-    $scope.onIssuesUpdated = function(request, sender, sendResponse) {
+    $scope.issues = [];
+    $scope.order = "author.name";
+    $scope.reverse = false;
+    for(var key in BG.getIssues().issues) {
+        $scope.issues.push(BG.getIssues().issues[key]);
+    }
+    var onIssuesUpdated = function(request, sender, sendResponse) {
         if (request.action && request.action == "issuesUpdated") {
             $scope.$apply(function(sc) {
-                sc.issues = BG.getIssues().issues;
+                sc.issues = [];
+                for(var key in BG.getIssues().issues) {
+                    sc.issues.push(BG.getIssues().issues[key]);
+                }
             });
         }
     };
@@ -89,7 +97,7 @@ function Home($scope) {
 //        window.location.href = chrome.extension.getURL("html/main.html#/project/"+config.getProfile().selectedProject);
 //    }
     // Add handler for issues updated
-    chrome.extension.onMessage.addListener($scope.onIssuesUpdated);
+    chrome.extension.onMessage.addListener(onIssuesUpdated);
 }
 
 /**
