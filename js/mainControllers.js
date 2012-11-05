@@ -80,6 +80,7 @@ function Home($scope) {
     $scope.issues = [];
     $scope.order = "author.name";
     $scope.reverse = false;
+    $scope.unreadClass = "unread";
     for(var key in BG.getIssues().issues) {
         $scope.issues.push(BG.getIssues().issues[key]);
     }
