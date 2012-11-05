@@ -77,10 +77,19 @@ function Options($scope) {
 
 function Home($scope) {
     $scope.options = config;
-    console.log(config.getProfile());
-    if (config.getProfile().selectedProject) {
-        window.location.href = chrome.extension.getURL("html/main.html#/project/"+config.getProfile().selectedProject);
-    }
+    $scope.issues = BG.getIssues().issues;
+    $scope.onIssuesUpdated = function(request, sender, sendResponse) {
+        if (request.action && request.action == "issuesUpdated") {
+            $scope.$apply(function(sc) {
+                sc.issues = BG.getIssues().issues;
+            });
+        }
+    };
+//    if (config.getProfile().selectedProject) {
+//        window.location.href = chrome.extension.getURL("html/main.html#/project/"+config.getProfile().selectedProject);
+//    }
+    // Add handler for issues updated
+    chrome.extension.onMessage.addListener($scope.onIssuesUpdated);
 }
 
 /**

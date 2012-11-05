@@ -14,7 +14,9 @@ function Config() {
         useHttpAuth: false,
         httpUser: "",
         httpPass: "",
-        selectedProject: false
+        selectedProject: false,
+        currentUserName: false,
+        currentUserId: false
     };
     this.loaded = false;
 }
@@ -137,10 +139,11 @@ function Loader() {
  */
 Loader.prototype.createXhr = function(method, url, async) {
     var xhr = new XMLHttpRequest();
+    var fullUrl = getConfig().getHost() + url;
     if (config.getProfile().useHttpAuth) {
-        xhr.open(method, url, (async || true), config.getProfile().httpUser, config.getProfile().httpPass);
+        xhr.open(method, fullUrl, (async || true), config.getProfile().httpUser, config.getProfile().httpPass);
     } else {
-        xhr.open(method, url, (async || true));
+        xhr.open(method, fullUrl, (async || true));
     }
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader("X-Redmine-API-Key", getConfig().getApiAccessKey());
@@ -215,7 +218,7 @@ Projects.prototype.get = function(id) {
         return project;
     }
     (function(obj) {
-        getLoader().get(getConfig().getHost() + "projects/"+id+".json?include=trackers,issue_categories", function(data) {
+        getLoader().get("projects/"+id+".json?include=trackers,issue_categories", function(data) {
             data.project.fullyLoaded = true;
             var key = obj.getProjectKey(id);
             if (key !== false) {
@@ -267,7 +270,7 @@ Projects.prototype.loadFromRedmine = function() {
     //update process
     this.projects = [];
     (function(obj) {
-        getLoader().get(getConfig().getHost() + "projects.json", function(data) {
+        getLoader().get("projects.json", function(data) {
             if (data.total_count && data.total_count > 0) {
                 obj.projects = data.projects;
                 obj.loaded = true;
@@ -338,7 +341,7 @@ Projects.prototype.getIssues = function(id) {
         return this.projects[key].issues;
     }
     (function(obj) {
-        getLoader().get(getConfig().getHost() + "issues.json?sort=updated_on:desc", function(data) {
+        getLoader().get("issues.json?sort=updated_on:desc", function(data) {
             console.log(data);
         });
     })(this);
@@ -352,9 +355,19 @@ Projects.prototype.getIssues = function(id) {
  */
 function Issues() {
     this.lastUpdated = localStorage.lastUpdated || false;
-    this.issues = [];
-    this.unread = 0;
+    this.issues = JSON.parse(localStorage.issues || "[]");;
+    this.unread = localStorage.unread || 0;
+    this.updateBrowserAction();
 }
+
+/**
+ * Set unread issues count to icon
+ * 
+ * @returns {void}
+ */
+Issues.prototype.updateBrowserAction = function() {
+    setUnreadIssuesCount(this.unread);
+};
 
 /**
  * Load issues list 
@@ -364,30 +377,73 @@ function Issues() {
 Issues.prototype.load = function() {
     console.log("Start loading issues");
     (function(obj) {
-        getLoader().get(getConfig().getHost() + "issues.json?sort=updated_on:desc", function(data) {
-            console.log(data);
-            if (data.total_count && data.total_count > 0) {
-                obj.issues = data.issues;
-                var updatedDate = false;
-                if (!obj.lastUpdated) {
-                    obj.unread = data.total_count;
-                } else {
-                    updatedDate = new Date(obj.lastUpdated);
-                    for(var key in obj.issues) {
-                        if (updatedDate < new Date(obj.issues[key].updated_on)) {
-                            obj.issues[key].read = false;
-                            obj.unread += 1;
-                        } else {
-                            obj.issues[key].read = true;
+        getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit=50", 
+            function(data) {
+                console.log(data);
+                if (data.total_count && data.total_count > 0) {
+                    obj.issues = data.issues;
+                    if (!obj.lastUpdated) {
+                        obj.unread = data.total_count;
+                    } else {
+                        for(var i in data.issues) {
+                            var found = false;
+                            for(var key in obj.issues) {
+                                //We found this issue
+                                if (obj.issues[key].id == data.issues[i].id) {
+                                    found = true;
+                                    if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
+                                        data.issues[i].read = false;
+                                        obj.unread += 1;
+                                        obj.issues[key] = data.issues[i];
+                                    }
+                                }
+                            }
+                            if (!found) {
+                                data.issues[i].read = false;
+                                obj.issues.push(data.issues[i]);
+                            }
                         }
                     }
+                    obj.lastUpdated = (new Date()).toISOString();
+                    setUnreadIssuesCount(obj.unread);
+                    obj.store();
+                    /**
+                     * Notify
+                     */
+                    chrome.extension.sendMessage({"action": "issuesUpdated"});
                 }
-                obj.lastUpdated = obj.issues[0].updated_on;
-                console.log(obj);
-                setUnreadIssuesCount(obj.unread);
             }
-        });
+        );
     })(this);
+};
+
+/**
+ * Get issue by it's ID 
+ * 
+ * @param {int} id
+ * @returns {Boolean}
+ */
+Issues.prototype.getById = function(id) {
+    if (this.issues.length < 1) {
+        return false;
+    }
+    for(var i in this.issues) {
+        if (this.issues[i].id == id) {
+            return {'intertalId': i, 'issue': this.issues[i]};
+        }
+    }
+    return false;
+};
+
+/**
+ * Store data into localStorage
+ * 
+ * @returns {void}
+ */
+Issues.prototype.store = function() {
+    localStorage['issues'] = JSON.stringify(this.issues);
+    localStorage['lastUpdated'] = this.lastUpdated;
+    localStorage['unread'] = this.unread;
 };
 
 /**
@@ -453,6 +509,15 @@ function getLoader() {
  */
 function getProjects() {
     return projects;
+}
+
+/**
+ * Get Issues
+ * 
+ * @returns {Issues}
+ */
+function getIssues() {
+    return issues;
 }
 
 /**
@@ -541,11 +606,46 @@ function scheduleRequest() {
     chrome.alarms.create({'delayInMinutes': delay});
 }
 
+/**
+ * 
+ * @param {type} onSuccess
+ * @returns {void}
+ */
+function getCurrentUser(onSuccess) {
+    getLoader().get("users/current.json",
+        function(json) {
+            if (json.user) {
+                getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
+                getConfig().getProfile().currentUserId = json.user.id;
+                getConfig().store(getConfig().getProfile());
+                onSuccess();
+            }
+        }
+    );
+}
+
+/**
+ * Start requesting of issues
+ * 
+ * @param {Object} params
+ * @returns {void}
+ */
 function startRequest(params) {
     if (params.scheduleRequest) {
         scheduleRequest();
     }
-    issues.load();
+    if (getConfig().getHost() != "") {
+        //check user
+        if (!getConfig().getProfile().currentUserId || !getConfig().getProfile().currentUserName) {
+            getCurrentUser(function() {
+                startRequest({scheduleRequest: false});
+            });
+        } else {
+            getIssues().load();
+        }
+    } else {
+        chrome.browserAction.setBadgeText({text: "Err"});
+    }
 }
 
 /**
@@ -553,11 +653,7 @@ function startRequest(params) {
  */
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
-    if (!config.isEmpty()) {
-        startRequest({scheduleRequest:true});
-    } else {
-        chrome.browserAction.setBadgeText({text: "Err"});
-    }
+    startRequest({scheduleRequest:true});
 });
 
 chrome.runtime.onSuspend.addListener(function() {
