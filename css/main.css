@@ -10,7 +10,7 @@ body {
     height: auto !important;
     height: 100%;
     /* Negative indent footer by it's height */
-    margin: 40px auto -40px;
+    margin: 40px auto 20px;
 }
 /* Set the fixed height of the footer here */
 #push,
@@ -40,4 +40,8 @@ body {
 
 table.issues .unread {
     font-weight: bold;
+}
+
+.pointer {
+    cursor: pointer;
 }

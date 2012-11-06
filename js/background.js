@@ -354,19 +354,25 @@ Projects.prototype.getIssues = function(id) {
  * @returns {Issues}
  */
 function Issues() {
-    this.lastUpdated = localStorage.lastUpdated || false;
+    this.lastUpdated = false;
+    if (localStorage.lastUpdated) {
+        this.lastUpdated = new Date(localStorage.lastUpdated);
+    }
     this.issues = JSON.parse(localStorage.issues || "[]");;
-    this.unread = localStorage.unread || 0;
-    this.updateBrowserAction();
+    this.unread = 0;
+    this.updateUnread(true);
 }
 
-/**
- * Set unread issues count to icon
- * 
- * @returns {void}
- */
-Issues.prototype.updateBrowserAction = function() {
-    setUnreadIssuesCount(this.unread);
+Issues.prototype.updateUnread = function(updateBadge) {
+    this.unread = 0;
+    for(var i in this.issues) {
+        if(!this.issues[i].read) {
+            this.unread += 1;
+        }
+    }
+    if (updateBadge) {
+        setUnreadIssuesCount(this.unread);
+    }
 };
 
 /**
@@ -381,31 +387,26 @@ Issues.prototype.load = function() {
             function(data) {
                 console.log(data);
                 if (data.total_count && data.total_count > 0) {
-                    obj.issues = data.issues;
-                    if (!obj.lastUpdated) {
-                        obj.unread = data.total_count;
-                    } else {
-                        for(var i in data.issues) {
-                            var found = false;
-                            for(var key in obj.issues) {
-                                //We found this issue
-                                if (obj.issues[key].id == data.issues[i].id) {
-                                    found = true;
-                                    if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
-                                        data.issues[i].read = false;
-                                        obj.unread += 1;
-                                        obj.issues[key] = data.issues[i];
-                                    }
+                    for(var i in data.issues) {
+                        var found = false;
+                        for(var key in obj.issues) {
+                            //We found this issue
+                            if (obj.issues[key].id == data.issues[i].id) {
+                                found = true;
+                                if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
+                                    data.issues[i].read = false;
+                                    obj.issues[key] = data.issues[i];
                                 }
                             }
-                            if (!found) {
-                                data.issues[i].read = false;
-                                obj.issues.push(data.issues[i]);
-                            }
+                        }
+                        if (!found) {
+                            data.issues[i].read = false;
+//                            data.issues[i].updated = new Date(data.issues[i].updated_on);
+                            obj.issues.push(data.issues[i]);
                         }
                     }
-                    obj.lastUpdated = (new Date()).toISOString();
-                    setUnreadIssuesCount(obj.unread);
+                    obj.lastUpdated = new Date();
+                    obj.updateUnread(true);
                     obj.store();
                     /**
                      * Notify
@@ -415,6 +416,33 @@ Issues.prototype.load = function() {
             }
         );
     })(this);
+};
+
+/**
+ * Mark issue read 
+ * 
+ * @param {int} id
+ * @returns {undefined}
+ */
+Issues.prototype.markAsRead = function(id) {
+    var issue = this.getById(id);
+    this.issues[issue.key].read = true;
+    this.unread -= 1;
+    setUnreadIssuesCount(this.unread);
+    this.store();
+};
+
+/**
+ * Mark all issues read
+ * 
+ * @returns {undefined}
+ */
+Issues.prototype.markAllAsRead = function() {
+    for(var i in this.issues) {
+        this.issues[i].read = true;
+    }
+    this.store();
+    this.updateUnread(true);
 };
 
 /**
@@ -429,7 +457,7 @@ Issues.prototype.getById = function(id) {
     }
     for(var i in this.issues) {
         if (this.issues[i].id == id) {
-            return {'intertalId': i, 'issue': this.issues[i]};
+            return {'key': i, 'issue': this.issues[i]};
         }
     }
     return false;
@@ -441,9 +469,9 @@ Issues.prototype.getById = function(id) {
  * @returns {void}
  */
 Issues.prototype.store = function() {
+    console.log(this.issues);
     localStorage['issues'] = JSON.stringify(this.issues);
-    localStorage['lastUpdated'] = this.lastUpdated;
-    localStorage['unread'] = this.unread;
+    localStorage['lastUpdated'] = this.lastUpdated.toISOString();
 };
 
 /**
@@ -527,6 +555,11 @@ function getIssues() {
  * @returns {void}
  */
 function setUnreadIssuesCount(count) {
+    //clear text
+    if (count <= 0) {
+        chrome.browserAction.setBadgeText({text: ""});
+        return;
+    }
     if (count > 99) {
         count = "99+";
     }

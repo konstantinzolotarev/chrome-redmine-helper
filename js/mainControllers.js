@@ -17,6 +17,24 @@ var loader = BG.getLoader();
  * @type Projects
  */
 var projects = BG.getProjects();
+/**
+ * Bind tooltips
+ */
+jQuery(document).ready(function($) {
+    $('.container').tooltip({
+        selector: "i[data-type='tooltip']"
+    });
+});
+
+/**
+ * Open Issue Author's Redmine page
+ * 
+ * @param {Object} issue
+ * @returns {undefined}
+ */
+function openAuthorPage(issue) {
+    chrome.tabs.create({url: BG.getConfig().getHost()+"users/"+issue.author.id});
+}
 
 /**
  * Main controller
@@ -78,22 +96,83 @@ function Options($scope) {
 function Home($scope) {
     $scope.options = config;
     $scope.issues = [];
-    $scope.order = "author.name";
-    $scope.reverse = false;
-    $scope.unreadClass = "unread";
-    for(var key in BG.getIssues().issues) {
-        $scope.issues.push(BG.getIssues().issues[key]);
-    }
+    $scope.order = "updated_on";
+    $scope.reverse = true;
+    $scope.issue = {};
+    $scope.isLoading = false;
+    
+    $scope.updateIssues = function() {
+        $scope.issues = [];
+        for(var key in BG.getIssues().issues) {
+            $scope.issues.push(BG.getIssues().issues[key]);
+        }
+    };
+    $scope.updateIssues();
+    $scope.markRead = function(issue) {
+        if (issue.read) {
+            return;
+        }
+        console.log(issue);
+        BG.getIssues().markAsRead(issue.id);
+        issue.read = true;
+    };
+    
+    $scope.markAllRead = function() {
+        BG.getIssues().markAllAsRead();
+        $scope.updateIssues();
+    };
+    
+    /**
+     * Reload issues
+     * 
+     * @returns {undefined}
+     */
+    $scope.reload = function() {
+        $scope.isLoading = true;
+        BG.getIssues().load();
+    };
+    
+    /**
+     * Open new tab with issue details
+     * 
+     * @param {Object} issue
+     */
+    $scope.openWebPage = function(issue) {
+        chrome.tabs.create({url: BG.getConfig().getHost()+"issues/"+issue.id});
+    };
+    
+    /**
+     * Open authors Redmine page
+     * @param {Object} issue
+     * @returns {undefined}
+     */
+    $scope.openAuthorPage = function(issue) {
+        openAuthorPage(issue);
+    };
+    
+    $('#issueDetails').modal({
+        show: false
+    });
+    /**
+     * Show issue details
+     */
+    $scope.showDetails = function(issue) {
+        $scope.issue = issue;
+        $('#issueDetails').modal('toggle');
+    };
+    
     var onIssuesUpdated = function(request, sender, sendResponse) {
         if (request.action && request.action == "issuesUpdated") {
             $scope.$apply(function(sc) {
                 sc.issues = [];
+                sc.isLoading = false;
                 for(var key in BG.getIssues().issues) {
                     sc.issues.push(BG.getIssues().issues[key]);
                 }
             });
         }
     };
+    
 //    if (config.getProfile().selectedProject) {
 //        window.location.href = chrome.extension.getURL("html/main.html#/project/"+config.getProfile().selectedProject);
 //    }
