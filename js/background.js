@@ -359,7 +359,6 @@ function Issues() {
         this.lastUpdated = new Date(localStorage.lastUpdated);
     }
     this.issues = JSON.parse(localStorage.issues || "[]");
-    this.lastLoadedOffset = localStorage.lastLoadedOffset || 0;
     this.unread = 0;
     this.updateUnread(true);
 }
@@ -384,15 +383,14 @@ Issues.prototype.updateUnread = function(updateBadge) {
  * @returns {void}
  */
 Issues.prototype.load = function(offset, limit) {
-    if (!offset) {
-        offset = this.lastLoadedOffset;
-    }
+    offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
     console.log("Start loading issues");
     (function(obj) {
         getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
             function(data) {
+                var updated = 0;
                 if (data.total_count && data.total_count > 0) {
                     for(var i in data.issues) {
                         var found = false;
@@ -403,6 +401,7 @@ Issues.prototype.load = function(offset, limit) {
                                 if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
                                     data.issues[i].read = false;
                                     obj.issues[key] = data.issues[i];
+                                    updated += 1;
                                 }
                             }
                         }
@@ -410,10 +409,10 @@ Issues.prototype.load = function(offset, limit) {
                             data.issues[i].read = false;
 //                            data.issues[i].updated = new Date(data.issues[i].updated_on);
                             obj.issues.push(data.issues[i]);
+                            updated += 1;
                         }
                     }
                     obj.lastUpdated = new Date();
-                    obj.lastLoadedOffset = offset;
                     obj.updateUnread(true);
                     obj.store();
                     /**
@@ -423,7 +422,7 @@ Issues.prototype.load = function(offset, limit) {
                     /**
                      * Load rest of issues
                      */
-                    if (data.total_count > (offset + limit)) {
+                    if (data.total_count > (offset + limit) && updated >= limit) {
                         obj.load((offset + limit), limit);
                     }
                 }
@@ -517,7 +516,6 @@ Issues.prototype.store = function() {
     console.log(this.issues);
     localStorage['issues'] = JSON.stringify(this.issues);
     localStorage['lastUpdated'] = this.lastUpdated.toISOString();
-    localStorage['lastLoadedOffset'] = this.lastLoadedOffset;
 };
 
 /**
