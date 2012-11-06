@@ -442,10 +442,20 @@ Issues.prototype.get = function(issue, reload) {
     if (issue.detailsLoaded && !reload) {
         return;
     }
-    getLoader().get("issue/"+issue.id+".json?include=journals,changesets", function(json) {
-        console.log(json);
-        chrome.extension.sendMessage({action: "issueDetails", id: issue.id});
-    });
+    (function(obj) {
+        getLoader().get("issues/"+issue.id+".json?include=journals,changesets", function(json) {
+            if (json.issue) {
+                var is = obj.getById(json.issue.id);
+                if (is) {
+                    json.issue.detailsLoaded = true;
+                    obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
+                    obj.store();
+                    //notify all listeners
+                    chrome.extension.sendMessage({action: "issueDetails", id: issue.id, issue: obj.issues[is.key]});
+                }
+            }
+        });
+    })(this);
 };
 
 /**
@@ -513,7 +523,6 @@ Issues.prototype.getById = function(id) {
  * @returns {void}
  */
 Issues.prototype.store = function() {
-    console.log(this.issues);
     localStorage['issues'] = JSON.stringify(this.issues);
     localStorage['lastUpdated'] = this.lastUpdated.toISOString();
 };
