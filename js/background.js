@@ -358,7 +358,8 @@ function Issues() {
     if (localStorage.lastUpdated) {
         this.lastUpdated = new Date(localStorage.lastUpdated);
     }
-    this.issues = JSON.parse(localStorage.issues || "[]");;
+    this.issues = JSON.parse(localStorage.issues || "[]");
+    this.lastLoadedOffset = localStorage.lastLoadedOffset || 0;
     this.unread = 0;
     this.updateUnread(true);
 }
@@ -383,9 +384,11 @@ Issues.prototype.updateUnread = function(updateBadge) {
  * @returns {void}
  */
 Issues.prototype.load = function(offset, limit) {
-    offset = offset || 0;
+    if (!offset) {
+        offset = this.lastLoadedOffset;
+    }
+    offset = parseInt(offset);
     limit = limit || 25;
-
     console.log("Start loading issues");
     (function(obj) {
         getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
@@ -410,6 +413,7 @@ Issues.prototype.load = function(offset, limit) {
                         }
                     }
                     obj.lastUpdated = new Date();
+                    obj.lastLoadedOffset = offset;
                     obj.updateUnread(true);
                     obj.store();
                     /**
@@ -513,6 +517,7 @@ Issues.prototype.store = function() {
     console.log(this.issues);
     localStorage['issues'] = JSON.stringify(this.issues);
     localStorage['lastUpdated'] = this.lastUpdated.toISOString();
+    localStorage['lastLoadedOffset'] = this.lastLoadedOffset;
 };
 
 /**
