@@ -49,3 +49,10 @@ table.issues .unread {
 .issue-description {
     padding-right: 10px;
 }
+
+.issue-history {
+    margin: 3px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    padding: 4px;
+}

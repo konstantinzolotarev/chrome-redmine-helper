@@ -209,6 +209,7 @@ function Home($scope) {
         BG.getIssues().get(issue, !issue.read);
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
+        console.log($scope.issue);
         $('#issueDetails').modal('toggle');
     };
     
@@ -218,7 +219,6 @@ function Home($scope) {
             if ($scope.issue.id == request.id) {
                 //update issue
                 $scope.$apply(function(sc) {
-                    console.log(request.issue);
                     sc.issue = request.issue;
                     sc.updateIssues();
                 });
