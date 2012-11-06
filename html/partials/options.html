@@ -1,3 +1,7 @@
+<div class="alert alert-success" data-ng-show="success">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Success!</strong> Your setting successfully saved !
+</div>
 <div class="page-header">
     <h1>Options</h1>
 </div>
@@ -12,7 +16,7 @@
         <div class="control-group">
             <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
             <div class="controls">
-                <input type="password" id="inputApiKey" required placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+                <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
             </div>
         </div>
         <div class="control-group">

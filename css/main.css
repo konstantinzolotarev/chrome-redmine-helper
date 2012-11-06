@@ -45,3 +45,10 @@ table.issues .unread {
 .pointer {
     cursor: pointer;
 }
+
+.issue-description {
+    max-height: 300px;
+    overflow: auto;
+    margin: -5px 0;
+    padding-right: 10px;
+}

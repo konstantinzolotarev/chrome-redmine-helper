@@ -378,14 +378,18 @@ Issues.prototype.updateUnread = function(updateBadge) {
 /**
  * Load issues list 
  * 
+ * @param {int} offset load result offset
+ * @param {int} limit Limit for results
  * @returns {void}
  */
-Issues.prototype.load = function() {
+Issues.prototype.load = function(offset, limit) {
+    offset = offset || 0;
+    limit = limit || 25;
+
     console.log("Start loading issues");
     (function(obj) {
-        getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit=50", 
+        getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
             function(data) {
-                console.log(data);
                 if (data.total_count && data.total_count > 0) {
                     for(var i in data.issues) {
                         var found = false;
@@ -412,10 +416,47 @@ Issues.prototype.load = function() {
                      * Notify
                      */
                     chrome.extension.sendMessage({"action": "issuesUpdated"});
+                    /**
+                     * Load rest of issues
+                     */
+                    if (data.total_count > (offset + limit)) {
+                        obj.load((offset + limit), limit);
+                    }
                 }
             }
         );
     })(this);
+};
+
+/**
+ * Get detailed issue information 
+ * 
+ * @param {Object} issue
+ * @param {boolean} reload
+ * @returns {undefined}
+ */
+Issues.prototype.get = function(issue, reload) {
+    if (issue.detailsLoaded && !reload) {
+        return;
+    }
+    getLoader().get("issue/"+issue.id+".json?include=journals,changesets", function(json) {
+        console.log(json);
+        chrome.extension.sendMessage({action: "issueDetails", id: issue.id});
+    });
+};
+
+/**
+ * Mark issue read 
+ * 
+ * @param {int} id
+ * @returns {undefined}
+ */
+Issues.prototype.markAsUnRead = function(id) {
+    var issue = this.getById(id);
+    this.issues[issue.key].read = false;
+    this.unread += 1;
+    setUnreadIssuesCount(this.unread);
+    this.store();
 };
 
 /**

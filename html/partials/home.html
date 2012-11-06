@@ -5,7 +5,7 @@
     </div>
 </div>
 <div class="row-fluid">
-    <div class="offset4 span4 alert alert-info center" data-ng-show="loading">
+    <div class="offset4 span4 alert alert-info center" data-ng-show="isLoading">
         <img src="/img/ajax-loader.gif" alt="Loading..." />
         <strong>Loading...</strong>
     </div>
@@ -27,11 +27,15 @@
             </small>
         </p>
         <hr/>
-        <p>
-            {{issue.description}}
-        </p>
+        <div class="issue-description">
+            <p data-ng-bind-html="issue.description | nl2br"></p>
+        </div>
     </div>
     <div class="modal-footer">
+        <a href="" class="btn" data-ng-click="openWebPage(issue)">
+            <i class="icon-share"></i>&nbsp;
+            Open in Redmine
+        </a>
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
     </div>
 </div>
@@ -56,20 +60,35 @@
         <table class="table table-hover table-condensed issues">
             <thead>
                 <tr>
-                    <th style="width: 15px;">#</th>
+                    <th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
+                    </th>
                     <th style="width: 250px;" >
                         <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
                     </th>
-                    <th>Title</th>
+                    <th>
+                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
+                    </th>
+                    <th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">
+                            <i class="icon-star"></i>
+                        </a>
+                    </th>
                     <th style="width: 50px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse" data-ng-class="issue.read || 'unread'">
-                    <td><i class="icon-check pointer" data-ng-click="markRead(issue)" data-ng-show="!issue.read"></i></td>
+                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
+                    <td>
+                        <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
+                    </td>
                     <td>{{issue.author.name}}</td>
                     <td>
                         <a href="" data-ng-click="showDetails(issue)">{{issue.subject}}</a>
+                    </td>
+                    <td>
+                        <i class="icon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
+                        <i class="icon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
                     </td>
                     <td>
                         <i class="icon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
@@ -77,5 +96,15 @@
                 </tr>
             </tbody>
         </table>
+        <div data-ng-show="issues.length > pageSize">
+            <ul class="pager">
+                <li>
+                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">&larr;&nbsp;Previous</button>
+                </li>
+                <li>
+                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">Next&nbsp;&rarr;</button>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
