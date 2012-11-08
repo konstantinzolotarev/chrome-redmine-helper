@@ -36,7 +36,6 @@ Config.prototype.isEmpty = function() {
  * @returns {void}
  */
 Config.prototype.initNew = function() {
-    console.log("Create new empty profile");
     this.store(this.profile);
 };
 
@@ -307,7 +306,6 @@ Projects.prototype.store = function() {
     if (!this.loaded) {
         return;
     }
-    console.log(this.projects);
     localStorage['projects'] = JSON.stringify(this.projects);
 };
 
@@ -406,7 +404,6 @@ Issues.prototype.load = function(offset, limit) {
     offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
-    console.log("Start loading issues");
     (function(obj) {
         getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
             function(data) {
@@ -756,7 +753,6 @@ function scheduleRequest() {
     var multiplier = Math.max(randomness * exponent, 1);
     var delay = Math.min(multiplier * pollIntervalMin, pollIntervalMax);
 
-    console.log("Scheduled: "+delay);
     chrome.alarms.create({'delayInMinutes': delay});
 }
 
