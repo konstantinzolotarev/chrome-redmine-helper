@@ -1,3 +1,5 @@
+var BG = chrome.extension.getBackgroundPage();
+
 /**
  * Create angular application
  */
@@ -44,14 +46,16 @@ angular.module('issues', ['ngSanitize']).
             }
             return id;
         };
-        
+    
         var updateText = function() {
             if (!item.name) {
                 return;
             }
             switch (item.name) {
                 case "status_id":
-                    element.html("<strong>Status</strong> changed to: "+item.new_value);
+                    element.html("<strong>Status</strong> changed from "
+                            + "<i>" + BG.getIssues().getStatusNameById(item.old_value) + "</i> to "
+                            + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
                     break;
                 case "assigned_to_id":
                     element.html("<strong>Assignee</strong> set to: "+item.new_value);

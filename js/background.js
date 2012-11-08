@@ -377,6 +377,9 @@ function Issues() {
     }
     this.issues = JSON.parse(localStorage.issues || "[]");
     this.unread = 0;
+    
+    this.statuses = JSON.parse(localStorage.issueStatuses || "[]");;
+    this.statusesLoaded = localStorage.statusesLoaded || false;
     this.updateUnread(true);
 }
 
@@ -432,6 +435,10 @@ Issues.prototype.load = function(offset, limit) {
                     obj.lastUpdated = new Date();
                     obj.updateUnread(true);
                     obj.store();
+                    /**
+                     * Update issue statuses
+                     */
+                    obj.loadStatuses();
                     /**
                      * Notify
                      */
@@ -535,6 +542,48 @@ Issues.prototype.getById = function(id) {
 };
 
 /**
+ * Load statuses from API
+ * 
+ * @param {boolean} reload
+ * @returns {Array}
+ */
+Issues.prototype.loadStatuses = function(reload) {
+    if (this.statusesLoaded && !reload) {
+        return this.statuses;
+    }
+    (function(obj) {
+        getLoader().get("issue_statuses.json", function(json) {
+            if (json.issue_statuses && json.issue_statuses.length > 0) {
+                obj.statuses = json.issue_statuses;
+                obj.statusesLoaded = true;
+                obj.store();
+                //notify all listeners
+                chrome.extension.sendMessage({action: "issueStatusesUpdated", statuses: obj.statuses});
+            }
+        });
+    })(this);
+    return this.statuses;
+};
+
+/**
+ * Get status name by id
+ * @param {int} id
+ * @returns {String}
+ */
+Issues.prototype.getStatusNameById = function(id) {
+    if (!this.statusesLoaded) {
+        this.loadStatuses();
+        return id;
+    }
+    for (var key in this.statuses) {
+        if (this.statuses[key].id == id) {
+            return this.statuses[key].name;
+        }
+    }
+    return id;
+};
+
+/**
  * Store data into localStorage
  * 
  * @returns {void}
@@ -542,6 +591,8 @@ Issues.prototype.getById = function(id) {
 Issues.prototype.store = function() {
     localStorage['issues'] = JSON.stringify(this.issues);
     localStorage['lastUpdated'] = this.lastUpdated.toISOString();
+    localStorage['issueStatuses'] = JSON.stringify(this.statuses);
+    localStorage['statusesLoaded'] = this.statusesLoaded;
 };
 
 /**
