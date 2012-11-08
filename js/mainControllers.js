@@ -116,9 +116,15 @@ function Home($scope) {
 
     $scope.pageSize = 25;
     $scope.page = 0;
+    
+    /**
+     * Get number of pages for list of issues
+     * 
+     * @returns {int}
+     */
     $scope.numberOfPages=function(){
         return Math.ceil($scope.issues.length/$scope.pageSize);                
-    }
+    };
     
     /**
      * Update issues on the screen.

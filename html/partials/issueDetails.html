@@ -1,0 +1,74 @@
+<div class="modal hide fade" id="issueDetails" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{{issue.subject}}</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+            <small>
+                Added by 
+                <a href="" data-ng-click="openAuthorPage(issue)">{{issue.author.name}}</a>
+                on {{issue.created_on | date:'MMM d, y'}}
+            </small>
+        </p>
+        <div class="row-fluid">
+            <div class="span3">
+                <p>
+                    <small>
+                        <strong>Status</strong>:&nbsp;{{issue.status.name}}<br/>
+                        <strong>Priority</strong>:&nbsp;{{issue.priority.name}}<br/>
+                    </small>
+                </p>
+            </div>
+            <div class="span3">
+                <div data-ng-show="issue.done_ratio >= 0">
+                    <small><strong>Done</strong>: &nbsp;{{issue.done_ratio}}%</small>
+                    <div class="progress progress-striped">
+                        <div class="bar" style="width: {{issue.done_ratio}}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+                <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="description">
+                    <div class="issue-description">
+                        <p data-ng-bind-html="issue.description | nl2br"></p>
+                    </div>
+                </div>
+                <div class="tab-pane" id="journals">
+                    <p class="center" data-ng-hide="issue.detailsLoaded">Loading...</p>
+                    <div data-ng-repeat="history in issue.journals" class="issue-history">                    
+                        <p>
+                            <small>
+                                <strong>Updated by</strong>&nbsp;
+                                <a href="#">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
+                            </small>
+                        </p>
+                        <ul data-ng-show="history.details.length > 0">
+                            <li data-ng-repeat="item in history.details">
+                                <div data-issue-history="item"></div>
+                            </li>
+                        </ul>
+                        <blockquote data-ng-show="history.notes">
+                            <p>{{history.notes}}</p>
+                            <small>New comment added</small>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="" class="btn" data-ng-click="openWebPage(issue)">
+            <i class="icon-share"></i>&nbsp;
+            Open in Redmine
+        </a>
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
