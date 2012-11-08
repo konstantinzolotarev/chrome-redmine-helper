@@ -1,3 +1,5 @@
+var BG = chrome.extension.getBackgroundPage();
+
 /**
  * Create angular application
  */
@@ -26,14 +28,34 @@ angular.module('issues', ['ngSanitize']).
 }).directive('issueHistory', function() {
     // return the directive link function. (compile function not needed)
     return function(scope, element, attrs) {
-
-        var updateText = function(item) {
+        var item, project;
+        
+        /**
+         * 
+         * @param {int} id
+         * @returns {String}
+         */
+        var getTracker = function(id) {
+            if (!project || !project.fullyLoaded || !project.trackers) {
+                return id;
+            }
+            for (var key in project.trackers) {
+                if (project.trackers[key].id == id) {
+                    return project.trackers[key].name;
+                }
+            }
+            return id;
+        };
+    
+        var updateText = function() {
             if (!item.name) {
                 return;
             }
             switch (item.name) {
                 case "status_id":
-                    element.html("<strong>Status</strong> changed to: "+item.new_value);
+                    element.html("<strong>Status</strong> changed from "
+                            + "<i>" + BG.getIssues().getStatusNameById(item.old_value) + "</i> to "
+                            + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
                     break;
                 case "assigned_to_id":
                     element.html("<strong>Assignee</strong> set to: "+item.new_value);
@@ -47,12 +69,26 @@ angular.module('issues', ['ngSanitize']).
                 case "estimated_hours":
                     element.html("<strong>Estimated time</strong> set to: "+item.new_value);
                     break;
+                case "tracker_id":
+                    element.html("<strong>Tracker</strong> changed from "
+                                    + "<i>"+getTracker(item.old_value)+"</i> to "
+                                    + "<i>"+getTracker(item.new_value)+"</i>");
+                    break;
+                default:
+                    
+                    break;
             }
         };
         // watch the expression, and update the UI on change.
         scope.$watch(attrs.issueHistory, function(value) {
-            console.log(value);
-            updateText(value);
+            item = value;
+            updateText();
+        });
+        
+        // watch the expression, and update the UI on change.
+        scope.$watch(attrs.project, function(value) {
+            project = value;
+            updateText();
         });
 
         // listen on DOM destroy (removal) event, and cancel the next UI update
