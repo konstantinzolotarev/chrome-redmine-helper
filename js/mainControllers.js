@@ -113,7 +113,7 @@ function Home($scope) {
     $scope.reverse = true;
     $scope.issue = {};
     $scope.isLoading = false;
-
+    
     $scope.pageSize = 25;
     $scope.page = 0;
     

@@ -38,6 +38,9 @@
                     <th style="width: 250px;" >
                         <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
                     </th>
+                    <th style="width: 250px;" >
+                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">Project</a>
+                    </th>
                     <th>
                         <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
                     </th>
@@ -55,6 +58,9 @@
                         <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
                     </td>
                     <td>{{issue.author.name}}</td>
+                    <td>
+                        {{issue.project.name}}
+                    </td>
                     <td>
                         <a href="" data-ng-click="showDetails(issue)">{{issue.subject}}</a>
                     </td>
