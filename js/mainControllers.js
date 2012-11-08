@@ -251,7 +251,6 @@ function Home($scope) {
     //handle project updated datas
     var onProjectUpdated = function(request, sender, sendResponse) {
         if (request.action && request.action == "projectUpdated" && request.project) {
-            console.log(request.project);
             $scope.$apply(function(sc) {
                 var projId = sc.issue.project.id;
                 if (projId && projId > 0 && projId == request.project.id) {

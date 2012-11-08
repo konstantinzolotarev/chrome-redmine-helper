@@ -75,7 +75,8 @@ angular.module('issues', ['ngSanitize']).
                                     + "<i>"+getTracker(item.new_value)+"</i>");
                     break;
                 default:
-                    
+                    element.html("<strong>Sorry</strong> this is under developent.");
+                    console.log(item);
                     break;
             }
         };
