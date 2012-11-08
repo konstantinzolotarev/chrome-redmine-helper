@@ -111,11 +111,14 @@ function Home($scope) {
     $scope.issues = [];
     $scope.order = "updated_on";
     $scope.reverse = true;
-    $scope.issue = {};
     $scope.isLoading = false;
     
     $scope.pageSize = 25;
     $scope.page = 0;
+    
+    //Vars for detailed info
+    $scope.issue = {};
+    $scope.project = {};
     
     /**
      * Get number of pages for list of issues
@@ -215,7 +218,8 @@ function Home($scope) {
         BG.getIssues().get(issue, !issue.read);
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
-        console.log($scope.issue);
+        $scope.project = BG.getProjects().get($scope.issue.project.id);
+        console.log(issue);
         $('#issueDetails').modal('toggle');
     };
     
@@ -244,10 +248,39 @@ function Home($scope) {
         }
     };
     
-    //Add handler for issue details 
-    chrome.extension.onMessage.addListener(onIssueDetails);
-    // Add handler for issues updated
-    chrome.extension.onMessage.addListener(onIssuesUpdated);
+    //handle project updated datas
+    var onProjectUpdated = function(request, sender, sendResponse) {
+        if (request.action && request.action == "projectUpdated" && request.project) {
+            console.log(request.project);
+            $scope.$apply(function(sc) {
+                var projId = sc.issue.project.id;
+                if (projId && projId > 0 && projId == request.project.id) {
+                    sc.project = request.project;
+                }
+            });
+        }
+    };
+    
+    //Global message listener
+    var onMessage = function(request, sender, sendResponse) {
+        if (!request.action) {
+            return;
+        }
+        switch(request.action) {
+            case "issueDetails": 
+                return onIssueDetails(request, sender, sendResponse);
+                break;
+            case "issuesUpdated": 
+                return onIssuesUpdated(request, sender, sendResponse);
+                break;
+            case "projectUpdated": 
+                return onProjectUpdated(request, sender, sendResponse);
+                break;
+        }
+    };
+    
+    //Add one global handler for messages from background
+    chrome.extension.onMessage.addListener(onMessage);
 }
 
 /**

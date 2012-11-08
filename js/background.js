@@ -114,7 +114,7 @@ Config.prototype.getProfile = function() {
  * @returns {void}
  */
 Config.prototype.setSelectedProject = function(id) {
-    if (projects.getByIdentifier(id) !== false) {
+    if (projects.getById(id) !== false) {
         this.profile.selectedProject = id;
         this.store(this.profile);
     }
@@ -126,8 +126,6 @@ Config.prototype.setSelectedProject = function(id) {
  * @returns {Loader}
  */
 function Loader() {
-    this.loaded = false;
-    this.projects = [];
 }
 
 /**
@@ -210,17 +208,21 @@ Projects.prototype.all = function(reload) {
  * Get project detailed info 
  * 
  * @param {String} id
+ * @param {boolean} reload
  * @returns {Object}
  */
-Projects.prototype.get = function(id) {
-    var project = this.getByIdentifier(id);
-    if (project.fullyLoaded) {
-        return project;
+Projects.prototype.get = function(id, reload) {
+    var p = this.getById(id);
+    if (!p) {
+        return false;
+    }
+    if (p.project.fullyLoaded && !reload) {
+        return p.project;
     }
     (function(obj) {
         getLoader().get("projects/"+id+".json?include=trackers,issue_categories", function(data) {
             data.project.fullyLoaded = true;
-            var key = obj.getProjectKey(id);
+            var key = p.key || false;
             if (key !== false) {
                 obj.projects[key] = merge(obj.projects[key], data.project);
                 obj.store();
@@ -228,7 +230,7 @@ Projects.prototype.get = function(id) {
             }
         });
     })(this);
-    return project;
+    return p;
 };
 
 /**
@@ -237,10 +239,25 @@ Projects.prototype.get = function(id) {
  * @param {String} ident
  * @returns {Object}
  */
-Projects.prototype.getByIdentifier = function(ident) {
+Projects.prototype.getByIdentofier = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
-            return this.projects[pid];
+            return {'key': pid, 'project': this.projects[pid]};
+        }
+    }
+    return false;
+};
+
+/**
+ * Get project from list by id
+ * 
+ * @param {String} id
+ * @returns {Object}
+ */
+Projects.prototype.getById = function(id) {
+    for(var pid in this.projects) {
+        if (this.projects[pid].id == id) {
+            return {'key': pid, 'project': this.projects[pid]};
         }
     }
     return false;
@@ -326,7 +343,7 @@ Projects.prototype.clear = function() {
  * @returns {void}
  */
 Projects.prototype.sendProjectUpdated = function(id, project) {
-    chrome.extension.sendMessage({"action": "projectUpdated", "id": id, "project": project});
+    chrome.extension.sendMessage({"action": "projectUpdated", "project": project});
 };
 
 /**
