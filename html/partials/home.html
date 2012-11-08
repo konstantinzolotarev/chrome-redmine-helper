@@ -5,34 +5,84 @@
     </div>
 </div>
 <div class="row-fluid">
-    <div class="offset4 span4 alert alert-info center" data-ng-show="loading">
+    <div class="offset4 span4 alert alert-info center" data-ng-show="isLoading">
         <img src="/img/ajax-loader.gif" alt="Loading..." />
         <strong>Loading...</strong>
     </div>
 </div>
-
+<div data-ng-include src="'/html/partials/issueDetails.html'"></div>
 <div class="page-header">
     <h3>Your Latest Issues</h3>
 </div>
+<div class="well well-small row-fluid">
+    <div class="span9">
+        <input type="text" class="input-medium search-query" data-ng-model="search.subject" placeholder="Search by subject"/>
+    </div>
+    <div class="span3">
+        <a href="" class="btn" data-ng-click="markAllRead()">
+            <i class="icon-ok"></i>&nbsp;Mark all as read
+        </a>
+        <a href="" class="btn" data-ng-click="reload()" data-ng-hide="isLoading">
+            <i class="icon-refresh"></i>&nbsp;Update
+        </a>
+    </div>
+</div>
 <div class="row-fluid">
     <div class="span12">
-        <table class="table">
+        <table class="table table-hover table-condensed issues">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Author</th>
-                    <th>Title</th>
-                    <th>Actions</th>
+                    <th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
+                    </th>
+                    <th style="width: 250px;" >
+                        <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
+                    </th>
+                    <th style="width: 250px;" >
+                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">Project</a>
+                    </th>
+                    <th>
+                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
+                    </th>
+                    <th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">
+                            <i class="icon-star"></i>
+                        </a>
+                    </th>
+                    <th style="width: 50px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="issue in issues">
-                    <td>{{issue.id}}</td>
+                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
+                    <td>
+                        <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
+                    </td>
                     <td>{{issue.author.name}}</td>
-                    <td>{{issue.subject}}</td>
-                    <td>--</td>
+                    <td>
+                        {{issue.project.name}}
+                    </td>
+                    <td>
+                        <a href="" data-ng-click="showDetails(issue)">{{issue.subject}}</a>
+                    </td>
+                    <td>
+                        <i class="icon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
+                        <i class="icon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
+                    </td>
+                    <td>
+                        <i class="icon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
+                    </td>
                 </tr>
             </tbody>
         </table>
+        <div data-ng-show="issues.length > pageSize">
+            <ul class="pager">
+                <li>
+                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">&larr;&nbsp;Previous</button>
+                </li>
+                <li>
+                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">Next&nbsp;&rarr;</button>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

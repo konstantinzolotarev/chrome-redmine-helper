@@ -17,6 +17,24 @@ var loader = BG.getLoader();
  * @type Projects
  */
 var projects = BG.getProjects();
+/**
+ * Bind tooltips
+ */
+jQuery(document).ready(function($) {
+    $('.container').tooltip({
+        selector: "i[data-type='tooltip']"
+    });
+});
+
+/**
+ * Open Issue Author's Redmine page
+ * 
+ * @param {Object} issue
+ * @returns {undefined}
+ */
+function openAuthorPage(issue) {
+    chrome.tabs.create({url: BG.getConfig().getHost()+"users/"+issue.author.id});
+}
 
 /**
  * Main controller
@@ -54,11 +72,22 @@ function Main($scope) {
  * Options screen controller
  * 
  * @param {Object} $scope
+ * @param {Object} $timeout
  * @returns {void}
  */
-function Options($scope) {
+function Options($scope, $timeout) {
     $scope.options = config;
+    $scope.success = false;
     $scope.useHttpAuth = config.profile.useHttpAuth;
+    /**
+     * Hide success message
+     */
+    $scope.hideSuccess = function() {
+        $scope.success = false;
+    };
+    /**
+     * Save new options
+     */
     $scope.storeOptions = function() {
         config.profile.host = document.querySelector("#inputHost").value;
         config.profile.apiAccessKey = document.querySelector("#inputApiKey").value;
@@ -68,6 +97,8 @@ function Options($scope) {
         config.store(config.profile);
         BG.clearItems();
         $scope.options = config;
+        $scope.success = true;
+        $timeout($scope.hideSuccess, 5000);
     };
     
     $scope.checkHttpAuth = function(event) {
@@ -77,19 +108,146 @@ function Options($scope) {
 
 function Home($scope) {
     $scope.options = config;
-    $scope.issues = BG.getIssues().issues;
-    $scope.onIssuesUpdated = function(request, sender, sendResponse) {
+    $scope.issues = [];
+    $scope.order = "updated_on";
+    $scope.reverse = true;
+    $scope.issue = {};
+    $scope.isLoading = false;
+    
+    $scope.pageSize = 25;
+    $scope.page = 0;
+    
+    /**
+     * Get number of pages for list of issues
+     * 
+     * @returns {int}
+     */
+    $scope.numberOfPages=function(){
+        return Math.ceil($scope.issues.length/$scope.pageSize);                
+    };
+    
+    /**
+     * Update issues on the screen.
+     */
+    $scope.updateIssues = function() {
+        $scope.issues = [];
+        for(var key in BG.getIssues().issues) {
+            $scope.issues.push(BG.getIssues().issues[key]);
+        }
+    };
+    //Run update issues action
+    $scope.updateIssues();
+    
+    /**
+     * Mark issue as read 
+     * 
+     * @param {Object} issue
+     * @returns {undefined}
+     */
+    $scope.markRead = function(issue) {
+        if (issue.read) {
+            return;
+        }
+        BG.getIssues().markAsRead(issue.id);
+        issue.read = true;
+    };
+
+    /**
+     * Mark issue unread
+     *
+     * @param {Object} issue
+     */
+    $scope.markUnRead = function(issue) {
+        if (!issue.read) {
+            return;
+        }
+        BG.getIssues().markAsUnRead(issue.id);
+        issue.read = false;
+    };
+    
+    /**
+     * Mark all visible issues as read
+     * 
+     * @returns {undefined}
+     */
+    $scope.markAllRead = function() {
+        BG.getIssues().markAllAsRead();
+        $scope.updateIssues();
+    };
+    
+    /**
+     * Reload issues
+     * 
+     * @returns {undefined}
+     */
+    $scope.reload = function() {
+        $scope.isLoading = true;
+        BG.getIssues().load();
+    };
+    
+    /**
+     * Open new tab with issue details
+     * 
+     * @param {Object} issue
+     */
+    $scope.openWebPage = function(issue) {
+        chrome.tabs.create({url: BG.getConfig().getHost()+"issues/"+issue.id});
+    };
+    
+    /**
+     * Open authors Redmine page
+     * @param {Object} issue
+     * @returns {undefined}
+     */
+    $scope.openAuthorPage = function(issue) {
+        openAuthorPage(issue);
+    };
+    
+    $('#issueDetails').modal({
+        show: false
+    });
+    /**
+     * Show issue details
+     * 
+     * @param {Object} issue
+     */
+    $scope.showDetails = function(issue) {
+        BG.getIssues().get(issue, !issue.read);
+        $scope.markRead(issue); //mark this issue as read
+        $scope.issue = issue;
+        console.log($scope.issue);
+        $('#issueDetails').modal('toggle');
+    };
+    
+    //Handle update issue details
+    var onIssueDetails = function(request, sender, sendResponse) {
+        if (request.action && request.action == "issueDetails") {
+            if ($scope.issue.id == request.id) {
+                //update issue
+                $scope.$apply(function(sc) {
+                    sc.issue = request.issue;
+                    sc.updateIssues();
+                });
+                sendResponse({});
+            }
+        }
+    };
+    
+    //Handle update issues list
+    var onIssuesUpdated = function(request, sender, sendResponse) {
         if (request.action && request.action == "issuesUpdated") {
             $scope.$apply(function(sc) {
-                sc.issues = BG.getIssues().issues;
+                sc.issues = [];
+                sc.isLoading = false;
+                sc.updateIssues();
             });
         }
     };
-//    if (config.getProfile().selectedProject) {
-//        window.location.href = chrome.extension.getURL("html/main.html#/project/"+config.getProfile().selectedProject);
-//    }
+    
+    //Add handler for issue details 
+    chrome.extension.onMessage.addListener(onIssueDetails);
     // Add handler for issues updated
-    chrome.extension.onMessage.addListener($scope.onIssuesUpdated);
+    chrome.extension.onMessage.addListener(onIssuesUpdated);
 }
 
 /**
@@ -106,16 +264,7 @@ function Project($scope, $routeParams) {
     $scope.issues = projects.getIssues($scope.id);
 }
 
-function Issues($scope, $timeout) {
-    $scope.options = config;
-    $scope.loading = true;
-    $scope.stopLoading = function() {
-        $scope.loading = false;
-    };
-    $timeout($scope.stopLoading, 5000);
-}
 
-//Options.$inject = ['$scope'];
+//Options.$inject = ['$scope', '$timeout'];
 //Home.$inject = ['$scope'];
-//Issues.$inject = ['$scope', '$timeout'];
 //Project.$inject = ['$scope', '$routeParams'];
