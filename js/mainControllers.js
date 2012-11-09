@@ -29,11 +29,11 @@ jQuery(document).ready(function($) {
 /**
  * Open Issue Author's Redmine page
  * 
- * @param {Object} issue
+ * @param {int} userId
  * @returns {undefined}
  */
-function openAuthorPage(issue) {
-    chrome.tabs.create({url: BG.getConfig().getHost()+"users/"+issue.author.id});
+function openAuthorPage(userId) {
+    chrome.tabs.create({url: BG.getConfig().getHost()+"users/"+userId});
 }
 
 /**
@@ -199,11 +199,11 @@ function Home($scope) {
     
     /**
      * Open authors Redmine page
-     * @param {Object} issue
+     * @param {int} userId
      * @returns {undefined}
      */
-    $scope.openAuthorPage = function(issue) {
-        openAuthorPage(issue);
+    $scope.openAuthorPage = function(userId) {
+        openAuthorPage(userId);
     };
     
     $('#issueDetails').modal({

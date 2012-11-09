@@ -113,7 +113,7 @@ Config.prototype.getProfile = function() {
  * @returns {void}
  */
 Config.prototype.setSelectedProject = function(id) {
-    if (projects.getById(id) !== false) {
+    if (projects.getById(id).project !== false) {
         this.profile.selectedProject = id;
         this.store(this.profile);
     }
@@ -154,10 +154,11 @@ Loader.prototype.createXhr = function(method, url, async) {
  * @param {Function} success
  * @returns {void}
  */
-Loader.prototype.get = function(url, success) {
+Loader.prototype.get = function(url, success, error) {
     var xhr = this.createXhr("GET", url);
     //Check input date
     success = success || function(data) {};
+    error = error || function() {};
 //    error = error || function(e, xhr) {};
     //success handler
     xhr.onload = function(e) {
@@ -165,7 +166,7 @@ Loader.prototype.get = function(url, success) {
             var data = JSON.parse(this.response);
             success(data);
         } else {
-            requestError(e);//, error);
+            error(e, this);
         }
     };
     //error handler
@@ -212,10 +213,12 @@ Projects.prototype.all = function(reload) {
  */
 Projects.prototype.get = function(id, reload) {
     var p = this.getById(id);
-    if (!p) {
+    if (!p.project) {
         return false;
     }
     if (p.project.fullyLoaded && !reload) {
+        //load members if they wa not loaded
+        this.getMembers(id);
         return p.project;
     }
     (function(obj) {
@@ -233,12 +236,41 @@ Projects.prototype.get = function(id, reload) {
 };
 
 /**
+ * Get list of project members
+ * 
+ * @param {int} projectId
+ * @param {boolean} reload
+ * @returns {Array}
+ */
+Projects.prototype.getMembers = function(projectId, reload) {
+    var proj = this.getById(projectId);
+    if (!proj || !proj.project) {
+        return [];
+    }
+    if (!reload && proj.project.membersLoaded) {
+        return proj.project.members;
+    }
+    (function(obj) {
+        getLoader().get("projects/"+projectId+"/memberships.json", function(json) {
+            console.log(json);
+        }, function(e, resp) {
+            if (resp.status && resp.status == 403) {
+                obj.projects[proj.key].membersLoaded = true;
+                obj.projects[proj.key].members = [];
+                obj.store();
+                console.log(obj.projects[proj.key]);
+            }
+        });
+    })(this);
+};
+
+/**
  * Get project from list by identifier
  * 
  * @param {String} ident
  * @returns {Object}
  */
-Projects.prototype.getByIdentofier = function(ident) {
+Projects.prototype.getByIdentifier = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
             return {'key': pid, 'project': this.projects[pid]};
@@ -254,12 +286,16 @@ Projects.prototype.getByIdentofier = function(ident) {
  * @returns {Object}
  */
 Projects.prototype.getById = function(id) {
+    var project = {
+        'key': false,
+        'project': false
+    };
     for(var pid in this.projects) {
         if (this.projects[pid].id == id) {
-            return {'key': pid, 'project': this.projects[pid]};
+            project = {'key': pid, 'project': this.projects[pid]};
         }
     }
-    return false;
+    return project;
 };
 
 /**
@@ -593,12 +629,55 @@ Issues.prototype.store = function() {
 };
 
 /**
+ * Users representation class
+ * 
+ * @class 
+ * @returns {Users}
+ */
+function Users() {
+    this.loaded = localStorage.users_loaded || false;
+    this.users = JSON.parse(localStorage.users || "[]");
+}
+
+/**
+ * Load users from server
+ * 
+ * @param {boolean} reload 
+ * @returns {undefined}
+ */
+Users.prototype.load = function(reload) {
+    if (!reload && this.loaded) {
+        return;
+    }
+    (function(obj) {
+        getLoader().get("users.json", function(json) {
+            console.log(json);
+        });
+    })(this);
+};
+
+/**
+ * Store user data 
+ * 
+ * @returns {undefined}
+ */
+Users.prototype.store = function() {
+   localStorage['users'] = JSON.stringify(this.users);
+   localStorage['users_loaded'] = this.loaded;
+};
+
+/**
  * Init global variables
  */
-var config = new Config();
-var loader = new Loader();
-var projects = new Projects();
-var issues = new Issues();
+var config = new Config(),
+loader = new Loader(),
+projects = new Projects(),
+issues = new Issues();
+/**
+ * 
+ * @type Users
+ */
+var users;
 
 /**
  * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
@@ -620,6 +699,7 @@ function merge(obj1,obj2){
  */
 function requestError(e) {
     chrome.extension.sendMessage({action: "xhrError", params: {"e": e}});
+    chrome.browserAction.setBadgeText({text: "Err"});
 }
 
 /**
@@ -664,6 +744,18 @@ function getProjects() {
  */
 function getIssues() {
     return issues;
+}
+
+/**
+ * Get Users
+ * 
+ * @returns {Users}
+ */
+function getUsers() {
+    if (!users) {
+        users = new Users();
+    }
+    return users;
 }
 
 /**
@@ -791,7 +883,14 @@ function startRequest(params) {
                 startRequest({scheduleRequest: false});
             });
         } else {
+            /**
+             * Load list of issues
+             */
             getIssues().load();
+            /**
+             * Load list of users
+             */
+//            getUsers().load();
         }
     } else {
         chrome.browserAction.setBadgeText({text: "Err"});

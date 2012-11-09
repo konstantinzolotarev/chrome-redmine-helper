@@ -10,16 +10,20 @@
         <p>
             <small>
                 Added by 
-                <a href="" data-ng-click="openAuthorPage(issue)">{{issue.author.name}}</a>
+                <a href="" data-ng-click="openAuthorPage(issue.author.id)">{{issue.author.name}}</a>
                 on {{issue.created_on | date:'MMM d, y'}}
             </small>
         </p>
         <div class="row-fluid">
-            <div class="span3">
+            <div class="span5">
                 <p>
                     <small>
                         <strong>Status</strong>:&nbsp;{{issue.status.name}}<br/>
                         <strong>Priority</strong>:&nbsp;{{issue.priority.name}}<br/>
+                        <span data-ng-show="issue.assigned_to">
+                            <strong>Assignee</strong>:&nbsp;
+                            <a href="" data-ng-click="openAuthorPage(issue.assigned_to.id)">{{issue.assigned_to.name}}</a>
+                        </span><br/>
                     </small>
                 </p>
             </div>
