@@ -41,6 +41,7 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
                 <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+                <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="description">
@@ -48,6 +49,7 @@
                         <p data-ng-bind-html="issue.description | nl2br"></p>
                     </div>
                 </div>
+                <!-- Show Issue actions history -->
                 <div class="tab-pane" id="journals">
                     <p class="center" data-ng-hide="issue.detailsLoaded">Loading...</p>
                     <div data-ng-repeat="history in issue.journals" class="issue-history">                    
@@ -67,6 +69,15 @@
                             <small>New comment added</small>
                         </blockquote>
                     </div>
+                </div>
+                <!-- Add new Comment to issue -->
+                <div class="tab-pane" id="addComment">
+                    <form>
+                        <textarea rows="5" class="input-block-level" data-ng-model="comment"></textarea>
+                        <div>
+                            <button class="btn" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

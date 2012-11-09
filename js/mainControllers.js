@@ -222,6 +222,10 @@ function Home($scope) {
         console.log(issue);
         $('#issueDetails').modal('toggle');
     };
+
+    $scope.addComment = function(comment) {
+        BG.getIssues().comment($scope.issue.id, comment);
+    };
     
     //Handle update issue details
     var onIssueDetails = function(request, sender, sendResponse) {

@@ -152,6 +152,7 @@ Loader.prototype.createXhr = function(method, url, async) {
  * 
  * @param {string} url
  * @param {Function} success
+ * @param {Function} error Error handler for invalid status
  * @returns {void}
  */
 Loader.prototype.get = function(url, success, error) {
@@ -159,7 +160,6 @@ Loader.prototype.get = function(url, success, error) {
     //Check input date
     success = success || function(data) {};
     error = error || function() {};
-//    error = error || function(e, xhr) {};
     //success handler
     xhr.onload = function(e) {
         if (this.status == 200) {
@@ -172,6 +172,62 @@ Loader.prototype.get = function(url, success, error) {
     //error handler
     xhr.onerror = requestError;
     xhr.send();
+};
+
+/**
+ * Make POST request 
+ * 
+ * @param {String} url
+ * @param {mixed} data
+ * @param {Function} success
+ * @param {Function} error
+ * @returns {undefined}
+ */
+Loader.prototype.post = function(url, data, success, error) {
+    var xhr = this.createXhr("POST", url);
+    //Check input date
+    data = data || "";
+    success = success || function() {};
+    error = error || function() {};
+    //success handler
+    xhr.onload = function(e) {
+        if (this.status == 200 || this.status == 201) {
+            success({});
+        } else {
+            error(e, this);
+        }
+    };
+    //error handler
+    xhr.onerror = requestError;
+    xhr.send(data);
+};
+
+/**
+ * Make PUT request 
+ * 
+ * @param {String} url
+ * @param {mixed} data
+ * @param {Function} success
+ * @param {Function} error
+ * @returns {undefined}
+ */
+Loader.prototype.put = function(url, data, success, error) {
+    var xhr = this.createXhr("PUT", url);
+    //Check input date
+    data = data || "";
+    success = success || function() {};
+    error = error || function() {};
+    //success handler
+    xhr.onload = function(e) {
+        if (this.status == 200 || this.status == 201) {
+            success({});
+        } else {
+            error(e, this);
+        }
+    };
+    //error handler
+    xhr.onerror = requestError;
+    xhr.send(data);
 };
 
 /**
@@ -503,7 +559,7 @@ Issues.prototype.get = function(issue, reload) {
         getLoader().get("issues/"+issue.id+".json?include=journals,changesets", function(json) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
-                if (is) {
+                if (is.issue) {
                     json.issue.detailsLoaded = true;
                     obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
                     obj.store();
@@ -516,6 +572,31 @@ Issues.prototype.get = function(issue, reload) {
 };
 
 /**
+ * Add new Comment to issue
+ * 
+ * @param {int} id
+ * @param {String} comment
+ * @returns {undefined}
+ */
+Issues.prototype.comment = function(id, comment) {
+    var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
+    (function(obj) {
+        var data = {
+            'issue': {
+                'notes': comment
+            }
+        };
+        getLoader().put("issues/"+id+".json", JSON.stringify(data), function(json) {
+            console.log(json);
+            obj.get(issue.issue, true);
+        });
+    })(this);
+};
+
+/**
  * Mark issue read 
  * 
  * @param {int} id
@@ -523,6 +604,9 @@ Issues.prototype.get = function(issue, reload) {
  */
 Issues.prototype.markAsUnRead = function(id) {
     var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
     this.issues[issue.key].read = false;
     this.unread += 1;
     setUnreadIssuesCount(this.unread);
@@ -537,6 +621,9 @@ Issues.prototype.markAsUnRead = function(id) {
  */
 Issues.prototype.markAsRead = function(id) {
     var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
     this.issues[issue.key].read = true;
     this.unread -= 1;
     setUnreadIssuesCount(this.unread);
@@ -563,15 +650,19 @@ Issues.prototype.markAllAsRead = function() {
  * @returns {Boolean}
  */
 Issues.prototype.getById = function(id) {
+    var issue = {
+        'key': false,
+        'issue': false
+    };
     if (this.issues.length < 1) {
         return false;
     }
     for(var i in this.issues) {
         if (this.issues[i].id == id) {
-            return {'key': i, 'issue': this.issues[i]};
+            issue = {'key': i, 'issue': this.issues[i]};
         }
     }
-    return false;
+    return issue;
 };
 
 /**
