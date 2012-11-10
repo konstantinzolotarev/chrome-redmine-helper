@@ -352,14 +352,31 @@ Issues.prototype.comment = function(id, comment) {
     if (!issue.issue) {
         return;
     }
+    return this.update(id, {'notes': comment});
+};
+
+/**
+ * Update issue into Redmine
+ * 
+ * @param {int} id
+ * @param {Object} issueData
+ * @returns {undefined}
+ */
+Issues.prototype.update = function(id, issueData) {
+    //check input data
+    if (issueData === null || typeof issueData != "object") {
+        return;
+    }
+    //Check issue
+    var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
     (function(obj) {
         var data = {
-            'issue': {
-                'notes': comment
-            }
+            'issue': issueData
         };
         getLoader().put("issues/"+id+".json", JSON.stringify(data), function(json) {
-            console.log(json);
             obj.get(issue.issue, true);
         });
     })(this);

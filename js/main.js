@@ -108,18 +108,16 @@ angular.module('issues', ['ngSanitize']).
                             +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
                         +'</span>'
                         +'<span data-ng-show="editing">'
-//                            +'<form class="form-inline">'
                                 +'<select class="input-medium" data-ng-model="value">'
-                                    +'<option data-ng-repeat="item in project.trackers" value="{{item.id}}">{{item.name}}</option>'
+                                    +'<option data-ng-repeat="item in list" value="{{item.id}}">{{item.name}}</option>'
                                 +'</select>'
                                 +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
                                 +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'
-//                            +'</form>'
                         +'</span>'
                     +'</span>',
         scope: {
-            value:   "=editableValue",
-            project: "=editableProject",
+            value: "=editableValue",
+            list: "=editableSelect",
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template

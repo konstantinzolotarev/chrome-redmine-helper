@@ -224,8 +224,14 @@ function Home($scope) {
         $('#issueDetails').modal('toggle');
     };
 
+    /**
+     * Update tracker data into issue
+     * 
+     * @param {int} value
+     */
     $scope.trackOk = function(value) {
-        console.log(value);
+        $scope.issue.detailsLoaded = false;
+        BG.getIssues().update($scope.issue.id, {'tracker_id': value})
     };
 
     $scope.addComment = function(comment) {
