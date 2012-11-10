@@ -1,6 +1,4 @@
 var pollIntervalMin = 5;  // 5 minutes
-var pollIntervalMax = 60;  // 1 hour
-var requestFailureCount = 0;  // used for exponential backoff
 
 /**
  * Init global variables
@@ -176,12 +174,7 @@ function openMainPage() {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    var randomness = Math.random() * 2;
-    var exponent = Math.pow(2, requestFailureCount);
-    var multiplier = Math.max(randomness * exponent, 1);
-    var delay = Math.min(multiplier * pollIntervalMin, pollIntervalMax);
-
-    chrome.alarms.create({'delayInMinutes': delay});
+    chrome.alarms.create({'delayInMinutes': pollIntervalMin});
 }
 
 /**

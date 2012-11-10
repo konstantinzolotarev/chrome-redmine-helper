@@ -220,7 +220,12 @@ function Home($scope) {
         $scope.issue = issue;
         $scope.project = BG.getProjects().get($scope.issue.project.id);
         console.log(issue);
+        console.log($scope.project);
         $('#issueDetails').modal('toggle');
+    };
+
+    $scope.trackOk = function(value) {
+        console.log(value);
     };
 
     $scope.addComment = function(comment) {

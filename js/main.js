@@ -98,4 +98,56 @@ angular.module('issues', ['ngSanitize']).
 //        $timeout.cancel(timeoutId);
         });
     };
-  });
+}).directive('editableList', function factory() {
+    var directiveDefinitionObject = {
+        replace: true,
+        transclude: true,
+        template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
+                        +'<span data-ng-hide="editing">'
+                            +'<span data-ng-transclude class="pointer"></span>'
+                            +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
+                        +'</span>'
+                        +'<span data-ng-show="editing">'
+//                            +'<form class="form-inline">'
+                                +'<select class="input-medium" data-ng-model="value">'
+                                    +'<option data-ng-repeat="item in project.trackers" value="{{item.id}}">{{item.name}}</option>'
+                                +'</select>'
+                                +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
+                                +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'
+//                            +'</form>'
+                        +'</span>'
+                    +'</span>',
+        scope: {
+            value:   "=editableValue",
+            project: "=editableProject",
+            onOk: "=onOk"
+        },
+        // The linking function will add behavior to the template
+        link: function(scope, element, attrs) {
+            scope.visible = false;
+            scope.editing = false;
+            
+            scope.mouseEnter = function() {
+                if (!scope.editing) {
+                    scope.visible = true;
+                }
+            };
+        
+            scope.mouseLeave = function() {
+                if (!scope.editing) {
+                    scope.visible = false;
+                }
+            };
+        
+            scope.edit = function() {
+                scope.editing = true;
+            };
+        
+            scope.cancel = function() {
+                scope.editing = false;
+            };
+        }
+    };
+    
+    return directiveDefinitionObject;
+});
