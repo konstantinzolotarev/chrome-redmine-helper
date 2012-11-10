@@ -15,7 +15,11 @@
         "default_title": "Redmine Issue Tracker"
     },
     "background": {
-        "scripts": ["js/background.js"],
+        "scripts": [
+            "js/serviceClasses.js",
+            "js/redmineClasses.js",
+            "js/background.js"
+        ],
         "persistent": false
     },
     "permissions": [
