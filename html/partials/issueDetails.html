@@ -51,7 +51,9 @@
                 </div>
                 <!-- Show Issue actions history -->
                 <div class="tab-pane" id="journals">
-                    <p class="center" data-ng-hide="issue.detailsLoaded">Loading...</p>
+                    <div class="alert center" data-ng-hide="issue.detailsLoaded">
+                        Loading...
+                    </div>
                     <div data-ng-repeat="history in issue.journals" class="issue-history">                    
                         <p>
                             <small>

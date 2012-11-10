@@ -224,6 +224,7 @@ function Home($scope) {
     };
 
     $scope.addComment = function(comment) {
+        $scope.issue.detailsLoaded = false;
         BG.getIssues().comment($scope.issue.id, comment);
     };
     
