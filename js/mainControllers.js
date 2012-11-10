@@ -220,7 +220,18 @@ function Home($scope) {
         $scope.issue = issue;
         $scope.project = BG.getProjects().get($scope.issue.project.id);
         console.log(issue);
+        console.log($scope.project);
         $('#issueDetails').modal('toggle');
+    };
+
+    /**
+     * Update tracker data into issue
+     * 
+     * @param {int} value
+     */
+    $scope.trackOk = function(value) {
+        $scope.issue.detailsLoaded = false;
+        BG.getIssues().update($scope.issue.id, {'tracker_id': value})
     };
 
     $scope.addComment = function(comment) {

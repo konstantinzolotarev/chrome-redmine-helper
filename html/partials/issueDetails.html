@@ -7,6 +7,9 @@
         </h3>
     </div>
     <div class="modal-body">
+        <div class="alert center" data-ng-hide="issue.detailsLoaded">
+            Loading...
+        </div>
         <p>
             <small>
                 Added by 
@@ -27,10 +30,17 @@
                     </small>
                 </p>
             </div>
-            <div class="span3">
+            <div class="span6">
                 <div data-ng-show="issue.done_ratio >= 0">
                     <small data-ng-show="issue.tracker">
-                        <strong>Type</strong>:&nbsp;{{issue.tracker.name}}<br/>
+                        <strong>Type</strong>:&nbsp;
+                        <span data-editable-list
+                              data-editable-value="issue.tracker.id" 
+                              data-editable-select="project.trackers" 
+                              data-on-ok="trackOk">
+                            {{issue.tracker.name}}
+                        </span>
+                        <br/>
                     </small>
                     <small>
                         <strong>Done</strong>: &nbsp;{{issue.done_ratio}}%
@@ -57,7 +67,7 @@
                 <!-- Show Issue actions history -->
                 <div class="tab-pane" id="journals">
                     <div class="alert center" data-ng-hide="issue.detailsLoaded">
-                        Loading...
+                        Loading history...
                     </div>
                     <div data-ng-repeat="history in issue.journals" class="issue-history">                    
                         <p>
