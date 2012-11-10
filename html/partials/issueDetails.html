@@ -10,22 +10,31 @@
         <p>
             <small>
                 Added by 
-                <a href="" data-ng-click="openAuthorPage(issue)">{{issue.author.name}}</a>
+                <a href="" data-ng-click="openAuthorPage(issue.author.id)">{{issue.author.name}}</a>
                 on {{issue.created_on | date:'MMM d, y'}}
             </small>
         </p>
         <div class="row-fluid">
-            <div class="span3">
+            <div class="span5">
                 <p>
                     <small>
                         <strong>Status</strong>:&nbsp;{{issue.status.name}}<br/>
                         <strong>Priority</strong>:&nbsp;{{issue.priority.name}}<br/>
+                        <span data-ng-show="issue.assigned_to">
+                            <strong>Assignee</strong>:&nbsp;
+                            <a href="" data-ng-click="openAuthorPage(issue.assigned_to.id)">{{issue.assigned_to.name}}</a>
+                        </span><br/>
                     </small>
                 </p>
             </div>
             <div class="span3">
                 <div data-ng-show="issue.done_ratio >= 0">
-                    <small><strong>Done</strong>: &nbsp;{{issue.done_ratio}}%</small>
+                    <small data-ng-show="issue.tracker">
+                        <strong>Type</strong>:&nbsp;{{issue.tracker.name}}<br/>
+                    </small>
+                    <small>
+                        <strong>Done</strong>: &nbsp;{{issue.done_ratio}}%
+                    </small>
                     <div class="progress progress-striped">
                         <div class="bar" style="width: {{issue.done_ratio}}%;"></div>
                     </div>
@@ -37,6 +46,7 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
                 <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+                <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="description">
@@ -44,8 +54,11 @@
                         <p data-ng-bind-html="issue.description | nl2br"></p>
                     </div>
                 </div>
+                <!-- Show Issue actions history -->
                 <div class="tab-pane" id="journals">
-                    <p class="center" data-ng-hide="issue.detailsLoaded">Loading...</p>
+                    <div class="alert center" data-ng-hide="issue.detailsLoaded">
+                        Loading...
+                    </div>
                     <div data-ng-repeat="history in issue.journals" class="issue-history">                    
                         <p>
                             <small>
@@ -63,6 +76,15 @@
                             <small>New comment added</small>
                         </blockquote>
                     </div>
+                </div>
+                <!-- Add new Comment to issue -->
+                <div class="tab-pane" id="addComment">
+                    <form>
+                        <textarea rows="5" class="input-block-level" data-ng-model="comment"></textarea>
+                        <div>
+                            <button class="btn" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

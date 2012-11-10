@@ -113,7 +113,7 @@ Config.prototype.getProfile = function() {
  * @returns {void}
  */
 Config.prototype.setSelectedProject = function(id) {
-    if (projects.getById(id) !== false) {
+    if (projects.getById(id).project !== false) {
         this.profile.selectedProject = id;
         this.store(this.profile);
     }
@@ -152,25 +152,82 @@ Loader.prototype.createXhr = function(method, url, async) {
  * 
  * @param {string} url
  * @param {Function} success
+ * @param {Function} error Error handler for invalid status
  * @returns {void}
  */
-Loader.prototype.get = function(url, success) {
+Loader.prototype.get = function(url, success, error) {
     var xhr = this.createXhr("GET", url);
     //Check input date
     success = success || function(data) {};
-//    error = error || function(e, xhr) {};
+    error = error || function() {};
     //success handler
     xhr.onload = function(e) {
         if (this.status == 200) {
             var data = JSON.parse(this.response);
             success(data);
         } else {
-            requestError(e);//, error);
+            error(e, this);
         }
     };
     //error handler
     xhr.onerror = requestError;
     xhr.send();
+};
+
+/**
+ * Make POST request 
+ * 
+ * @param {String} url
+ * @param {mixed} data
+ * @param {Function} success
+ * @param {Function} error
+ * @returns {undefined}
+ */
+Loader.prototype.post = function(url, data, success, error) {
+    var xhr = this.createXhr("POST", url);
+    //Check input date
+    data = data || "";
+    success = success || function() {};
+    error = error || function() {};
+    //success handler
+    xhr.onload = function(e) {
+        if (this.status == 200 || this.status == 201) {
+            success({});
+        } else {
+            error(e, this);
+        }
+    };
+    //error handler
+    xhr.onerror = requestError;
+    xhr.send(data);
+};
+
+/**
+ * Make PUT request 
+ * 
+ * @param {String} url
+ * @param {mixed} data
+ * @param {Function} success
+ * @param {Function} error
+ * @returns {undefined}
+ */
+Loader.prototype.put = function(url, data, success, error) {
+    var xhr = this.createXhr("PUT", url);
+    //Check input date
+    data = data || "";
+    success = success || function() {};
+    error = error || function() {};
+    //success handler
+    xhr.onload = function(e) {
+        if (this.status == 200 || this.status == 201) {
+            success({});
+        } else {
+            error(e, this);
+        }
+    };
+    //error handler
+    xhr.onerror = requestError;
+    xhr.send(data);
 };
 
 /**
@@ -212,10 +269,12 @@ Projects.prototype.all = function(reload) {
  */
 Projects.prototype.get = function(id, reload) {
     var p = this.getById(id);
-    if (!p) {
+    if (!p.project) {
         return false;
     }
     if (p.project.fullyLoaded && !reload) {
+        //load members if they wa not loaded
+        this.getMembers(id);
         return p.project;
     }
     (function(obj) {
@@ -233,12 +292,41 @@ Projects.prototype.get = function(id, reload) {
 };
 
 /**
+ * Get list of project members
+ * 
+ * @param {int} projectId
+ * @param {boolean} reload
+ * @returns {Array}
+ */
+Projects.prototype.getMembers = function(projectId, reload) {
+    var proj = this.getById(projectId);
+    if (!proj || !proj.project) {
+        return [];
+    }
+    if (!reload && proj.project.membersLoaded) {
+        return proj.project.members;
+    }
+    (function(obj) {
+        getLoader().get("projects/"+projectId+"/memberships.json", function(json) {
+            console.log(json);
+        }, function(e, resp) {
+            if (resp.status && resp.status == 403) {
+                obj.projects[proj.key].membersLoaded = true;
+                obj.projects[proj.key].members = [];
+                obj.store();
+                console.log(obj.projects[proj.key]);
+            }
+        });
+    })(this);
+};
+
+/**
  * Get project from list by identifier
  * 
  * @param {String} ident
  * @returns {Object}
  */
-Projects.prototype.getByIdentofier = function(ident) {
+Projects.prototype.getByIdentifier = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
             return {'key': pid, 'project': this.projects[pid]};
@@ -254,12 +342,16 @@ Projects.prototype.getByIdentofier = function(ident) {
  * @returns {Object}
  */
 Projects.prototype.getById = function(id) {
+    var project = {
+        'key': false,
+        'project': false
+    };
     for(var pid in this.projects) {
         if (this.projects[pid].id == id) {
-            return {'key': pid, 'project': this.projects[pid]};
+            project = {'key': pid, 'project': this.projects[pid]};
         }
     }
-    return false;
+    return project;
 };
 
 /**
@@ -467,7 +559,7 @@ Issues.prototype.get = function(issue, reload) {
         getLoader().get("issues/"+issue.id+".json?include=journals,changesets", function(json) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
-                if (is) {
+                if (is.issue) {
                     json.issue.detailsLoaded = true;
                     obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
                     obj.store();
@@ -480,6 +572,31 @@ Issues.prototype.get = function(issue, reload) {
 };
 
 /**
+ * Add new Comment to issue
+ * 
+ * @param {int} id
+ * @param {String} comment
+ * @returns {undefined}
+ */
+Issues.prototype.comment = function(id, comment) {
+    var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
+    (function(obj) {
+        var data = {
+            'issue': {
+                'notes': comment
+            }
+        };
+        getLoader().put("issues/"+id+".json", JSON.stringify(data), function(json) {
+            console.log(json);
+            obj.get(issue.issue, true);
+        });
+    })(this);
+};
+
+/**
  * Mark issue read 
  * 
  * @param {int} id
@@ -487,6 +604,9 @@ Issues.prototype.get = function(issue, reload) {
  */
 Issues.prototype.markAsUnRead = function(id) {
     var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
     this.issues[issue.key].read = false;
     this.unread += 1;
     setUnreadIssuesCount(this.unread);
@@ -501,6 +621,9 @@ Issues.prototype.markAsUnRead = function(id) {
  */
 Issues.prototype.markAsRead = function(id) {
     var issue = this.getById(id);
+    if (!issue.issue) {
+        return;
+    }
     this.issues[issue.key].read = true;
     this.unread -= 1;
     setUnreadIssuesCount(this.unread);
@@ -527,15 +650,19 @@ Issues.prototype.markAllAsRead = function() {
  * @returns {Boolean}
  */
 Issues.prototype.getById = function(id) {
+    var issue = {
+        'key': false,
+        'issue': false
+    };
     if (this.issues.length < 1) {
         return false;
     }
     for(var i in this.issues) {
         if (this.issues[i].id == id) {
-            return {'key': i, 'issue': this.issues[i]};
+            issue = {'key': i, 'issue': this.issues[i]};
         }
     }
-    return false;
+    return issue;
 };
 
 /**
@@ -593,12 +720,55 @@ Issues.prototype.store = function() {
 };
 
 /**
+ * Users representation class
+ * 
+ * @class 
+ * @returns {Users}
+ */
+function Users() {
+    this.loaded = localStorage.users_loaded || false;
+    this.users = JSON.parse(localStorage.users || "[]");
+}
+
+/**
+ * Load users from server
+ * 
+ * @param {boolean} reload 
+ * @returns {undefined}
+ */
+Users.prototype.load = function(reload) {
+    if (!reload && this.loaded) {
+        return;
+    }
+    (function(obj) {
+        getLoader().get("users.json", function(json) {
+            console.log(json);
+        });
+    })(this);
+};
+
+/**
+ * Store user data 
+ * 
+ * @returns {undefined}
+ */
+Users.prototype.store = function() {
+   localStorage['users'] = JSON.stringify(this.users);
+   localStorage['users_loaded'] = this.loaded;
+};
+
+/**
  * Init global variables
  */
-var config = new Config();
-var loader = new Loader();
-var projects = new Projects();
-var issues = new Issues();
+var config = new Config(),
+loader = new Loader(),
+projects = new Projects(),
+issues = new Issues();
+/**
+ * 
+ * @type Users
+ */
+var users;
 
 /**
  * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
@@ -620,6 +790,7 @@ function merge(obj1,obj2){
  */
 function requestError(e) {
     chrome.extension.sendMessage({action: "xhrError", params: {"e": e}});
+    chrome.browserAction.setBadgeText({text: "Err"});
 }
 
 /**
@@ -664,6 +835,18 @@ function getProjects() {
  */
 function getIssues() {
     return issues;
+}
+
+/**
+ * Get Users
+ * 
+ * @returns {Users}
+ */
+function getUsers() {
+    if (!users) {
+        users = new Users();
+    }
+    return users;
 }
 
 /**
@@ -791,7 +974,14 @@ function startRequest(params) {
                 startRequest({scheduleRequest: false});
             });
         } else {
+            /**
+             * Load list of issues
+             */
             getIssues().load();
+            /**
+             * Load list of users
+             */
+//            getUsers().load();
         }
     } else {
         chrome.browserAction.setBadgeText({text: "Err"});
