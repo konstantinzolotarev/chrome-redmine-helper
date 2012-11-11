@@ -1,5 +1,9 @@
 Changelog
 ---------------------------------
+0.9 (11-Nov-2012)
+    - New "Change issue status" feature
+    - Minor core fixes
+
 0.8 (11-Nov-2012)
     - New "Change issue type" feature
     - Small UI improvements
