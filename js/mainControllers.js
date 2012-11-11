@@ -228,6 +228,7 @@ function Home($scope) {
     /**
      * Change the issue status and update it in Redmine
      * 
+     * @param {String} value new issue status
      * @returns {void}
      */
     $scope.stausOk = function(value) {

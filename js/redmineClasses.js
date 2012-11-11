@@ -236,9 +236,13 @@ function Issues() {
     }
     this.issues = JSON.parse(localStorage.issues || "[]");
     this.unread = 0;
-    
-    this.statuses = JSON.parse(localStorage.issueStatuses || "[]");;
+    //Global issue statuses
+    this.statuses = JSON.parse(localStorage.issueStatuses || "[]");
     this.statusesLoaded = localStorage.statusesLoaded || false;
+    //Global issue Priorities
+    this.priorities = JSON.parse(localStorage.priorities || "[]");
+    this.prioripiesLoaded = localStorage.prioripiesLoaded || false;;
+    
     this.updateUnread(true);
 }
 
@@ -452,7 +456,7 @@ Issues.prototype.getById = function(id) {
 };
 
 /**
- * Load statuses from API
+ * Load list of Issue Statuses from API
  * 
  * @param {boolean} reload
  * @returns {Array}
@@ -469,6 +473,33 @@ Issues.prototype.getStatuses = function(reload) {
                 obj.store();
                 //notify all listeners
                 chrome.extension.sendMessage({action: "issueStatusesUpdated", statuses: obj.statuses});
+            }
+        });
+    })(this);
+    return this.statuses;
+};
+
+/**
+ * Load list of Issue Priorities from API
+ * 
+ * @param {boolean} reload
+ * @returns {Array}
+ */
+Issues.prototype.getPriorities = function(reload) {
+    return; //Now not working in Redmine
+    if (this.prioripiesLoaded && !reload) {
+        return this.priorities;
+    }
+    (function(obj) {
+        getLoader().get("enumerations/issue_priorities.json", function(json) {
+            console.log(json);
+            return;
+            if (json.issue_statuses && json.issue_statuses.length > 0) {
+                obj.priorities = json.issue_statuses;
+                obj.prioripiesLoaded = true;
+                obj.store();
+                //notify all listeners
+                chrome.extension.sendMessage({action: "issuePrioritiesUpdated", statuses: obj.statuses});
             }
         });
     })(this);
