@@ -18,10 +18,16 @@
             </small>
         </p>
         <div class="row-fluid">
-            <div class="span5">
+            <div class="span6">
                 <p>
                     <small>
-                        <strong>Status</strong>:&nbsp;{{issue.status.name}}<br/>
+                        <strong>Status</strong>:&nbsp;
+                        <span data-editable-list
+                              data-editable-value="issue.status.id" 
+                              data-editable-select="availStatuses" 
+                              data-on-ok="stausOk">
+                            {{issue.status.name}}
+                        </span><br/>
                         <strong>Priority</strong>:&nbsp;{{issue.priority.name}}<br/>
                         <span data-ng-show="issue.assigned_to">
                             <strong>Assignee</strong>:&nbsp;

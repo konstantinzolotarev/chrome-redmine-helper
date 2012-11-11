@@ -296,7 +296,7 @@ Issues.prototype.load = function(offset, limit) {
                     /**
                      * Update issue statuses
                      */
-                    obj.loadStatuses();
+                    obj.getStatuses();
                     /**
                      * Notify
                      */
@@ -457,7 +457,7 @@ Issues.prototype.getById = function(id) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Issues.prototype.loadStatuses = function(reload) {
+Issues.prototype.getStatuses = function(reload) {
     if (this.statusesLoaded && !reload) {
         return this.statuses;
     }
@@ -482,7 +482,7 @@ Issues.prototype.loadStatuses = function(reload) {
  */
 Issues.prototype.getStatusNameById = function(id) {
     if (!this.statusesLoaded) {
-        this.loadStatuses();
+        this.getStatuses();
         return id;
     }
     for (var key in this.statuses) {
