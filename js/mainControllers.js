@@ -108,6 +108,7 @@ function Options($scope, $timeout) {
 
 function Home($scope) {
     $scope.options = config;
+    $scope.availStatuses = BG.getIssues().getStatuses();
     $scope.issues = [];
     $scope.order = "updated_on";
     $scope.reverse = true;
@@ -225,13 +226,24 @@ function Home($scope) {
     };
 
     /**
+     * Change the issue status and update it in Redmine
+     * 
+     * @param {String} value new issue status
+     * @returns {void}
+     */
+    $scope.stausOk = function(value) {
+        $scope.issue.detailsLoaded = false;
+        BG.getIssues().update($scope.issue.id, {'status_id': parseInt(value)});
+    };
+
+    /**
      * Update tracker data into issue
      * 
      * @param {int} value
      */
     $scope.trackOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'tracker_id': value})
+        BG.getIssues().update($scope.issue.id, {'tracker_id': parseInt(value)});
     };
 
     $scope.addComment = function(comment) {
