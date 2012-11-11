@@ -246,6 +246,21 @@ function Home($scope) {
         BG.getIssues().update($scope.issue.id, {'tracker_id': parseInt(value)});
     };
 
+    /**
+     * Update issue done ratio
+     * 
+     * @param {int} value
+     */
+    $scope.doneOk = function(value) {
+        $scope.issue.detailsLoaded = false;
+        BG.getIssues().update($scope.issue.id, {'done_ratio': parseInt(value)});
+    };
+
+    /**
+     * Add new comment to issue
+     * 
+     * @param {String} comment
+     */
     $scope.addComment = function(comment) {
         $scope.issue.detailsLoaded = false;
         BG.getIssues().comment($scope.issue.id, comment);

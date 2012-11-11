@@ -1,5 +1,10 @@
 Changelog
 ---------------------------------
+0.9.1 (11-Nov-2012)
+    - New "Change issue done ratio" feature
+    - Minor core fixes
+    - Small UI improvements
+
 0.9 (11-Nov-2012)
     - New "Change issue status" feature
     - Minor core fixes

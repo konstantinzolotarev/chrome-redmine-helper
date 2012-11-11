@@ -49,7 +49,11 @@
                         <br/>
                     </small>
                     <small>
-                        <strong>Done</strong>: &nbsp;{{issue.done_ratio}}%
+                        <strong>Done</strong>:&nbsp;<span data-progress
+                              data-editable-value="issue.done_ratio"
+                              data-on-ok="doneOk">
+                            {{issue.done_ratio}}%
+                        </span>
                     </small>
                     <div class="progress progress-striped">
                         <div class="bar" style="width: {{issue.done_ratio}}%;"></div>

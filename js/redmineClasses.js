@@ -57,7 +57,7 @@ Projects.prototype.get = function(id, reload) {
             }
         });
     })(this);
-    return p;
+    return p.project;
 };
 
 /**
