@@ -139,6 +139,7 @@ angular.module('issues', ['ngSanitize']).
         
             scope.edit = function() {
                 scope.editing = true;
+                scope.visible = false;
             };
         
             scope.cancel = function() {
@@ -148,4 +149,55 @@ angular.module('issues', ['ngSanitize']).
     };
     
     return directiveDefinitionObject;
+}).directive('progress', function factory() {
+    return {
+        replace: true,
+        transclude: true,
+        template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
+                        +'<span data-ng-hide="editing">'
+                            +'<span data-ng-transclude class="pointer"></span>'
+                            +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
+                        +'</span>'
+                        +'<span data-ng-show="editing">'
+                            +'<input type="range" min="0" max="100" class="input-small" data-ng-model="value">'
+                            +'&nbsp;{{value}}%&nbsp;'
+                            +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
+                            +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'
+                        +'</span>'
+                    +'</span>',
+        scope: {
+            value: "=editableValue",
+            onOk: "=onOk"
+        },
+        // The linking function will add behavior to the template
+        link: function(scope, element, attrs) {
+            var defaultValue;
+            scope.visible = false;
+            scope.editing = false;
+            
+            scope.mouseEnter = function() {
+                if (!scope.editing) {
+                    scope.visible = true;
+                }
+            };
+        
+            scope.mouseLeave = function() {
+                if (!scope.editing) {
+                    scope.visible = false;
+                }
+            };
+        
+            scope.edit = function() {
+                scope.editing = true;
+                scope.visible = false;
+                defaultValue = scope.value;
+            };
+        
+            scope.cancel = function() {
+                scope.value = defaultValue;
+                attrs.$set('editableValue', defaultValue);
+                scope.editing = false;
+            };
+        }
+    };
 });
