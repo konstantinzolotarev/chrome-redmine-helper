@@ -619,7 +619,7 @@ Users.prototype.getNameById = function(userId) {
            return this.users[i].name;
        }
    } 
-   return "";
+   return userId;
 };
 
 /**
