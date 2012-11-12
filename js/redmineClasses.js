@@ -608,6 +608,21 @@ Users.prototype.load = function(reload) {
 };
 
 /**
+ * Get username by userId
+ * 
+ * @param {int} userId
+ * @returns {String} 
+ */
+Users.prototype.getNameById = function(userId) {
+   for (var i in this.users) {
+       if (this.users[i] == userId) {
+           return this.users[i].name;
+       }
+   } 
+   return "";
+};
+
+/**
  * Store user data 
  * 
  * @returns {undefined}
