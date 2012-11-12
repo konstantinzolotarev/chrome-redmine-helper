@@ -281,13 +281,19 @@ Issues.prototype.load = function(offset, limit) {
                             if (obj.issues[key].id == data.issues[i].id) {
                                 found = true;
                                 if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
+                                    //mark as unread
                                     data.issues[i].read = false;
                                     obj.issues[key] = data.issues[i];
                                     updated += 1;
+                                    //Bind users from issue
+                                    getUsers().grabFromIssue(data.issues[i]);
                                 }
                             }
                         }
                         if (!found) {
+                            //Bind users from issue
+                            getUsers().grabFromIssue(data.issues[i]);
+                            //mark as unread
                             data.issues[i].read = false;
 //                            data.issues[i].updated = new Date(data.issues[i].updated_on);
                             obj.issues.push(data.issues[i]);
@@ -333,6 +339,9 @@ Issues.prototype.get = function(issue, reload) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
                 if (is.issue) {
+                    //Grab users from issue
+                    getUsers().grabFromIssue(json.issue);
+                    //update issue
                     json.issue.detailsLoaded = true;
                     obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
                     obj.store();
@@ -546,6 +555,36 @@ function Users() {
     this.loaded = localStorage.users_loaded || false;
     this.users = JSON.parse(localStorage.users || "[]");
 }
+
+/**
+ * Grab users from issue
+ * 
+ * @param {Object} issue
+ * @returns {undefined}
+ */
+Users.prototype.grabFromIssue = function(issue) {
+    this.push(issue.assigned_to);
+    this.push(issue.author);
+};
+
+/**
+ * Add new user to the list 
+ * 
+ * @param {Object} user
+ * @returns {undefined}
+ */
+Users.prototype.push = function(user) {
+    if (!user || !user.id || !user.name) {
+        return;
+    }
+    for(var i in this.users) {
+        if (this.users[i].id == user.id) {
+            return;
+        }
+    }
+    this.users.push(user);
+    this.store();
+};
 
 /**
  * Load users from server
