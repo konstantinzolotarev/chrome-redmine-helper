@@ -1,5 +1,35 @@
 var BG = chrome.extension.getBackgroundPage();
 
+
+var linkFunction = function(scope, element, attrs) {
+    var defaultValue;
+    scope.visible = false;
+    scope.editing = false;
+
+    scope.mouseEnter = function() {
+        if (!scope.editing) {
+            scope.visible = true;
+        }
+    };
+
+    scope.mouseLeave = function() {
+        if (!scope.editing) {
+            scope.visible = false;
+        }
+    };
+
+    scope.edit = function() {
+        scope.editing = true;
+        scope.visible = false;
+        defaultValue = scope.value;
+    };
+
+    scope.cancel = function() {
+        scope.value = defaultValue;
+        attrs.$set('editableValue', defaultValue);
+        scope.editing = false;
+    };
+};
 /**
  * Create angular application
  */
@@ -104,7 +134,7 @@ angular.module('issues', ['ngSanitize']).
         });
     };
 }).directive('editableList', function factory() {
-    var directiveDefinitionObject = {
+    return {
         replace: true,
         transclude: true,
         template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
@@ -126,34 +156,8 @@ angular.module('issues', ['ngSanitize']).
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template
-        link: function(scope, element, attrs) {
-            scope.visible = false;
-            scope.editing = false;
-            
-            scope.mouseEnter = function() {
-                if (!scope.editing) {
-                    scope.visible = true;
-                }
-            };
-        
-            scope.mouseLeave = function() {
-                if (!scope.editing) {
-                    scope.visible = false;
-                }
-            };
-        
-            scope.edit = function() {
-                scope.editing = true;
-                scope.visible = false;
-            };
-        
-            scope.cancel = function() {
-                scope.editing = false;
-            };
-        }
+        link: linkFunction
     };
-    
-    return directiveDefinitionObject;
 }).directive('progress', function factory() {
     return {
         replace: true,
@@ -175,35 +179,7 @@ angular.module('issues', ['ngSanitize']).
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template
-        link: function(scope, element, attrs) {
-            var defaultValue;
-            scope.visible = false;
-            scope.editing = false;
-            
-            scope.mouseEnter = function() {
-                if (!scope.editing) {
-                    scope.visible = true;
-                }
-            };
-        
-            scope.mouseLeave = function() {
-                if (!scope.editing) {
-                    scope.visible = false;
-                }
-            };
-        
-            scope.edit = function() {
-                scope.editing = true;
-                scope.visible = false;
-                defaultValue = scope.value;
-            };
-        
-            scope.cancel = function() {
-                scope.value = defaultValue;
-                attrs.$set('editableValue', defaultValue);
-                scope.editing = false;
-            };
-        }
+        link: linkFunction
     };
 }).directive('editableInput', function factory() {
     var directiveDefinitionObject = {
@@ -225,31 +201,7 @@ angular.module('issues', ['ngSanitize']).
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template
-        link: function(scope, element, attrs) {
-            scope.visible = false;
-            scope.editing = false;
-            
-            scope.mouseEnter = function() {
-                if (!scope.editing) {
-                    scope.visible = true;
-                }
-            };
-        
-            scope.mouseLeave = function() {
-                if (!scope.editing) {
-                    scope.visible = false;
-                }
-            };
-        
-            scope.edit = function() {
-                scope.editing = true;
-                scope.visible = false;
-            };
-        
-            scope.cancel = function() {
-                scope.editing = false;
-            };
-        }
+        link: linkFunction
     };
     
     return directiveDefinitionObject;
