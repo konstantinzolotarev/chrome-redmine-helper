@@ -13,7 +13,10 @@ function Config() {
         httpPass: "",
         selectedProject: false,
         currentUserName: false,
-        currentUserId: false
+        currentUserId: false,
+        notifications: {
+            show: 'none'
+        }
     };
     this.loaded = false;
 }
@@ -59,6 +62,11 @@ Config.prototype.load = function() {
         return;
     }
     this.profile = JSON.parse(profile);
+    if (!this.profile.notifications) {
+        this.profile.notifications = {
+            show: 'none'
+        };
+    }
     this.loaded = true;
     return;
 };
@@ -102,6 +110,15 @@ Config.prototype.getApiAccessKey = function() {
 Config.prototype.getProfile = function() {
     this.load();
     return this.profile;
+};
+
+/**
+ * Get notifications options
+ * 
+ * @returns {Object} 
+ */
+Config.prototype.getNotifications = function() {
+    return this.profile.notifications;
 };
 
 /**

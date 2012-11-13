@@ -94,8 +94,10 @@ function Options($scope, $timeout) {
         config.profile.useHttpAuth = $scope.useHttpAuth;
         config.profile.httpUser = config.profile.useHttpAuth ? document.querySelector("#httpUser").value : "";
         config.profile.httpPass = config.profile.useHttpAuth ? document.querySelector("#httpPass").value : "";
+        console.log(document.querySelector(".notification_show:checked").value);
+        config.profile.notifications.show = document.querySelector(".notification_show:checked").value;
         config.store(config.profile);
-        BG.clearItems();
+//        BG.clearItems();
         $scope.options = config;
         $scope.success = true;
         $timeout($scope.hideSuccess, 5000);
