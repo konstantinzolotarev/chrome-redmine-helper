@@ -74,6 +74,11 @@ angular.module('issues', ['ngSanitize']).
                                     + "<i>"+getTracker(item.old_value)+"</i> to "
                                     + "<i>"+getTracker(item.new_value)+"</i>");
                     break;
+                case "subject": 
+                    element.html("<strong>Subject</strong> changed from "
+                                    + "<i><u>"+item.old_value+"</u></i> to "
+                                    + "<i><u>"+item.new_value+"</u></i>");
+                    break;
                 default:
                     element.html("<strong>Sorry</strong> this is under developent.");
                     console.log(item);
@@ -200,4 +205,52 @@ angular.module('issues', ['ngSanitize']).
             };
         }
     };
+}).directive('editableInput', function factory() {
+    var directiveDefinitionObject = {
+        replace: true,
+        transclude: true,
+        template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
+                        +'<span data-ng-hide="editing">'
+                            +'<span data-ng-transclude class="pointer"></span>'
+                            +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
+                        +'</span>'
+                        +'<span data-ng-show="editing">'
+                                +'<input type="text" class="input-small" data-ng-model="value"/>'
+                                +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
+                                +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'
+                        +'</span>'
+                    +'</span>',
+        scope: {
+            value: "=editableValue",
+            onOk: "=onOk"
+        },
+        // The linking function will add behavior to the template
+        link: function(scope, element, attrs) {
+            scope.visible = false;
+            scope.editing = false;
+            
+            scope.mouseEnter = function() {
+                if (!scope.editing) {
+                    scope.visible = true;
+                }
+            };
+        
+            scope.mouseLeave = function() {
+                if (!scope.editing) {
+                    scope.visible = false;
+                }
+            };
+        
+            scope.edit = function() {
+                scope.editing = true;
+                scope.visible = false;
+            };
+        
+            scope.cancel = function() {
+                scope.editing = false;
+            };
+        }
+    };
+    
+    return directiveDefinitionObject;
 });

@@ -257,6 +257,16 @@ function Home($scope) {
     };
 
     /**
+     * Chage estimate hours
+     * 
+     * @param {int} value
+     */
+    $scope.estimatedOk = function(value) {
+        $scope.issue.detailsLoaded = false;
+        BG.getIssues().update($scope.issue.id, {'estimated_hours': parseInt(value)});
+    };
+
+    /**
      * Add new comment to issue
      * 
      * @param {String} comment

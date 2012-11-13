@@ -615,7 +615,7 @@ Users.prototype.load = function(reload) {
  */
 Users.prototype.getNameById = function(userId) {
    for (var i in this.users) {
-       if (this.users[i] == userId) {
+       if (this.users[i].id == userId) {
            return this.users[i].name;
        }
    } 
