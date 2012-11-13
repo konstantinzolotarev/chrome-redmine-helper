@@ -1,6 +1,6 @@
 {
     "name": "Redmine Helper",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "manifest_version": 2,
     "description": "This extension will help to work with your Redmine issues without need to open Redmine",
     "minimum_chrome_version": "22",
