@@ -1,6 +1,55 @@
 var BG = chrome.extension.getBackgroundPage();
 
 /**
+ * Link handler for editable field
+ * 
+ * @param {Object} scope
+ * @param {Object} element
+ * @param {Object} attrs
+ * @returns {undefined}
+ */
+var linkFunction = function(scope, element, attrs) {
+    var defaultValue;
+    scope.visible = false;
+    scope.editing = false;
+    /**
+     * On mouse enter
+     */
+    scope.mouseEnter = function() {
+        if (!scope.editing) {
+            scope.visible = true;
+        }
+    };
+    
+    /**
+     * On mouse leave
+     */
+    scope.mouseLeave = function() {
+        if (!scope.editing) {
+            scope.visible = false;
+        }
+    };
+    
+    /**
+     * Open edit
+     */
+    scope.edit = function() {
+        scope.editing = true;
+        scope.visible = false;
+        defaultValue = scope.value;
+    };
+    
+    /**
+     * Close edit without saving
+     */
+    scope.cancel = function() {
+        scope.value = defaultValue;
+        attrs.$set('editableValue', defaultValue);
+        scope.editing = false;
+    };
+};
+
+/**
  * Create angular application
  */
 angular.module('issues', ['ngSanitize']).
@@ -58,7 +107,7 @@ angular.module('issues', ['ngSanitize']).
                             + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
                     break;
                 case "assigned_to_id":
-                    element.html("<strong>Assignee</strong> set to: "+item.new_value);
+                    element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(item.new_value));
                     break;
                 case "category_id":
                     element.html("<strong>Category</strong> set to: "+item.new_value);
@@ -73,6 +122,11 @@ angular.module('issues', ['ngSanitize']).
                     element.html("<strong>Tracker</strong> changed from "
                                     + "<i>"+getTracker(item.old_value)+"</i> to "
                                     + "<i>"+getTracker(item.new_value)+"</i>");
+                    break;
+                case "subject": 
+                    element.html("<strong>Subject</strong> changed from "
+                                    + "<i><u>"+item.old_value+"</u></i> to "
+                                    + "<i><u>"+item.new_value+"</u></i>");
                     break;
                 default:
                     element.html("<strong>Sorry</strong> this is under developent.");
@@ -99,7 +153,7 @@ angular.module('issues', ['ngSanitize']).
         });
     };
 }).directive('editableList', function factory() {
-    var directiveDefinitionObject = {
+    return {
         replace: true,
         transclude: true,
         template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
@@ -121,34 +175,8 @@ angular.module('issues', ['ngSanitize']).
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template
-        link: function(scope, element, attrs) {
-            scope.visible = false;
-            scope.editing = false;
-            
-            scope.mouseEnter = function() {
-                if (!scope.editing) {
-                    scope.visible = true;
-                }
-            };
-        
-            scope.mouseLeave = function() {
-                if (!scope.editing) {
-                    scope.visible = false;
-                }
-            };
-        
-            scope.edit = function() {
-                scope.editing = true;
-                scope.visible = false;
-            };
-        
-            scope.cancel = function() {
-                scope.editing = false;
-            };
-        }
+        link: linkFunction
     };
-    
-    return directiveDefinitionObject;
 }).directive('progress', function factory() {
     return {
         replace: true,
@@ -170,34 +198,28 @@ angular.module('issues', ['ngSanitize']).
             onOk: "=onOk"
         },
         // The linking function will add behavior to the template
-        link: function(scope, element, attrs) {
-            var defaultValue;
-            scope.visible = false;
-            scope.editing = false;
-            
-            scope.mouseEnter = function() {
-                if (!scope.editing) {
-                    scope.visible = true;
-                }
-            };
-        
-            scope.mouseLeave = function() {
-                if (!scope.editing) {
-                    scope.visible = false;
-                }
-            };
-        
-            scope.edit = function() {
-                scope.editing = true;
-                scope.visible = false;
-                defaultValue = scope.value;
-            };
-        
-            scope.cancel = function() {
-                scope.value = defaultValue;
-                attrs.$set('editableValue', defaultValue);
-                scope.editing = false;
-            };
-        }
+        link: linkFunction
+    };
+}).directive('editableInput', function factory() {
+    return {
+        replace: true,
+        transclude: true,
+        template: '<span data-ng-mouseenter="mouseEnter()" data-ng-mouseleave="mouseLeave()">'
+                        +'<span data-ng-hide="editing">'
+                            +'<span data-ng-transclude class="pointer"></span>'
+                            +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
+                        +'</span>'
+                        +'<span data-ng-show="editing">'
+                                +'<input type="text" class="input-small" data-ng-model="value"/>'
+                                +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
+                                +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'
+                        +'</span>'
+                    +'</span>',
+        scope: {
+            value: "=editableValue",
+            onOk: "=onOk"
+        },
+        // The linking function will add behavior to the template
+        link: linkFunction
     };
 });
