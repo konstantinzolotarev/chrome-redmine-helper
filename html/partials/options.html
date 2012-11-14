@@ -6,7 +6,6 @@
     <h1>Options</h1>
 </div>
 <div>
-    <form class="form-horizontal">
         <div class="tabbable tabs-left">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
@@ -14,38 +13,44 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="connection">
-                    <div class="control-group">
-                        <label class="control-label" for="inputHost">Redmine Host</label>
-                        <div class="controls">
-                            <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="inputHost">Redmine Host</label>
+                            <div class="controls">
+                                <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
-                        <div class="controls">
-                            <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+                        <div class="control-group">
+                            <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
+                            <div class="controls">
+                                <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
-                        <div class="controls">
-                            <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
+                        <div class="control-group">
+                            <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
+                            <div class="controls">
+                                <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group" data-ng-show="useHttpAuth">
-                        <label class="control-label" for="httpUser">HTTP Username</label>
-                        <div class="controls">
-                            <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
+                        <div class="control-group" data-ng-show="useHttpAuth">
+                            <label class="control-label" for="httpUser">HTTP Username</label>
+                            <div class="controls">
+                                <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group" data-ng-show="useHttpAuth">
-                        <label class="control-label" for="httpPass">HTTP Password</label>
-                        <div class="controls">
-                            <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
+                        <div class="control-group" data-ng-show="useHttpAuth">
+                            <label class="control-label" for="httpPass">HTTP Password</label>
+                            <div class="controls">
+                                <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
+                            </div>
                         </div>
-                    </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+                        </div>
+                    </form>
                 </div>
                 <div class="tab-pane" id="notifications">
+                    <form class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label">Show notifications</label>
                         <div class="controls">
@@ -66,11 +71,11 @@
                             </label>
                         </div>
                     </div>
+                    <div class="form-actions">
+                            <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
-        </div>
-    </form>
 </div>

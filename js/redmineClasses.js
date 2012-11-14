@@ -273,6 +273,7 @@ Issues.prototype.load = function(offset, limit) {
         getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
             function(data) {
                 var updated = 0;
+                var notifiedIssues = [];
                 if (data.total_count && data.total_count > 0) {
                     for(var i in data.issues) {
                         var found = false;
@@ -287,6 +288,9 @@ Issues.prototype.load = function(offset, limit) {
                                     updated += 1;
                                     //Bind users from issue
                                     getUsers().grabFromIssue(data.issues[i]);
+                                    if (getConfig().getNotifications().show == "updated") {
+                                        notifiedIssues.push(obj.issues[key]);
+                                    }
                                 }
                             }
                         }
@@ -298,6 +302,9 @@ Issues.prototype.load = function(offset, limit) {
 //                            data.issues[i].updated = new Date(data.issues[i].updated_on);
                             obj.issues.push(data.issues[i]);
                             updated += 1;
+                            if (getConfig().getNotifications().show == "new") {
+                                notifiedIssues.push(obj.issues[key]);
+                            }
                         }
                     }
                     obj.lastUpdated = new Date();
@@ -317,10 +324,40 @@ Issues.prototype.load = function(offset, limit) {
                     if (data.total_count > (offset + limit) && updated >= limit) {
                         obj.load((offset + limit), limit);
                     }
+                    /**
+                     * Show notifications for issues
+                     */
+                    if (notifiedIssues.length > 0) {
+                        obj.showNotifications(notifiedIssues);
+                    }
                 }
             }
         );
     })(this);
+};
+
+/**
+ * Show notifications 
+ * 
+ * @param {Array} notifications
+ * @returns {undefined}
+ */
+Issues.prototype.showNotifications = function(notifications) {
+    var text = "";
+    var subject = "";
+    if (notifications.length == 1) {
+        subject = "You have an update in Redmine";
+        text = "asdadasd";
+    } else if(notifications.length > 1) {
+        subject = "You have updates in Redmine";
+        text = "asdadasd";
+    }
+    var notification = webkitNotifications.createNotification(
+        'icon/icon-48.png', // icon url - can be relative
+        subject, // notification title
+        text  // notification body text
+    );
+    notification.show();
 };
 
 /**

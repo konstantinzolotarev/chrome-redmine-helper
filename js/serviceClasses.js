@@ -14,6 +14,7 @@ function Config() {
         selectedProject: false,
         currentUserName: false,
         currentUserId: false,
+        //Added into version 0.9
         notifications: {
             show: 'none'
         }
@@ -62,11 +63,6 @@ Config.prototype.load = function() {
         return;
     }
     this.profile = JSON.parse(profile);
-    if (!this.profile.notifications) {
-        this.profile.notifications = {
-            show: 'none'
-        };
-    }
     this.loaded = true;
     return;
 };

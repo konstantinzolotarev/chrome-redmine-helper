@@ -227,10 +227,27 @@ function startRequest(params) {
 }
 
 /**
+ * 
+ * @returns {undefined}
+ */
+function upgradeSettings() {
+    //Check for updated settings
+    if (!getConfig().getProfile().notifications) {
+        //update profile with new settings
+        getConfig().getProfile().notifications = {
+            show: 'none'
+        };
+        //Store changes
+        getConfig().store(getConfig().getProfile());
+    }
+}
+
+/**
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
+    upgradeSettings();
     startRequest({scheduleRequest:true});
 });
 

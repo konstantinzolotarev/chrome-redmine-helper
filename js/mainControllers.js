@@ -1,23 +1,6 @@
 var BG = chrome.extension.getBackgroundPage();
 
 /**
- * 
- * @type Config
- */
-var config = BG.getConfig();
-
-/**
- * 
- * @type Loader
- */
-var loader = BG.getLoader();
-
-/**
- * 
- * @type Projects
- */
-var projects = BG.getProjects();
-/**
  * Bind tooltips
  */
 jQuery(document).ready(function($) {
@@ -43,9 +26,9 @@ function openAuthorPage(userId) {
  * @returns {void}
  */
 function Main($scope) {
-    $scope.options = config;
+    $scope.options = BG.getConfig();
     $scope.xhrError = false;
-    $scope.projects = projects.all();
+    $scope.projects = BG.getProjects().all();
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "xhrError" && request.params) {
             $scope.$apply(function(sc) {
@@ -62,7 +45,7 @@ function Main($scope) {
     };
     
     $scope.updateProjects = function() {
-        projects.all(true);
+        BG.getProjects().all(true);
     };
     chrome.extension.onMessage.addListener($scope.xhrErrorHandler);
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
@@ -76,9 +59,9 @@ function Main($scope) {
  * @returns {void}
  */
 function Options($scope, $timeout) {
-    $scope.options = config;
+    $scope.options = BG.getConfig();
     $scope.success = false;
-    $scope.useHttpAuth = config.profile.useHttpAuth;
+    $scope.useHttpAuth = BG.getConfig().getProfile().useHttpAuth;
     /**
      * Hide success message
      */
@@ -89,27 +72,48 @@ function Options($scope, $timeout) {
      * Save new options
      */
     $scope.storeOptions = function() {
-        config.profile.host = document.querySelector("#inputHost").value;
-        config.profile.apiAccessKey = document.querySelector("#inputApiKey").value;
-        config.profile.useHttpAuth = $scope.useHttpAuth;
-        config.profile.httpUser = config.profile.useHttpAuth ? document.querySelector("#httpUser").value : "";
-        config.profile.httpPass = config.profile.useHttpAuth ? document.querySelector("#httpPass").value : "";
-        console.log(document.querySelector(".notification_show:checked").value);
-        config.profile.notifications.show = document.querySelector(".notification_show:checked").value;
-        config.store(config.profile);
-//        BG.clearItems();
-        $scope.options = config;
+        BG.getConfig().getProfile().host = document.querySelector("#inputHost").value;
+        BG.getConfig().getProfile().apiAccessKey = document.querySelector("#inputApiKey").value;
+        BG.getConfig().getProfile().useHttpAuth = $scope.useHttpAuth;
+        BG.getConfig().getProfile().httpUser = BG.getConfig().getProfile().useHttpAuth ? document.querySelector("#httpUser").value : "";
+        BG.getConfig().getProfile().httpPass = BG.getConfig().getProfile().useHttpAuth ? document.querySelector("#httpPass").value : "";
+        BG.getConfig().store(BG.getConfig().getProfile());
+        BG.clearItems();
+        $scope.options = BG.getConfig();
+        $scope.success = true;
+        $timeout($scope.hideSuccess, 5000);
+    };
+
+    /**
+     * Save notifications options
+     */
+    $scope.storeNotifications = function() {
+        BG.getConfig().getProfile().notifications.show = document.querySelector(".notification_show:checked").value;
+        console.log(BG.getConfig().profile.notifications.show);
+        BG.getConfig().store(BG.getConfig().getProfile());
+        $scope.options = BG.getConfig();
         $scope.success = true;
         $timeout($scope.hideSuccess, 5000);
     };
     
+    /**
+     * Check if http auth available
+     * 
+     * @param {Event} event
+     */
     $scope.checkHttpAuth = function(event) {
         $scope.useHttpAuth = $(event.source).is(":checked");
     };
 }
 
+/**
+ * Main screen controller
+ * 
+ * @param {Scope} $scope
+ * @returns {undefined}
+ */
 function Home($scope) {
-    $scope.options = config;
+    $scope.options = BG.getConfig();
     $scope.availStatuses = BG.getIssues().getStatuses();
     $scope.issues = [];
     $scope.order = "updated_on";
@@ -264,6 +268,7 @@ function Home($scope) {
      * @param {int} value
      */
     $scope.estimatedOk = function(value) {
+        console.log(value);
         $scope.issue.detailsLoaded = false;
         BG.getIssues().update($scope.issue.id, {'estimated_hours': parseInt(value)});
     };
@@ -345,10 +350,10 @@ function Home($scope) {
  */
 function Project($scope, $routeParams) {
     $scope.id = $routeParams.id;
-    $scope.project = projects.get($scope.id);
-    config.setSelectedProject($scope.id);
-    projects.get($scope.id);
-    $scope.issues = projects.getIssues($scope.id);
+    $scope.project = BG.getProjects().get($scope.id);
+    BG.getConfig().setSelectedProject($scope.id);
+    BG.getProjects().get($scope.id);
+    $scope.issues = BG.getProjects().getIssues($scope.id);
 }
 
 
