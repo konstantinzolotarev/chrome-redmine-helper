@@ -33,11 +33,11 @@
                             <strong>Assignee</strong>:&nbsp;
                             <a href="" data-ng-click="openAuthorPage(issue.assigned_to.id)">{{issue.assigned_to.name}}</a>
                         </span><br/>
-                        <span data-ng-show="issue.estimated_hours">
+                        <span>
                             <strong>Estimated hours</strong>:&nbsp;<span data-editable-input
-                                  data-editable-value="issue.estimated_hours"
+                                  data-editable-value="issue.estimated_hours || 0"
                                   data-on-ok="estimatedOk">
-                                {{issue.estimated_hours}}
+                                {{issue.estimated_hours || 0}}
                             </span>
                         </span>
                     </small>
