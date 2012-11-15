@@ -62,6 +62,9 @@ function Main($scope) {
         console.log(event);
     };
 
+    /**
+     * Store project filtering settings
+     */
     $scope.storeProjects = function() {
         //Clear list
         BG.getConfig().getProjectsSettings().list = [];
