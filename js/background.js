@@ -240,6 +240,16 @@ function upgradeSettings() {
         //Store changes
         getConfig().store(getConfig().getProfile());
     }
+    //Check for updated settings for projects
+    if (!getConfig().getProfile().projects) {
+        //update profile with new settings
+        getConfig().getProfile().projects = {
+            show_for: 'all',
+            list: []
+        };
+        //Store changes
+        getConfig().store(getConfig().getProfile());
+    }
 }
 
 /**

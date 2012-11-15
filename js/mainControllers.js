@@ -29,6 +29,8 @@ function Main($scope) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
     $scope.projects = BG.getProjects().all();
+    
+    
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "xhrError" && request.params) {
             $scope.$apply(function(sc) {
@@ -44,8 +46,32 @@ function Main($scope) {
         }
     };
     
+    /**
+     * On projects updated
+     */
     $scope.updateProjects = function() {
         BG.getProjects().all(true);
+    };
+
+    /**
+     * On project filter
+     * 
+     * @param {Event} event
+     */
+    $scope.projectChecked = function(event) {
+        console.log(event);
+    };
+
+    $scope.storeProjects = function() {
+        //Clear list
+        BG.getConfig().getProjectsSettings().list = [];
+        angular.forEach($scope.projects, function(value, key) {
+            if (value.used) {
+                BG.getConfig().getProjectsSettings().list.push(value.id);
+            }
+        });
+        BG.getConfig().store(BG.getConfig().getProfile());
+        BG.getProjects().store();
     };
     chrome.extension.onMessage.addListener($scope.xhrErrorHandler);
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
