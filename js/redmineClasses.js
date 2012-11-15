@@ -347,17 +347,18 @@ Issues.prototype.showNotifications = function(notifications) {
     var subject = "";
     if (notifications.length == 1) {
         subject = "You have an update in Redmine";
-        text = "asdadasd";
+        text = "Issue: "+notifications[0].subject+" updated !";
     } else if(notifications.length > 1) {
         subject = "You have updates in Redmine";
-        text = "asdadasd";
+        text = "You have "+notifications.length+" updated issue into Redmine";
     }
-    var notification = webkitNotifications.createNotification(
+    notification = webkitNotifications.createNotification(
         'icon/icon-48.png', // icon url - can be relative
         subject, // notification title
         text  // notification body text
     );
     notification.show();
+    chrome.alarms.create("notifications", {delayInMinutes: 0.2});
 };
 
 /**

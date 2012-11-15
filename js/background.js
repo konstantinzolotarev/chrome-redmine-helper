@@ -1,5 +1,5 @@
 var pollIntervalMin = 5;  // 5 minutes
-
+var notification;
 /**
  * Init global variables
  */
@@ -174,7 +174,7 @@ function openMainPage() {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.create({'delayInMinutes': pollIntervalMin});
+    chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
 }
 
 /**
@@ -256,11 +256,21 @@ chrome.runtime.onSuspend.addListener(function() {
 });
 
 /**
- * Run actions on timer
+ * sRun actions on timer
+ * 
+ * @param {Alarm} alarm
  */
-chrome.alarms.onAlarm.addListener(function() {
-    startRequest({scheduleRequest:true});
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    if (alarm.name && alarm.name == "issues") {
+        startRequest({scheduleRequest:true});
+    }
+    if (alarm.name && alarm.name == "notifications") {
+        if (notification) {
+            notification.cancel();
+        }
+    }
 });
+
 
 /**
  * Bind click action to icon

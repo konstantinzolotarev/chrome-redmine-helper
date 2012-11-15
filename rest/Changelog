@@ -1,5 +1,9 @@
 Changelog
 ---------------------------------
+0.9.5 (15-Nov-2012)
+    - Added notifications support & options
+    - Major stability improvements
+
 0.9.2 (13-Nov-2012)
     - Added "estimation time" field
     - Major code improvements
