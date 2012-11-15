@@ -277,6 +277,10 @@ Issues.prototype.load = function(offset, limit) {
                 if (data.total_count && data.total_count > 0) {
                     for(var i in data.issues) {
                         var found = false;
+                        if (getConfig().getProjectsSettings().show_for == "selected"
+                                && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
+                            continue;
+                        }
                         for(var key in obj.issues) {
                             //We found this issue
                             if (obj.issues[key].id == data.issues[i].id) {
@@ -569,6 +573,17 @@ Issues.prototype.getStatusNameById = function(id) {
         }
     }
     return id;
+};
+
+/**
+ * Clear issues list 
+ * 
+ * @returns {undefined}
+ */
+Issues.prototype.clearIssues = function() {
+    this.issues = [];
+    this.store();
+    this.load();
 };
 
 /**

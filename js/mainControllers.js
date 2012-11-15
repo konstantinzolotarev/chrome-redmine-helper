@@ -75,6 +75,8 @@ function Main($scope) {
         });
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.getProjects().store();
+        BG.getIssues().clearIssues();
+        jQuery('#projectFilters').modal('toggle');
     };
     chrome.extension.onMessage.addListener($scope.xhrErrorHandler);
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
