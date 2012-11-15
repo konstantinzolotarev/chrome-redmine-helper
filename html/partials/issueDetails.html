@@ -33,11 +33,11 @@
                             <strong>Assignee</strong>:&nbsp;
                             <a href="" data-ng-click="openAuthorPage(issue.assigned_to.id)">{{issue.assigned_to.name}}</a>
                         </span><br/>
-                        <span data-ng-show="issue.estimated_hours">
+                        <span>
                             <strong>Estimated hours</strong>:&nbsp;<span data-editable-input
                                   data-editable-value="issue.estimated_hours"
                                   data-on-ok="estimatedOk">
-                                {{issue.estimated_hours}}
+                                {{issue.estimated_hours || 0}}
                             </span>
                         </span>
                     </small>
@@ -107,9 +107,9 @@
                 <!-- Add new Comment to issue -->
                 <div class="tab-pane" id="addComment">
                     <form>
-                        <textarea rows="5" class="input-block-level" data-ng-model="comment"></textarea>
+                        <textarea rows="5" class="input-block-level" data-ng-disabled="!issue.detailsLoaded" data-ng-model="comment"></textarea>
                         <div>
-                            <button class="btn" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
+                            <button class="btn" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
                         </div>
                     </form>
                 </div>

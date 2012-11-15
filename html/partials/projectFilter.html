@@ -1,0 +1,40 @@
+<div class="modal hide fade" id="projectFilters" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>
+            Project filtering settings
+        </h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label">Show issues for:</label>
+                <div class="controls">
+                    <label class="radio">
+                        <input type="radio" class="projects_show" name="projects_show" id="projRadios0" value="all" 
+                               data-ng-model="options.profile.projects.show_for" />
+                        All projects
+                    </label>
+                    <label class="radio">
+                        <input type="radio" class="projects_show" name="projects_show" id="projRadios1" value="selected" 
+                               data-ng-model="options.profile.projects.show_for" />
+                        Selected projects
+                    </label>
+                </div>
+            </div>
+            <div class="control-group" data-ng-show="options.profile.projects.show_for == 'selected'">
+                <label class="control-label">Projects:</label>
+                <div class="controls">
+                    <label class="checkbox" data-ng-repeat="project in projects">
+                        <input type="checkbox" 
+                               data-ng-model="project.used" /> {{project.name}}
+                    </label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success" data-ng-click="storeProjects()">Store settings</button>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -13,7 +13,15 @@ function Config() {
         httpPass: "",
         selectedProject: false,
         currentUserName: false,
-        currentUserId: false
+        currentUserId: false,
+        //Added into version 0.9
+        notifications: {
+            show: 'none'
+        },
+        projects: {
+            show_for: 'all',
+            list: []
+        }
     };
     this.loaded = false;
 }
@@ -102,6 +110,30 @@ Config.prototype.getApiAccessKey = function() {
 Config.prototype.getProfile = function() {
     this.load();
     return this.profile;
+};
+
+/**
+ * Get settings for project filters
+ * 
+ * @returns {Object}
+ */
+Config.prototype.getProjectsSettings = function() {
+    if (!this.getProfile().projects) {
+        this.getProfile().projects = {
+            show_for: 'all',
+            list: []
+        };
+    }
+    return this.getProfile().projects;
+};
+
+/**
+ * Get notifications options
+ * 
+ * @returns {Object} 
+ */
+Config.prototype.getNotifications = function() {
+    return this.profile.notifications;
 };
 
 /**

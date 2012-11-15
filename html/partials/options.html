@@ -6,39 +6,76 @@
     <h1>Options</h1>
 </div>
 <div>
-    <form class="form-horizontal">
-        <div class="control-group">
-            <label class="control-label" for="inputHost">Redmine Host</label>
-            <div class="controls">
-                <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+        <div class="tabbable tabs-left">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
+                <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="connection">
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="inputHost">Redmine Host</label>
+                            <div class="controls">
+                                <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
+                            <div class="controls">
+                                <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
+                            <div class="controls">
+                                <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
+                            </div>
+                        </div>
+                        <div class="control-group" data-ng-show="useHttpAuth">
+                            <label class="control-label" for="httpUser">HTTP Username</label>
+                            <div class="controls">
+                                <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
+                            </div>
+                        </div>
+                        <div class="control-group" data-ng-show="useHttpAuth">
+                            <label class="control-label" for="httpPass">HTTP Password</label>
+                            <div class="controls">
+                                <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane" id="notifications">
+                    <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label">Show notifications</label>
+                        <div class="controls">
+                            <label class="radio">
+                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios0" value="none" 
+                                       data-ng-checked="options.profile.notifications.show == 'none'" />
+                                Never
+                            </label>
+                            <label class="radio">
+                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios1" value="new" 
+                                       data-ng-checked="options.profile.notifications.show == 'new'" />
+                                On new issues
+                            </label>
+                            <label class="radio">
+                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios2" value="updated"
+                                       data-ng-checked="options.profile.notifications.show == 'updated'" />
+                                On new and updated issues
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="control-group">
-            <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
-            <div class="controls">
-                <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
-            <div class="controls">
-                <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
-            </div>
-        </div>
-        <div class="control-group" data-ng-show="useHttpAuth">
-            <label class="control-label" for="httpUser">HTTP Username</label>
-            <div class="controls">
-                <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
-            </div>
-        </div>
-        <div class="control-group" data-ng-show="useHttpAuth">
-            <label class="control-label" for="httpPass">HTTP Password</label>
-            <div class="controls">
-                <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
-            </div>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
-        </div>
-    </form>
+    </div>
 </div>

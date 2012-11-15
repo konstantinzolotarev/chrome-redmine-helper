@@ -1,5 +1,17 @@
 Changelog
 ---------------------------------
+0.9.5 (15-Nov-2012)
+    - Added notifications support & options
+    - Added projects filtering options
+    - Major stability improvements
+
+0.9.2 (13-Nov-2012)
+    - Added "estimation time" field
+    - Major code improvements
+    - New "Edit Estimate hours" feature
+    - Change issue subject history action fix
+    - User name resolving into "Change assignee" history action
+
 0.9.1 (11-Nov-2012)
     - New "Change issue done ratio" feature
     - Minor core fixes

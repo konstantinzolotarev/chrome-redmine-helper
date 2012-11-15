@@ -1,5 +1,5 @@
 var pollIntervalMin = 5;  // 5 minutes
-
+var notification;
 /**
  * Init global variables
  */
@@ -174,7 +174,7 @@ function openMainPage() {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.create({'delayInMinutes': pollIntervalMin});
+    chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
 }
 
 /**
@@ -227,10 +227,37 @@ function startRequest(params) {
 }
 
 /**
+ * 
+ * @returns {undefined}
+ */
+function upgradeSettings() {
+    //Check for updated settings
+    if (!getConfig().getProfile().notifications) {
+        //update profile with new settings
+        getConfig().getProfile().notifications = {
+            show: 'none'
+        };
+        //Store changes
+        getConfig().store(getConfig().getProfile());
+    }
+    //Check for updated settings for projects
+    if (!getConfig().getProfile().projects) {
+        //update profile with new settings
+        getConfig().getProfile().projects = {
+            show_for: 'all',
+            list: []
+        };
+        //Store changes
+        getConfig().store(getConfig().getProfile());
+    }
+}
+
+/**
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
+    upgradeSettings();
     startRequest({scheduleRequest:true});
 });
 
@@ -239,11 +266,21 @@ chrome.runtime.onSuspend.addListener(function() {
 });
 
 /**
- * Run actions on timer
+ * sRun actions on timer
+ * 
+ * @param {Alarm} alarm
  */
-chrome.alarms.onAlarm.addListener(function() {
-    startRequest({scheduleRequest:true});
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    if (alarm.name && alarm.name == "issues") {
+        startRequest({scheduleRequest:true});
+    }
+    if (alarm.name && alarm.name == "notifications") {
+        if (notification) {
+            notification.cancel();
+        }
+    }
 });
+
 
 /**
  * Bind click action to icon
