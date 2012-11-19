@@ -36,22 +36,27 @@
                 </select>
             </div>
         </div>
-        <div class="control-group" data-ng-show="project.members">
+        <div class="control-group" data-ng-show="issue.project_id > 0">
             <label class="control-label" for="assigned_to_id">Assign to</label>
             <div class="controls">
+                <span data-ng-hide="project.membersLoaded">Loading...</span>
                 <select id="assigned_to_id"
+                        data-ng-show="project.membersLoaded"
                         data-ng-model="issue.assigned_to_id" 
                         data-ng-options="member.id as member.name for member in project.members">
                     <option value="">Select assignee</option>
                 </select>
             </div>
         </div>
-        <div class="control-group" data-ng-show="project.trackers">
+        <div class="control-group" data-ng-show="issue.project_id > 0">
             <label class="control-label" for="tracker_id">Tracker</label>
             <div class="controls">
+                <span data-ng-hide="project.fullyLoaded">Loading...</span>
                 <select id="tracker_id"
+                        data-ng-show="project.fullyLoaded"
                         data-ng-model="issue.tracker_id" 
                         data-ng-options="track.id as track.name for track in project.trackers">
+                    <option value="" >Select tracker</option>
                 </select>
             </div>
         </div>

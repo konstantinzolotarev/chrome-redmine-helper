@@ -392,6 +392,8 @@ function NewIssue($scope) {
     //List of errors
     $scope.errors = [];
     
+    $scope.membersLoading = false;
+    
     // Issue model
     $scope.issue = {
         subject: "",
