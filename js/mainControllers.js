@@ -382,6 +382,7 @@ function Home($scope) {
 function NewIssue($scope) {
     //list of projects
     $scope.projects = BG.getProjects().all();
+    $scope.project = {};
     
     $scope.isLoading = false;
     $scope.success = false;
@@ -393,6 +394,21 @@ function NewIssue($scope) {
         subject: "",
         project_id: 0,
         description: ""
+    };
+
+    /**
+     * handle project selection
+     */
+    $scope.projectChanged = function() {
+        if ($scope.issue.project_id > 0) {
+            $scope.project = BG.getProjects().get($scope.issue.project_id);
+        } else {
+            $scope.project = {};
+        }
+        //clear field depending on selected project
+        if ($scope.issue.tracker_id) {
+            delete $scope.issue.tracker_id;
+        }
     };
 
     /**
@@ -411,7 +427,50 @@ function NewIssue($scope) {
         }
         BG.getIssues().create($scope.issue);
         $scope.isLoading = true;
-        console.log($scope.issue);
+    };
+
+    /**
+     * On new issue created
+     * 
+     * @param {Object} request
+     * @param {Object} sender
+     * @param {Object} sendResponse
+     * @returns {undefined}
+     */
+    var onIssueCreated = function(request, sender, sendResponse) {
+        $scope.$apply(function(sc) {
+            sc.isLoading = false;
+            sc.success = true;
+            //clear issue
+            sc.issue = {
+                subject: "",
+                project_id: 0,
+                description: ""
+            };
+            //clear project
+            sc.project = {};
+        });
+    };
+    /**
+     * On project details updated
+     * 
+     * @param {Object} request
+     * @param {Object} sender
+     * @param {Object} sendResponse
+     * @returns {undefined}
+     */
+    var onProjectUpdated = function(request, sender, sendResponse) {
+        //check project
+        if (!request.project) {
+            return;
+        }
+        //Check current project
+        if ($scope.issue.project_id != request.project.id) {
+            return;
+        }
+        $scope.$apply(function(sc) {
+            sc.project = request.project;
+        });
     };
 
     //Handle new issue creation
@@ -419,15 +478,14 @@ function NewIssue($scope) {
         if (!request.action && request.action != "issueCreated") {
             return;
         }
-        $scope.$apply(function(sc) {
-            sc.isLoading = false;
-            sc.success = true;
-            sc.issue = {
-                subject: "",
-                project_id: 0,
-                description: ""
-            };
-        });
+        switch(request.action) {
+            case "issueCreated":
+                return onIssueCreated(request, sender, sendResponse);
+                break;
+            case "projectUpdated":
+                return onProjectUpdated(request, sender, sendResponse);
+                break;
+        };
     };
 
     //Add one global handler for messages from background

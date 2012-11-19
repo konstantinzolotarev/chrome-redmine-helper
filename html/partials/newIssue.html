@@ -28,8 +28,20 @@
         <div class="control-group">
             <label class="control-label" for="project_id">Project</label>
             <div class="controls">
-                <select data-ng-model="issue.project_id">
-                    <option data-ng-repeat="project in projects" value="{{project.id}}">{{project.name}}</option>
+                <select id="project_id"
+                        data-ng-model="issue.project_id" 
+                        data-ng-options="project.id as project.name for project in projects" 
+                        data-ng-change="projectChanged()">
+                    <option value="">Select project</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-group" data-ng-show="project.trackers">
+            <label class="control-label" for="tracker_id">Tracker</label>
+            <div class="controls">
+                <select id="tracker_id"
+                        data-ng-model="issue.tracker_id" 
+                        data-ng-options="track.id as track.name for track in project.trackers">
                 </select>
             </div>
         </div>

@@ -449,11 +449,9 @@ Issues.prototype.create = function(issue) {
             'issue': issue
         };
         getLoader().post("issues.json", JSON.stringify(data), function(json) {
-            if (!json.issue) {
-                return;
-            }
+            var iss = json.issue || issue;
             //notify all listeners
-            chrome.extension.sendMessage({action: "issueCreated", issue: json.issue});
+            chrome.extension.sendMessage({action: "issueCreated", issue: iss});
         });
     })(this);
 };
