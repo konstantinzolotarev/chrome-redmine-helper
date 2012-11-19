@@ -57,6 +57,7 @@ angular.module('issues', ['ngSanitize']).
     $routeProvider.
             when('/options', {templateUrl: 'partials/options.html', controller: Options}).
             when('/home', {templateUrl: 'partials/home.html', controller: Home}).
+            when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
             when('/project/:id', {templateUrl: 'partials/project.html', controller: Project}).
             otherwise({redirectTo: '/home'});
 }])

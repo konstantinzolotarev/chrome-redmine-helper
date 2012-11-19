@@ -438,6 +438,27 @@ Issues.prototype.update = function(id, issueData) {
 };
 
 /**
+ * Create new Issue on server
+ * 
+ * @param {Object} issue
+ * @returns {undefined}
+ */
+Issues.prototype.create = function(issue) {
+    (function(obj) {
+        var data = {
+            'issue': issue
+        };
+        getLoader().post("issues.json", JSON.stringify(data), function(json) {
+            if (!json.issue) {
+                return;
+            }
+            //notify all listeners
+            chrome.extension.sendMessage({action: "issueCreated", issue: json.issue});
+        });
+    })(this);
+};
+
+/**
  * Mark issue read 
  * 
  * @param {int} id

@@ -374,6 +374,67 @@ function Home($scope) {
 }
 
 /**
+ * New issue controller
+ * 
+ * @param {Scope} $scope
+ * @returns {undefined}
+ */
+function NewIssue($scope) {
+    //list of projects
+    $scope.projects = BG.getProjects().all();
+    
+    $scope.isLoading = false;
+    $scope.success = false;
+    //List of errors
+    $scope.errors = [];
+    
+    // Issue model
+    $scope.issue = {
+        subject: "",
+        project_id: 0,
+        description: ""
+    };
+
+    /**
+     * Submit handler
+     */
+    $scope.submit = function() {
+        $scope.errors = []; //clear errors
+        //checks
+        if ($scope.issue.project_id < 1) {
+            $scope.errors.push("Please select project");
+        }
+    
+        //Check before submit
+        if ($scope.errors.length > 0) {
+            return false;
+        }
+        BG.getIssues().create($scope.issue);
+        $scope.isLoading = true;
+        console.log($scope.issue);
+    };
+
+    //Handle new issue creation
+    var onMessage = function(request, sender, sendResponse) {
+        if (!request.action && request.action != "issueCreated") {
+            return;
+        }
+        $scope.$apply(function(sc) {
+            sc.isLoading = false;
+            sc.success = true;
+            sc.issue = {
+                subject: "",
+                project_id: 0,
+                description: ""
+            };
+        });
+    };
+
+    //Add one global handler for messages from background
+    chrome.extension.onMessage.addListener(onMessage);
+}
+
+/**
  * Controller for project template
  * @param {Object} $scope
  * @param {Object} $routeParams
@@ -390,4 +451,5 @@ function Project($scope, $routeParams) {
 
 //Options.$inject = ['$scope', '$timeout'];
 //Home.$inject = ['$scope'];
+//NewIssue.$inject = ['$scope'];
 //Project.$inject = ['$scope', '$routeParams'];
