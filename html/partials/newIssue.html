@@ -36,6 +36,16 @@
                 </select>
             </div>
         </div>
+        <div class="control-group" data-ng-show="project.members">
+            <label class="control-label" for="assigned_to_id">Assign to</label>
+            <div class="controls">
+                <select id="assigned_to_id"
+                        data-ng-model="issue.assigned_to_id" 
+                        data-ng-options="member.id as member.name for member in project.members">
+                    <option value="">Select assignee</option>
+                </select>
+            </div>
+        </div>
         <div class="control-group" data-ng-show="project.trackers">
             <label class="control-label" for="tracker_id">Tracker</label>
             <div class="controls">

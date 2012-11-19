@@ -341,6 +341,9 @@ function Home($scope) {
     
     //handle project updated datas
     var onProjectUpdated = function(request, sender, sendResponse) {
+        if (!$scope.issue.project) {
+            return;
+        }
         if (request.action && request.action == "projectUpdated" && request.project) {
             $scope.$apply(function(sc) {
                 var projId = sc.issue.project.id;
@@ -402,6 +405,9 @@ function NewIssue($scope) {
     $scope.projectChanged = function() {
         if ($scope.issue.project_id > 0) {
             $scope.project = BG.getProjects().get($scope.issue.project_id);
+            if (!$scope.project.membersLoaded) {
+                BG.getProjects().getMembers($scope.issue.project_id);
+            }
         } else {
             $scope.project = {};
         }
@@ -409,6 +415,10 @@ function NewIssue($scope) {
         if ($scope.issue.tracker_id) {
             delete $scope.issue.tracker_id;
         }
+        if ($scope.issue.assigned_to_id) {
+            delete $scope.issue.assigned_to_id;
+        }
+        console.log($scope.project);
     };
 
     /**
@@ -420,7 +430,10 @@ function NewIssue($scope) {
         if ($scope.issue.project_id < 1) {
             $scope.errors.push("Please select project");
         }
-    
+        //clear empty values
+        if ($scope.issue.assigned_to_id == "") {
+            delete $scope.issue.assigned_to_id;
+        }
         //Check before submit
         if ($scope.errors.length > 0) {
             return false;
@@ -470,6 +483,7 @@ function NewIssue($scope) {
         }
         $scope.$apply(function(sc) {
             sc.project = request.project;
+            console.log("Updated", sc.project);
         });
     };
 

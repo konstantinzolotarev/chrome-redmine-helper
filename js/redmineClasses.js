@@ -77,13 +77,21 @@ Projects.prototype.getMembers = function(projectId, reload) {
     }
     (function(obj) {
         getLoader().get("projects/"+projectId+"/memberships.json", function(json) {
-            console.log(json);
+            if (json.total_count && json.total_count > 0 && json.memberships) {
+                obj.projects[proj.key].members = [];
+                for (var i in json.memberships) {
+                    obj.projects[proj.key].members.push(json.memberships[i].user);
+                }
+                obj.projects[proj.key].membersLoaded = true;
+                obj.store();
+                obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
+            }
         }, function(e, resp) {
             if (resp.status && resp.status == 403) {
                 obj.projects[proj.key].membersLoaded = true;
-                obj.projects[proj.key].members = [];
+                obj.projects[proj.key].members = getUsers().users;
                 obj.store();
-                console.log(obj.projects[proj.key]);
+                obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
             }
         });
     })(this);
