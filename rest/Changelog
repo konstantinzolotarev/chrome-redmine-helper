@@ -1,5 +1,8 @@
 Changelog
 ---------------------------------
+0.9.8 (20-Nov-2012)
+    - Added "Issue list options"
+
 0.9.7 (19-Nov-2012)
     - Added assignee field into Create issue
     - Core fixes
