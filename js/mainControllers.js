@@ -159,6 +159,13 @@ function Home($scope) {
     $scope.project = {};
     
     /**
+     * Store table options
+     */
+    $scope.storeTableOptions = function() {
+        BG.getConfig().store(BG.getConfig().getProfile());
+        $('#tableOptions').modal('toggle');
+    };
+    /**
      * Get number of pages for list of issues
      * 
      * @returns {int}
