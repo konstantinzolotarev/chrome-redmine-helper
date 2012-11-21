@@ -56,3 +56,12 @@ table.issues .unread {
     border-radius: 3px;
     padding: 4px;
 }
+
+.attach {
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 8px;
+}
+
+.add-attach {
+    margin-bottom: 5px;
+}

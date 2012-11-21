@@ -73,6 +73,9 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
                 <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+                <li class="">
+                    <a href="#attachments" data-toggle="tab">Attachments</a>
+                </li>
                 <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
             </ul>
             <div class="tab-content">
@@ -102,6 +105,36 @@
                             <p>{{history.notes}}</p>
                             <small>New comment added</small>
                         </blockquote>
+                    </div>
+                </div>
+                <!-- List of attachments for issue -->
+                <div class="tab-pane" id="attachments">
+                    <div class="issue-attachments">
+                        <div class="add-attach">
+                            <div class="center">
+                                <i>
+                                    <a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">
+                                        <i class="icon-file"></i>&nbsp;Attach new file
+                                    </a>
+                                </i>
+                            </div>
+                            <div class="well well-small" data-ng-show="attachOpen">
+                                <input type="file" id="addAttach"/>
+                                <p>
+                                    <small>
+                                        File will be uploaded after selection
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                        <div data-ng-repeat="attach in issue.attachments" class="attach">
+                            <i class="icon-chevron-right"></i>&nbsp;
+                            <a data-ng-href="{{attach.content_url}}" target="_blank">{{attach.filename}}</a>
+                            &nbsp;
+                            <small>
+                                <i>{{attach.author.name}}&nbsp;{{attach.created_on | date:'dd-MM-yyyy'}}</i>
+                            </small>
+                        </div>
                     </div>
                 </div>
                 <!-- Add new Comment to issue -->

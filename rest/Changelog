@@ -1,5 +1,12 @@
 Changelog
 ---------------------------------
+1.0 ()
+    - Create new issue from selected text
+    - Comment to issue with selected text
+    
+0.9.9 ()
+    - Attach file to issue
+
 0.9.8 (20-Nov-2012)
     - Added "Issue list options"
 

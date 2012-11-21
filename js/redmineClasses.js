@@ -385,7 +385,7 @@ Issues.prototype.get = function(issue, reload) {
         return;
     }
     (function(obj) {
-        getLoader().get("issues/"+issue.id+".json?include=journals,changesets", function(json) {
+        getLoader().get("issues/"+issue.id+".json?include=journals,changesets,attachments", function(json) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
                 if (is.issue) {
