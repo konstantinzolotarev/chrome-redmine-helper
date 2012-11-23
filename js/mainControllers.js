@@ -7,6 +7,13 @@ jQuery(document).ready(function($) {
     $('.container').tooltip({
         selector: "i[data-type='tooltip']"
     });
+
+    //Popover
+    $('.container').popover({
+        selector: ".help[data-type='popover']",
+        trigger: "hover",
+        placement: "top"
+    });
 });
 
 /**
@@ -413,6 +420,9 @@ function NewIssue($scope) {
     $scope.projects = BG.getProjects().all();
     $scope.project = {};
     
+    //User options
+    $scope.options = BG.getConfig();
+
     $scope.isLoading = false;
     $scope.success = false;
     //List of errors

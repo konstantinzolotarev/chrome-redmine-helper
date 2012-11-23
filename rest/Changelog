@@ -3,9 +3,14 @@ Changelog
 1.0 ()
     - Create new issue from selected text
     - Comment to issue with selected text
+    - Hints + disable hints in options
+    - Options code optimization
     
-0.9.9 ()
+0.9.9 (23-Nov-2012)
     - Attach file to issue
+    - Attachment history parsing
+    - Stability improvements
+    - V8 code optimazation
 
 0.9.8 (20-Nov-2012)
     - Added "Issue list options"
