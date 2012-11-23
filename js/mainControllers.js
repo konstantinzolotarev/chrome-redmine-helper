@@ -364,8 +364,17 @@ function Home($scope) {
 
     // Handle file upload to redmine
     var onFileUploaded = function(request, sender, sendResponse) {
-        console.log(request.token, $scope.issue);
-        BG.getIssues().update($scope.issue.id, {'uploads':[{'upload': {'token': request.token}}]});
+        console.log(request.token, request.file);
+        var data = {
+            'uploads': [ 
+                {
+                    'token': request.token,
+                    'filename': request.file.name,
+                    'content_type': request.file.type
+                }
+            ]
+        };
+        BG.getIssues().update($scope.issue.id, data);
     };
     
     //Global message listener

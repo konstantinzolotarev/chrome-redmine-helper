@@ -290,7 +290,7 @@ angular.module('issues', ['ngSanitize']).
                         sc.error = false;
                         sc.loading = false;
                         //Notify listeners that file is uploaded
-                        chrome.extension.sendMessage({"action": "fileUploaded", 'token': json.upload.token});
+                        chrome.extension.sendMessage({"action": "fileUploaded", 'token': json.upload.token, 'file': file});
                     });
                 }, function(e, resp) {
                     scope.$apply(function(sc) {
