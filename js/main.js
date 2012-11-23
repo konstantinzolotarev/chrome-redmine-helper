@@ -101,38 +101,42 @@ angular.module('issues', ['ngSanitize']).
             if (!item.name) {
                 return;
             }
-            switch (item.name) {
-                case "status_id":
-                    element.html("<strong>Status</strong> changed from "
-                            + "<i>" + BG.getIssues().getStatusNameById(item.old_value) + "</i> to "
-                            + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
-                    break;
-                case "assigned_to_id":
-                    element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(item.new_value));
-                    break;
-                case "category_id":
-                    element.html("<strong>Category</strong> set to: "+item.new_value);
-                    break;
-                case "done_ratio":
-                    element.html("<strong>% Done</strong> changed from "+item.old_value+" to "+item.new_value);
-                    break;
-                case "estimated_hours":
-                    element.html("<strong>Estimated time</strong> set to: "+item.new_value);
-                    break;
-                case "tracker_id":
-                    element.html("<strong>Tracker</strong> changed from "
-                                    + "<i>"+getTracker(item.old_value)+"</i> to "
-                                    + "<i>"+getTracker(item.new_value)+"</i>");
-                    break;
-                case "subject": 
-                    element.html("<strong>Subject</strong> changed from "
-                                    + "<i><u>"+item.old_value+"</u></i> to "
-                                    + "<i><u>"+item.new_value+"</u></i>");
-                    break;
-                default:
-                    element.html("<strong>Sorry</strong> this is under developent.");
-                    console.log(item);
-                    break;
+            if (item.property == "attr") {
+                switch (item.name) {
+                    case "status_id":
+                        element.html("<strong>Status</strong> changed from "
+                                + "<i>" + BG.getIssues().getStatusNameById(item.old_value) + "</i> to "
+                                + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
+                        break;
+                    case "assigned_to_id":
+                        element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(item.new_value));
+                        break;
+                    case "category_id":
+                        element.html("<strong>Category</strong> set to: "+item.new_value);
+                        break;
+                    case "done_ratio":
+                        element.html("<strong>% Done</strong> changed from "+item.old_value+" to "+item.new_value);
+                        break;
+                    case "estimated_hours":
+                        element.html("<strong>Estimated time</strong> set to: "+item.new_value);
+                        break;
+                    case "tracker_id":
+                        element.html("<strong>Tracker</strong> changed from "
+                                        + "<i>"+getTracker(item.old_value)+"</i> to "
+                                        + "<i>"+getTracker(item.new_value)+"</i>");
+                        break;
+                    case "subject": 
+                        element.html("<strong>Subject</strong> changed from "
+                                        + "<i><u>"+item.old_value+"</u></i> to "
+                                        + "<i><u>"+item.new_value+"</u></i>");
+                        break;
+                    default:
+                        element.html("<strong>Sorry</strong> this is under developent.");
+                        break;
+                }
+            } else if (item.property == "attachment") {
+                element.html("<strong>Attachment</strong> added "
+                                        + "<i><u>"+item.new_value+"</u></i>");
             }
         };
         // watch the expression, and update the UI on change.
