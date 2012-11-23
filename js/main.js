@@ -223,4 +223,85 @@ angular.module('issues', ['ngSanitize']).
         // The linking function will add behavior to the template
         link: linkFunction
     };
+}).directive('uploadFile', function() {
+    return {
+        replace: true,
+        transclude: true,
+        restrict: "EA",
+        template: '<div class="add-attach">'
+                            + '<div class="center">'
+                                + '<i>'
+                                    + '<a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">'
+                                        + '<i class="icon-file"></i>&nbsp;Attach new file'
+                                    + '</a>'
+                                + '</i>'
+                            + '</div>'
+                            + '<div class="well well-small" data-ng-show="attachOpen">'
+                                + '<div class="alert alert-info" data-ng-show="loading">'
+                                    + '<strong>Uploading!</strong> Your file is uploading to server...'
+                                + '</div>'
+                                + '<div class="alert alert-error" data-ng-show="error">'
+                                    + '<button type="button" class="close" data-dismiss="alert">×</button>'
+                                    + '<strong>Warning!</strong> File couldn\'t be uploaded !'
+                                + '</div>'
+                                + '<input type="file" id="addAttach" data-ng-hide="loading"/>'
+                                + '<p>'
+                                    + '<small>'
+                                        + 'File will be uploaded automaticaly after selection'
+                                    + '</small>'
+                                + '</p>'
+                            + '</div>'
+                        + '</div>',
+        scope: {
+            // uploadFile: "=onOk"
+        },
+        // The linking function will add behavior to the template
+        link: function(scope, element, attrs) {
+            scope.file = null;
+            scope.files = [];
+            scope.error = false;
+            //Open flag for
+            scope.attachOpen = false;
+            scope.loading = false;
+            
+            //Handle new file selection
+            var onFileChange = function() {
+                if (this.files.length < 1) {
+                    return;
+                }
+                var file = this.files[0];
+                scope.$apply(function(sc) {
+                    sc.uploadFile(file);
+                });
+                this.value = "";
+            };
+            
+            /**
+             * Upload file to Redmine server
+             */
+            scope.uploadFile = function(file) {
+                scope.loading = true;
+                BG.getLoader().upload("uploads.json", file, function(resp) {
+                    if (!resp.response || resp.response == "") {
+                        return;
+                    }
+                    var json = JSON.parse(resp.response);
+                    scope.$apply(function(sc) {
+                        sc.error = false;
+                        sc.loading = false;
+                        //Notify listeners that file is uploaded
+                        chrome.extension.sendMessage({"action": "fileUploaded", 'token': json.upload.token});
+                    });
+                }, function(e, resp) {
+                    scope.$apply(function(sc) {
+                        sc.error = true;
+                        sc.loading = false;
+                    });
+                });
+            };
+
+            //Add listener for file upload
+            document.getElementById('addAttach').addEventListener('change', onFileChange);
+        }
+    };
 });

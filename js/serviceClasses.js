@@ -163,7 +163,7 @@ function Loader() {
  * @param {String} url
  * @param {boolean} async
  */
-Loader.prototype.createXhr = function(method, url, async) {
+Loader.prototype.createXhr = function(method, url, async, preventContentType) {
     var xhr = new XMLHttpRequest();
     var fullUrl = getConfig().getHost() + url;
     if (config.getProfile().useHttpAuth) {
@@ -171,8 +171,10 @@ Loader.prototype.createXhr = function(method, url, async) {
     } else {
         xhr.open(method, fullUrl, (async || true));
     }
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader("X-Redmine-API-Key", getConfig().getApiAccessKey());
+    if (!preventContentType) {
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    }
     return xhr;
 };
 
@@ -204,6 +206,35 @@ Loader.prototype.get = function(url, success, error) {
 };
 
 /**
+ * Make POST request with file
+ * 
+ * @param {String} url
+ * @param {mixed} data
+ * @param {Function} success
+ * @param {Function} error
+ * @returns {undefined}
+ */
+Loader.prototype.upload = function(url, data, success, error) {
+    var xhr = this.createXhr("POST", url, true, true);
+    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+    //Check input date
+    data = data || "";
+    success = success || function() {};
+    error = error || function() {};
+    //success handler
+    xhr.onload = function(e) {
+        if (this.status == 200 || this.status == 201) {
+            success(this);
+        } else {
+            error(e, this);
+        }
+    };
+    //error handler
+    xhr.onerror = error;
+    xhr.send(data);
+};
+
+/**
  * Make POST request 
  * 
  * @param {String} url
@@ -221,7 +252,7 @@ Loader.prototype.post = function(url, data, success, error) {
     //success handler
     xhr.onload = function(e) {
         if (this.status == 200 || this.status == 201) {
-            success({});
+            success(this);
         } else {
             error(e, this);
         }

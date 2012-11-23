@@ -110,23 +110,7 @@
                 <!-- List of attachments for issue -->
                 <div class="tab-pane" id="attachments">
                     <div class="issue-attachments">
-                        <div class="add-attach">
-                            <div class="center">
-                                <i>
-                                    <a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">
-                                        <i class="icon-file"></i>&nbsp;Attach new file
-                                    </a>
-                                </i>
-                            </div>
-                            <div class="well well-small" data-ng-show="attachOpen">
-                                <input type="file" id="addAttach"/>
-                                <p>
-                                    <small>
-                                        File will be uploaded automaticaly after selection
-                                    </small>
-                                </p>
-                            </div>
-                        </div>
+                        <upload-file></upload-file>
                         <div data-ng-repeat="attach in issue.attachments" class="attach">
                             <i class="icon-chevron-right"></i>&nbsp;
                             <a data-ng-href="{{attach.content_url}}" target="_blank">{{attach.filename}}</a>

@@ -157,6 +157,13 @@ function Home($scope) {
     //Vars for detailed info
     $scope.issue = {};
     $scope.project = {};
+
+    /**
+     * On new file selected for upload
+     */
+    $scope.fileSubmitted = function(file) {
+        console.log(file);
+    };
     
     /**
      * Store table options
@@ -323,27 +330,23 @@ function Home($scope) {
     
     //Handle update issue details
     var onIssueDetails = function(request, sender, sendResponse) {
-        if (request.action && request.action == "issueDetails") {
-            if ($scope.issue.id == request.id) {
-                //update issue
-                $scope.$apply(function(sc) {
-                    sc.issue = request.issue;
-                    sc.updateIssues();
-                });
-                sendResponse({});
-            }
+        if ($scope.issue.id == request.id) {
+            //update issue
+            $scope.$apply(function(sc) {
+                sc.issue = request.issue;
+                sc.updateIssues();
+            });
+            sendResponse({});
         }
     };
     
     //Handle update issues list
     var onIssuesUpdated = function(request, sender, sendResponse) {
-        if (request.action && request.action == "issuesUpdated") {
-            $scope.$apply(function(sc) {
-                sc.issues = [];
-                sc.isLoading = false;
-                sc.updateIssues();
-            });
-        }
+        $scope.$apply(function(sc) {
+            sc.issues = [];
+            sc.isLoading = false;
+            sc.updateIssues();
+        });
     };
     
     //handle project updated datas
@@ -351,14 +354,18 @@ function Home($scope) {
         if (!$scope.issue.project) {
             return;
         }
-        if (request.action && request.action == "projectUpdated" && request.project) {
-            $scope.$apply(function(sc) {
-                var projId = sc.issue.project.id;
-                if (projId && projId > 0 && projId == request.project.id) {
-                    sc.project = request.project;
-                }
-            });
-        }
+        $scope.$apply(function(sc) {
+            var projId = sc.issue.project.id;
+            if (projId && projId > 0 && projId == request.project.id) {
+                sc.project = request.project;
+            }
+        });
+    };
+
+    // Handle file upload to redmine
+    var onFileUploaded = function(request, sender, sendResponse) {
+        console.log(request.token, $scope.issue);
+        BG.getIssues().update($scope.issue.id, {'uploads':[{'upload': {'token': request.token}}]});
     };
     
     //Global message listener
@@ -375,6 +382,9 @@ function Home($scope) {
                 break;
             case "projectUpdated": 
                 return onProjectUpdated(request, sender, sendResponse);
+                break;
+            case "fileUploaded": 
+                return onFileUploaded(request, sender, sendResponse);
                 break;
         }
     };
