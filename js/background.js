@@ -226,38 +226,12 @@ function startRequest(params) {
     }
 }
 
-/**
- * 
- * @returns {undefined}
- */
-function upgradeSettings() {
-    //Check for updated settings
-    if (!getConfig().getProfile().notifications) {
-        //update profile with new settings
-        getConfig().getProfile().notifications = {
-            show: 'none'
-        };
-        //Store changes
-        getConfig().store(getConfig().getProfile());
-    }
-    //Check for updated settings for projects
-    if (!getConfig().getProfile().projects) {
-        //update profile with new settings
-        getConfig().getProfile().projects = {
-            show_for: 'all',
-            list: []
-        };
-        //Store changes
-        getConfig().store(getConfig().getProfile());
-    }
-}
 
 /**
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
     console.log("Installed");
-    upgradeSettings();
     startRequest({scheduleRequest:true});
 });
 
