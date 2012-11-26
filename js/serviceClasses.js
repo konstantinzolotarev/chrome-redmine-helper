@@ -21,7 +21,14 @@ function Config() {
         projects: {
             show_for: 'all',
             list: []
-        }
+        },
+        table: {
+            project: true,
+            author: true,
+            tracker: false,
+            status: false
+        },
+        test: "Test passed"
     };
     this.loaded = false;
 }
@@ -66,7 +73,8 @@ Config.prototype.load = function() {
         this.loaded = true;
         return;
     }
-    this.profile = JSON.parse(profile);
+    var loadedProfile = JSON.parse(profile);
+    this.profile = merge(this.profile, loadedProfile);
     this.loaded = true;
     return;
 };
