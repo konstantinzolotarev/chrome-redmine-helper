@@ -110,14 +110,8 @@ function Options($scope, $timeout) {
      * Save new options
      */
     $scope.storeOptions = function() {
-        BG.getConfig().getProfile().host = document.querySelector("#inputHost").value;
-        BG.getConfig().getProfile().apiAccessKey = document.querySelector("#inputApiKey").value;
-        BG.getConfig().getProfile().useHttpAuth = $scope.useHttpAuth;
-        BG.getConfig().getProfile().httpUser = BG.getConfig().getProfile().useHttpAuth ? document.querySelector("#httpUser").value : "";
-        BG.getConfig().getProfile().httpPass = BG.getConfig().getProfile().useHttpAuth ? document.querySelector("#httpPass").value : "";
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.clearItems();
-        $scope.options = BG.getConfig();
         $scope.success = true;
         $timeout($scope.hideSuccess, 5000);
     };
@@ -127,11 +121,17 @@ function Options($scope, $timeout) {
      */
     $scope.storeNotifications = function() {
         BG.getConfig().getProfile().notifications.show = document.querySelector(".notification_show:checked").value;
-        console.log(BG.getConfig().profile.notifications.show);
         BG.getConfig().store(BG.getConfig().getProfile());
         $scope.options = BG.getConfig();
         $scope.success = true;
         $timeout($scope.hideSuccess, 5000);
+    };
+
+    /**
+     * Store Misc tab settings
+     */
+    $scope.storeMisc = function() {
+        BG.getConfig().store(BG.getConfig().getProfile());
     };
     
     /**

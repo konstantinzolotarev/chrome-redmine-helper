@@ -10,6 +10,7 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
                 <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
+                <li><a href="#misc" data-toggle="tab">Misc</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="connection">
@@ -17,31 +18,31 @@
                         <div class="control-group">
                             <label class="control-label" for="inputHost">Redmine Host</label>
                             <div class="controls">
-                                <input type="text" id="inputHost" placeholder="https://some.redmine.host" required value="{{options.getHost()}}" />
+                                <input type="text" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />
                             </div>
                         </div>
                         <div class="control-group">
                             <label class="control-label" for="inputApiKey">Redmine Api Access Key</label>
                             <div class="controls">
-                                <input type="password" id="inputApiKey" placeholder="Your Api Access Key" value="{{options.getApiAccessKey()}}" />
+                                <input type="password" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
                             </div>
                         </div>
                         <div class="control-group">
                             <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
                             <div class="controls">
-                                <input type="checkbox" id="useHttpAuth" data-ng-model="useHttpAuth" data-ng-checked="useHttpAuth" />
+                                <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
                             </div>
                         </div>
-                        <div class="control-group" data-ng-show="useHttpAuth">
+                        <div class="control-group" data-ng-show="options.profile.useHttpAuth">
                             <label class="control-label" for="httpUser">HTTP Username</label>
                             <div class="controls">
-                                <input type="text" id="httpUser" placeholder="username" value="{{options.profile.httpUser}}" />
+                                <input type="text" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
                             </div>
                         </div>
-                        <div class="control-group" data-ng-show="useHttpAuth">
+                        <div class="control-group" data-ng-show="options.profile.useHttpAuth">
                             <label class="control-label" for="httpPass">HTTP Password</label>
                             <div class="controls">
-                                <input type="password" id="httpPass" placeholder="password" value="{{options.profile.httpPass}}" />
+                                <input type="password" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
                             </div>
                         </div>
                         <div class="form-actions">
@@ -73,6 +74,22 @@
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane" id="misc">
+                    <form class="form-horizontal">
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input type="checkbox" id="showhints" 
+                                       data-ng-model="options.profile.hideHints" />
+                                Hide help messages and hints
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success" data-ng-click="storeMisc()">Store settings</button>
                     </div>
                 </form>
             </div>
