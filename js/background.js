@@ -156,9 +156,12 @@ function getMainUrl(absolute) {
 /**
  * Will open new Extension Main page or set selected page that already open
  * 
+ * @param {Object} page
  * @returns {void}
  */
-function openMainPage() {
+function openMainPage(page) {
+    var urlToOpen = page ? getMainUrl()+"#"+page : getMainUrl() ;
+    console.log(urlToOpen, page);
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
             if (tab.url && isMainUrl(tab.url)) {
@@ -166,7 +169,7 @@ function openMainPage() {
                 return;
             }
         }
-        chrome.tabs.create({url: getMainUrl()});
+        chrome.tabs.create({url: urlToOpen});
     });
 }
 
@@ -254,4 +257,6 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 /**
  * Bind click action to icon
  */
-chrome.browserAction.onClicked.addListener(openMainPage);
+chrome.browserAction.onClicked.addListener(function() {
+    openMainPage(); 
+});
