@@ -231,12 +231,7 @@ function startRequest(params) {
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
-    console.log("Installed");
     startRequest({scheduleRequest:true});
-});
-
-chrome.runtime.onSuspend.addListener(function() {
-    console.log("Suspended");
 });
 
 /**
