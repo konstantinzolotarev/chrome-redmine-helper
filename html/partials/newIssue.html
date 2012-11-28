@@ -23,7 +23,7 @@
             <div class="control-group">
                 <label class="control-label" for="subject">Subject</label>
                 <div class="controls">
-                    <input type="text" id="subject" placeholder="Subject" data-ng-model="issue.subject" required />
+                    <input type="text" id="subject" placeholder="Subject" data-ng-model="issue.subject" required tabindex="1"/>
                 </div>
             </div>
             <div class="control-group">
@@ -32,7 +32,8 @@
                     <select id="project_id"
                             data-ng-model="issue.project_id" 
                             data-ng-options="project.id as project.name for project in projects" 
-                            data-ng-change="projectChanged()">
+                            data-ng-change="projectChanged()" 
+                            tabindex="2">
                         <option value="">Select project</option>
                     </select>
                 </div>
@@ -44,7 +45,8 @@
                     <select id="assigned_to_id"
                             data-ng-show="project.membersLoaded"
                             data-ng-model="issue.assigned_to_id" 
-                            data-ng-options="member.id as member.name for member in project.members">
+                            data-ng-options="member.id as member.name for member in project.members"
+                            tabindex="3">
                         <option value="">Select assignee</option>
                     </select>
                 </div>
@@ -56,7 +58,8 @@
                     <select id="tracker_id"
                             data-ng-show="project.fullyLoaded"
                             data-ng-model="issue.tracker_id" 
-                            data-ng-options="track.id as track.name for track in project.trackers">
+                            data-ng-options="track.id as track.name for track in project.trackers"
+                            tabindex="4">
                         <option value="" >Select tracker</option>
                     </select>
                 </div>
@@ -66,18 +69,18 @@
                     Estimated hours
                 </label>
                 <div class="controls">
-                    <input type="number" id="estimated_hours" min="0" data-ng-model="issue.estimated_hours" />  
+                    <input type="number" id="estimated_hours" min="0" data-ng-model="issue.estimated_hours" tabindex="5"/>  
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="description">Description</label>
                 <div class="controls">
-                    <textarea rows="7" id="description" class="input-xxlarge" data-ng-model="issue.description"></textarea>
+                    <textarea rows="7" id="description" class="input-xxlarge" data-ng-model="issue.description" tabindex="6"></textarea>
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn btn-success" data-ng-click="submit()">Create new Issue</button>
-                <a href="#/home" class="btn">Cancel</a>
+                <button type="submit" class="btn btn-success" data-ng-click="submit()" tabindex="7">Create new Issue</button>
+                <a href="#/home" class="btn" tabindex="8">Cancel</a>
             </div>
         </form>
     </div>

@@ -413,9 +413,14 @@ function Home($scope) {
  * New issue controller
  * 
  * @param {Scope} $scope
+ * @param {RouteParams} $routeParams
  * @returns {undefined}
  */
 function NewIssue($scope) {
+    //Store selected in context menu text
+    var subject = BG.getSelectedText();
+    //clear selected text
+    BG.clearSelectedText();
     //list of projects
     $scope.projects = BG.getProjects().all();
     $scope.project = {};
@@ -432,7 +437,7 @@ function NewIssue($scope) {
     
     // Issue model
     $scope.issue = {
-        subject: "",
+        subject: subject,
         project_id: 0,
         description: ""
     };

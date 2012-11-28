@@ -1,5 +1,7 @@
 var pollIntervalMin = 5;  // 5 minutes
 var notification;
+var selectedText = "";
+
 /**
  * Init global variables
  */
@@ -12,6 +14,22 @@ issues = new Issues();
  * @type Users
  */
 var users;
+
+/**
+ * Get selected text from context menu event
+ *
+ * @returns {String} selected text
+ */
+function getSelectedText() {
+    return selectedText;
+}
+
+/**
+ * Clear selected in context menu text
+ */
+function clearSelectedText() {
+    selectedText = "";
+}
 
 /**
  * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
@@ -165,7 +183,10 @@ function openMainPage(page) {
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
             if (tab.url && isMainUrl(tab.url)) {
-                chrome.tabs.update(tab.id, {selected: true});
+                chrome.tabs.update(tab.id, {
+                    selected: true,
+                    url: urlToOpen
+                });
                 return;
             }
         }
@@ -229,6 +250,22 @@ function startRequest(params) {
     }
 }
 
+/**
+ * handler for click on context menu
+ */
+function handleContextMenu(info, tab) {
+    console.log(info);
+    //store selected text
+    selectedText = info.selectionText;
+    //open new tab to create issue 
+    openMainPage("/new_issue");
+}
+
+/**
+ * Add handler to context menu click
+ */
+chrome.contextMenus.onClicked.addListener(handleContextMenu);
+
 
 /**
  * Bind actions on extension is installed
@@ -260,3 +297,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 chrome.browserAction.onClicked.addListener(function() {
     openMainPage(); 
 });
+
+/**
+ * Create context menu to create new issues from selected text
+ */ 
+ chrome.contextMenus.create({
+    'id': "newIssueContextMenu",
+    'title': "Create new Redmine issue",
+    'contexts': ["selection"]
+ });
