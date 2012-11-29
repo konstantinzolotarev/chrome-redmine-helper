@@ -217,18 +217,45 @@ Projects.prototype.sendProjectUpdated = function(id, project) {
  * Get list of issues for project
  * 
  * @param {String} id project identifier
+ * @param {int} offset
+ * @param {boolean} reload
  * @returns {Array}
  */
-Projects.prototype.getIssues = function(id) {
-    var key = this.getProjectKey(id);
-    if (this.projects[key].issuesLoaded) {
+Projects.prototype.getIssues = function(id, offset, reload) {
+    var proj = this.getById(id);
+    if (!proj.key || !proj.project) {
+        return [];
+    }
+    var key = parseInt(proj.key);
+    if (this.projects[key].issuesLoaded && !reload) {
         return this.projects[key].issues;
     }
-    (function(obj) {
-        getLoader().get("issues.json?sort=updated_on:desc", function(data) {
-            console.log(data);
+    if (reload || !this.projects[key].issues) {
+        //clear issues
+        this.projects[key].issues = [];
+    }
+    offset = offset || 0;
+    var limit = 50;
+    (function(obj, key, limit) {
+        getLoader().get("issues.json?sort=updated_on:desc&project_id="+id+"&limit="+limit+"&offset="+offset, function(json) {
+            if (!json.issues || !json.total_count || json.total_count < 1) {
+                return [];
+            }
+            for(var i in json.issues) {
+                obj.projects[key].issues.push(json.issues[i]);    
+            }
+            obj.projects[key].issuesLoaded = true;
+            obj.sendProjectUpdated(id, this.projects[key]);
+            obj.store();
+            /**
+             * Load rest of issues for selected project
+             */
+            if (json.total_count > (offset + limit)) {
+                obj.getIssues(obj.projects[key].id, (offset + limit), false);
+            }
+            console.log(obj.projects[key]);
         });
-    })(this);
+    })(this, key, limit);
     return [];
 };
 

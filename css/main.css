@@ -65,3 +65,7 @@ table.issues .unread {
 .add-attach {
     margin-bottom: 5px;
 }
+
+.margin {
+    margin-bottom: 10px;
+}

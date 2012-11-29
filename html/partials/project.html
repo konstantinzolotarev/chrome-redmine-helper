@@ -1,6 +1,21 @@
 <div class="page-header">
     <h3>{{project.name}}&nbsp;&nbsp;<small>{{project.description}}</small></h3>
 </div>
-<div class="well">
-    <strong>Sorry.</strong> This page is under construction.
+<div class="row-fluid well well-small">
+	<div class="span12">
+		<strong class="muted">
+			Quick filters:
+		</strong>&nbsp;
+		<a href="" 
+			class="btn" 
+			data-ng-class="filters.onlyMy && 'active'" 
+			data-ng-click="onlyMy()">
+			Only my issues
+		</a>&nbsp;
+	</div>
+</div>
+<div class="row-fluid">
+	<div data-ng-repeat="issue in issues | filter:issueFilter">
+		{{issue.subject}}
+	</div>
 </div>

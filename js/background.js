@@ -179,7 +179,6 @@ function getMainUrl(absolute) {
  */
 function openMainPage(page) {
     var urlToOpen = page ? getMainUrl()+"#"+page : getMainUrl() ;
-    console.log(urlToOpen, page);
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
             if (tab.url && isMainUrl(tab.url)) {
