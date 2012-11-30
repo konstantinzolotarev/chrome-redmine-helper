@@ -1,8 +1,27 @@
+<!-- Dialog windows -->
+<div class="modal hide fade" id="statusesSelection" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>
+            Statuses to show
+        </h3>
+    </div>
+    <div class="modal-body">
+    	<div data-ng-include src="'/html/partials/statusesSelection.html'"></div>
+    </div>
+    <div class="modal-footer">
+        <a href="" class="btn btn-success" data-ng-click="storeIssuesSelection()">
+            Store options
+        </a>
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+    </div>
+</div>
+<!-- -->
 <div class="page-header">
     <h3>{{project.name}}&nbsp;&nbsp;<small>{{project.description}}</small></h3>
 </div>
 <div class="row-fluid well well-small">
-	<div class="span12">
+	<div class="span10">
 		<strong class="muted">
 			Quick filters:
 		</strong>&nbsp;
@@ -13,9 +32,28 @@
 			Only my issues
 		</a>&nbsp;
 	</div>
+	<div class="span2">
+		<a href="#statusesSelection" class="btn" data-toggle="modal">
+			<i class="icon-cog"></i>
+		</a>
+	</div>
 </div>
+<!-- Create cols -->
 <div class="row-fluid">
-	<div data-ng-repeat="issue in issues | filter:issueFilter">
-		{{issue.subject}}
+	<div data-ng-repeat="col in cols | orderBy:'order'" class="span4 col">
+		<div class="title">
+			<h4>{{col.title}}</h4>
+		</div>
+		<div class="content">
+			<div class="no-issues center" data-ng-hide="col.issues.length > 0">We have no issues</div>
+			<div class="issue" data-ng-repeat="issue in col.issues">
+				<div class="issue-title">
+					<strong>{{issue.subject}}</strong>
+				</div>
+				<div class="issue-desc">
+					{{issue.description}}
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

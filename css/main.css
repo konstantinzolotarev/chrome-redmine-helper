@@ -69,3 +69,52 @@ table.issues .unread {
 .margin {
     margin-bottom: 10px;
 }
+
+/* Project part */
+.col {
+    border: 1px solid #afafaf;
+    border-radius: 5px;
+    padding: 1px;
+}
+
+.col .title {
+    border-bottom: 1px solid #afafaf;
+    padding: 0 15px;
+}
+
+.col .content {
+    padding: 8px 0;
+    min-height: 150px;
+    max-height: 600px;
+    overflow: auto;
+}
+
+.col .content .no-issues  {
+    padding: 20px 0;
+    font-size: 30px;
+    color: #efefef
+}
+
+.col .content .issue {
+    border: 1px solid #ececec;
+    border-radius: 3px;
+    padding: 8px;
+    margin: 7px 3px;
+    box-shadow: rgba(0, 0, 128, 0.25)  1px 1px 3px;
+}
+
+.col .content .issue:hover {
+    border: 1px solid #ababab;
+    cursor: move;
+}
+
+.col .content .issue .issue-title {
+    padding: 2px 5px;
+    border-bottom: 1px solid #ececec;
+}
+
+.col .content .issue .issue-desc {
+    margin-top: 4px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
