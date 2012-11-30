@@ -245,7 +245,7 @@ Projects.prototype.getIssues = function(id, offset, reload) {
                 obj.projects[key].issues.push(json.issues[i]);    
             }
             obj.projects[key].issuesLoaded = true;
-            obj.sendProjectUpdated(id, this.projects[key]);
+            obj.sendProjectUpdated(id, obj.projects[key]);
             obj.store();
             /**
              * Load rest of issues for selected project
@@ -253,7 +253,6 @@ Projects.prototype.getIssues = function(id, offset, reload) {
             if (json.total_count > (offset + limit)) {
                 obj.getIssues(obj.projects[key].id, (offset + limit), false);
             }
-            console.log(obj.projects[key]);
         });
     })(this, key, limit);
     return [];

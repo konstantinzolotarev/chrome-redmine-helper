@@ -51,6 +51,9 @@ function Project($scope, $routeParams) {
      */
     $scope.bindIssues = function() {
         $scope.issues = [];
+        for(var colKey in $scope.cols) {
+            $scope.cols[colKey].issues = [];
+        }
         for(var key in $scope.project.issues) {
             $scope.cols[0].issues.push($scope.project.issues[key]);
         }
@@ -61,6 +64,15 @@ function Project($scope, $routeParams) {
     $scope.bindIssues();
 
     console.log($scope.issues);
+
+    /**
+     * Reload current project
+     */
+    $scope.updateProject = function() {
+        BG.getProjects().get($scope.id, true);
+        BG.getProjects().getIssues($scope.id, 0, true);
+    };
+
     /**
      * Store issues statuses that should be visible in table
      */
@@ -96,6 +108,7 @@ function Project($scope, $routeParams) {
         $scope.$apply(function(sc) {
             sc.project = request.project;
             sc.bindIssues();
+            console.log(request.project);
         });
     };
 

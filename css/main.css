@@ -117,4 +117,5 @@ table.issues .unread {
     margin-top: 4px;
     text-overflow: ellipsis;
     overflow: hidden;
+    max-height: 60px;
 }

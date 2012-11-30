@@ -21,7 +21,7 @@
     <h3>{{project.name}}&nbsp;&nbsp;<small>{{project.description}}</small></h3>
 </div>
 <div class="row-fluid well well-small">
-	<div class="span10">
+	<div class="span9">
 		<strong class="muted">
 			Quick filters:
 		</strong>&nbsp;
@@ -32,7 +32,11 @@
 			Only my issues
 		</a>&nbsp;
 	</div>
-	<div class="span2">
+	<div class="span3">
+		<a href="" class="btn" data-ng-click="updateProject()">
+			<i class="icon-refresh"></i>&nbsp;
+			Update
+		</a>
 		<a href="#statusesSelection" class="btn" data-toggle="modal">
 			<i class="icon-cog"></i>
 		</a>
