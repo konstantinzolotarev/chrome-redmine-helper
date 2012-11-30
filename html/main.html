@@ -13,7 +13,6 @@
         <script type="text/javascript" src="../js/lib/angular-sanitize.min.js"></script>
         <script type="text/javascript" src="../js/main.js"></script>
         <script type="text/javascript" src="../js/mainControllers.js"></script>
-        <script type="text/javascript" src="../js/projectController.js"></script>
     </head>
     <body>
         <div data-ng-controller="Main">
@@ -31,28 +30,6 @@
                                 </li>
                                 <li>
                                     <a href="#projectFilters" data-toggle="modal">Projects filtering</a>
-                                </li>
-                            </ul>
-                            <ul class="nav pull-right">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        My projects
-                                        <b class="caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li data-ng-show="projects.length < 1">
-                                            <a href="#/home">No projects</a>
-                                        </li>
-                                        <li data-ng-repeat="project in projects">
-                                            <a href="#/project/{{project.id}}">{{project.name}}</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="" data-ng-click="updateProjects()">
-                                                <i class="icon-refresh"></i>&nbsp;Update project list
-                                            </a>
-                                        </li>
-                                    </ul>
                                 </li>
                             </ul>
                         </div>
