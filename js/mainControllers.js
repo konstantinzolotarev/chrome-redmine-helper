@@ -36,6 +36,7 @@ function Main($scope) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
     $scope.projects = BG.getProjects().all();
+    $scope.customError = "";
     
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
@@ -45,11 +46,43 @@ function Main($scope) {
             });
         }
     };
-    $scope.onMessageHandler = function(request, sender, sendResponse) {
+
+    $scope.projectsLoadedHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "projectsLoaded" && request.projects) {
             $scope.$apply(function(sc) {
                 sc.projects = request.projects;
             });
+        }
+    };
+
+    $scope.onCustomError = function(request, sender, sendResponse) {
+        console.log(request);
+        if (request.errors) {
+            var msg = "<ul>";
+            for(var i in request.errors.errors) {
+                msg += "<li>"+request.errors.errors[i]+"</li>";
+            }
+            msg += "</ul>"
+            $scope.$apply(function(sc) {
+                sc.customError = msg;
+            });
+        }
+    };
+
+    $scope.onMessageHandler = function(request, sender, sendResponse) {
+        if (!request || !request.action) {
+            return;
+        }
+        switch(request.action) {
+            case "projectsLoaded":
+                $scope.projectsLoadedHandler(request, sender, sendResponse);
+                break;
+            case "xhrError":
+                $scope.xhrErrorHandler(request, sender, sendResponse);
+                break;
+            case "customError":
+                $scope.onCustomError(request, sender, sendResponse);
+                break;
         }
     };
     
@@ -85,7 +118,6 @@ function Main($scope) {
         BG.getIssues().clearIssues();
         jQuery('#projectFilters').modal('toggle');
     };
-    chrome.extension.onMessage.addListener($scope.xhrErrorHandler);
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
 }
 
@@ -401,6 +433,17 @@ function Home($scope) {
         };
         BG.getIssues().update($scope.issue.id, data);
     };
+
+    //Handle error on update issue
+    var onCustomError = function(request, sender, sendResponse) {
+        if (!request || !request.type || request.type != "issueUpdate") {
+            return;
+        }
+        //stop loading
+        $scope.$apply(function(sc) {
+            sc.isLoading = false;
+        });
+    };
     
     //Global message listener
     var onMessage = function(request, sender, sendResponse) {
@@ -419,6 +462,9 @@ function Home($scope) {
                 break;
             case "fileUploaded": 
                 return onFileUploaded(request, sender, sendResponse);
+                break;
+            case "customError":
+                return onCustomError(request, sender, sendResponse);
                 break;
         }
     };
@@ -548,6 +594,17 @@ function NewIssue($scope) {
         });
     };
 
+    //Handle error on create new issue
+    var onCustomError = function(request, sender, sendResponse) {
+        if (!request || !request.type || request.type != "issueCreate") {
+            return;
+        }
+        //stop loading
+        $scope.$apply(function(sc) {
+            sc.isLoading = false;
+        });
+    };
+
     //Handle new issue creation
     var onMessage = function(request, sender, sendResponse) {
         if (!request.action && request.action != "issueCreated") {
@@ -559,6 +616,9 @@ function NewIssue($scope) {
                 break;
             case "projectUpdated":
                 return onProjectUpdated(request, sender, sendResponse);
+                break;
+            case "customError":
+                return onCustomError(request, sender, sendResponse);
                 break;
         };
     };

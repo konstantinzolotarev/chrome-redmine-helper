@@ -266,7 +266,7 @@ Loader.prototype.post = function(url, data, success, error) {
         }
     };
     //error handler
-    xhr.onerror = requestError;
+    xhr.onerror = error;
     xhr.send(data);
 };
 
@@ -294,6 +294,6 @@ Loader.prototype.put = function(url, data, success, error) {
         }
     };
     //error handler
-    xhr.onerror = requestError;
+    xhr.onerror = error;
     xhr.send(data);
 };

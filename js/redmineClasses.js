@@ -467,6 +467,11 @@ Issues.prototype.update = function(id, issueData) {
         };
         getLoader().put("issues/"+id+".json", JSON.stringify(data), function(json) {
             obj.get(issue.issue, true);
+        }, function(e, request) {
+            if (request && request.readyState == 4 && request.status == 422) {
+                var json = JSON.parse(request.response);
+                chrome.extension.sendMessage({action: "customError", type: "issueUpdate", errors: json});
+            }
         });
     })(this);
 };
@@ -486,6 +491,11 @@ Issues.prototype.create = function(issue) {
             var iss = json.issue || issue;
             //notify all listeners
             chrome.extension.sendMessage({action: "issueCreated", issue: iss});
+        }, function(e, request) {
+            if (request && request.readyState == 4 && request.status == 422) {
+                var json = JSON.parse(request.response);
+                chrome.extension.sendMessage({action: "customError", type: "issueCreate", errors: json});
+            }
         });
     })(this);
 };

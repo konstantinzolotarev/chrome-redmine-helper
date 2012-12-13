@@ -41,6 +41,10 @@
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
                 </div>
+                <div class="alert alert-error ng-cloak" style="margin-top: 40px;" data-ng-show="customError != ''">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <div data-ng-bind-html="customError"></div>
+                </div>
             </div>
             <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
         </div>
