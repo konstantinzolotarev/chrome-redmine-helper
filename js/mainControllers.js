@@ -166,6 +166,24 @@ function Home($scope) {
     $scope.project = {};
 
     /**
+     * Time tracking 
+     */
+
+    /**
+     * Starts time tracking 
+     */
+    $scope.startTrackingTime = function() {
+        $scope.issue.tracking = true;
+    };
+
+    /**
+     * Stop time tracking 
+     */
+    $scope.stopTrackingTime = function() {
+        $scope.issue.tracking = false;
+    };
+
+    /**
      * On new file selected for upload
      */
     $scope.fileSubmitted = function(file) {

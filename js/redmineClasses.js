@@ -646,6 +646,9 @@ Issues.prototype.clearIssues = function() {
  */
 Issues.prototype.store = function() {
     localStorage['issues'] = JSON.stringify(this.issues);
+    if (!this.lastUpdated) {
+        this.lastUpdated = new Date();
+    }
     localStorage['lastUpdated'] = this.lastUpdated.toISOString();
     localStorage['issueStatuses'] = JSON.stringify(this.statuses);
     localStorage['statusesLoaded'] = this.statusesLoaded;

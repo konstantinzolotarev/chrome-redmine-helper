@@ -298,10 +298,15 @@ chrome.browserAction.onClicked.addListener(function() {
 });
 
 /**
- * Create context menu to create new issues from selected text
- */ 
- chrome.contextMenus.create({
-    'id': "newIssueContextMenu",
-    'title': "Create new Redmine issue",
-    'contexts': ["selection"]
- });
+ * Remove all context menues first
+ */
+chrome.contextMenus.removeAll(function() {
+    /**
+     * Create context menu to create new issues from selected text
+     */ 
+     chrome.contextMenus.create({
+        'id': "newIssueContextMenu",
+        'title': "Create new Redmine issue",
+        'contexts': ["selection"]
+     });
+});
