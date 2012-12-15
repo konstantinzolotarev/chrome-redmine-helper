@@ -107,21 +107,24 @@
                         Loading history...
                     </div>
                     <div data-ng-repeat="history in issue.journals" class="issue-history">                    
-                        <p>
+                        <p class="pointer minify" data-ng-click="toggleMinify(history)">
                             <small>
                                 <strong>Updated by</strong>&nbsp;
                                 <a href="#">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
                             </small>
+                            <i class="pull-right" data-ng-class="history.minified && 'icon-plus' || 'icon-minus'"></i>
                         </p>
-                        <ul data-ng-show="history.details.length > 0">
-                            <li data-ng-repeat="item in history.details">
-                                <div data-issue-history="item" data-project="project"></div>
-                            </li>
-                        </ul>
-                        <blockquote data-ng-show="history.notes">
-                            <p>{{history.notes}}</p>
-                            <small>New comment added</small>
-                        </blockquote>
+                        <div data-ng-hide="history.minified">
+                            <ul data-ng-show="history.details.length > 0">
+                                <li data-ng-repeat="item in history.details">
+                                    <div data-issue-history="item" data-project="project"></div>
+                                </li>
+                            </ul>
+                            <blockquote data-ng-show="history.notes">
+                                <p>{{history.notes}}</p>
+                                <small>New comment added</small>
+                            </blockquote>
+                        </div>
                     </div>
                 </div>
                 <!-- List of attachments for issue -->

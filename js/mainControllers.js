@@ -334,6 +334,14 @@ function Home($scope) {
     };
 
     /**
+     * Hide comment and store current state
+     */
+    $scope.toggleMinify = function(history) {
+        history.minified = !history.minified;
+        BG.getIssues().store();
+    };
+
+    /**
      * Change the issue status and update it in Redmine
      * 
      * @param {String} value new issue status
