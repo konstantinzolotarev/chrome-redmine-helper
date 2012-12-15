@@ -297,14 +297,30 @@ Issues.prototype.updateUnread = function(updateBadge) {
  * 
  * @param {int} offset load result offset
  * @param {int} limit Limit for results
+ * @param {Boolean} watcher
  * @returns {void}
  */
-Issues.prototype.load = function(offset, limit) {
+Issues.prototype.load = function(offset, limit, watcher) {
     offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
+    if  (typeof watcher == "undefined") {
+        watcher = false;
+    }
     (function(obj) {
-        getLoader().get("issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId+"&limit="+limit+"&offset="+offset, 
+        var url = "";
+        if (!watcher) {
+            url = "issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId
+                                // +"&watcher_id="+getConfig().getProfile().currentUserId
+                                +"&limit="+limit
+                                +"&offset="+offset;
+        } else {
+            url = "issues.json?sort=updated_on:desc"//&assigned_to_id="+getConfig().getProfile().currentUserId
+                                +"&watcher_id="+getConfig().getProfile().currentUserId
+                                +"&limit="+limit
+                                +"&offset="+offset
+        }
+        getLoader().get(url, 
             function(data) {
                 var updated = 0;
                 var notifiedIssues = [];
@@ -322,6 +338,14 @@ Issues.prototype.load = function(offset, limit) {
                                 if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
                                     //mark as unread
                                     data.issues[i].read = false;
+                                    //mark as watcher issue
+                                    if (watcher) {
+                                        if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                           data.issues[i].watcher = false; 
+                                        } else {
+                                            data.issues[i].watcher = true; 
+                                        }
+                                    }
                                     obj.issues[key] = data.issues[i];
                                     updated += 1;
                                     //Bind users from issue
@@ -337,6 +361,14 @@ Issues.prototype.load = function(offset, limit) {
                             getUsers().grabFromIssue(data.issues[i]);
                             //mark as unread
                             data.issues[i].read = false;
+                            //mark as watcher issue
+                            if (watcher) {
+                                if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                   data.issues[i].watcher = false; 
+                                } else {
+                                    data.issues[i].watcher = true; 
+                                }
+                            }
 //                            data.issues[i].updated = new Date(data.issues[i].updated_on);
                             obj.issues.push(data.issues[i]);
                             updated += 1;
@@ -359,8 +391,18 @@ Issues.prototype.load = function(offset, limit) {
                     /**
                      * Load rest of issues
                      */
-                    if (data.total_count > (offset + limit) && updated >= limit) {
+                    if (!watcher && data.total_count > (offset + limit) && updated >= limit) {
                         obj.load((offset + limit), limit);
+                    } else {
+                        //load my watcher issues
+                        if(!watcher) {
+                            obj.load(0, limit, true);
+                        }
+                    }
+                    if (watcher) {
+                        if (data.total_count > (offset + limit) && updated >= limit) {
+                            obj.load((offset + limit), limit, true);
+                        }
                     }
                     /**
                      * Show notifications for issues

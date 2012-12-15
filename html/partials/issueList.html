@@ -39,7 +39,13 @@
                         {{issue.project.name}}
                     </td>
                     <td>
-                        <a href="" data-ng-click="showDetails(issue)">{{issue.subject}}</a>
+                        <a href="" data-ng-click="showDetails(issue)">
+                            <i class="icon-eye-open ng-cloak" 
+                                    data-ng-show="issue.watcher" 
+                                    data-type="tooltip" 
+                                    data-original-title="You are only watching this issue"></i>
+                            {{issue.subject}}
+                        </a>
                     </td>
                     <td data-ng-show="options.profile.table.tracker">
                         {{issue.tracker.name}}
