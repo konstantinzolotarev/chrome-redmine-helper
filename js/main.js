@@ -75,86 +75,86 @@ angular.module('issues', ['ngSanitize']).
     // Register the 'myCurrentTime' directive factory method.
     // We inject no service since the factory method is DI.
 }).directive('issueHistory', function() {
-    // return the directive link function. (compile function not needed)
-    return function(scope, element, attrs) {
-        var item, project;
-        
-        /**
-         * 
-         * @param {int} id
-         * @returns {String}
-         */
-        var getTracker = function(id) {
-            if (!project || !project.fullyLoaded || !project.trackers) {
-                return id;
-            }
-            for (var key in project.trackers) {
-                if (project.trackers[key].id == id) {
-                    return project.trackers[key].name;
+    return {
+        replace: true,
+        transclude: false,
+        scope: {
+            issue: "=issue",
+            project: "=project",
+            item: "=issueHistory"
+        },
+        link: function(scope, element, attrs) {
+
+            /**
+             * 
+             * @param {int} id
+             * @returns {String}
+             */
+            var getTracker = function(id) {
+                if (!scope.project || !scope.project.fullyLoaded || !scope.project.trackers) {
+                    return id;
                 }
-            }
-            return id;
-        };
-    
-        var updateText = function() {
-            if (!item.name) {
+                for (var key in scope.project.trackers) {
+                    if (scope.project.trackers[key].id == id) {
+                        return scope.project.trackers[key].name;
+                    }
+                }
+                return id;
+            };
+
+            var getAttachmentUrl = function() {
+                if (!scope.issue.attachments || !angular.isArray(scope.issue.attachments) || scope.issue.attachments.length < 1) {
+                    return scope.item.new_value;
+                }
+                for (var i in scope.issue.attachments) {
+                    if (scope.issue.attachments[i].id == scope.item.name) {
+                        return '<a href="'+scope.issue.attachments[i].content_url+'" target="_blank">'+scope.item.new_value+'</a>';
+                    }
+                }
+                return scope.item.new_value;
+            };
+
+            if (!scope.item.name) {
                 return;
             }
-            if (item.property == "attr") {
-                switch (item.name) {
+            if (scope.item.property == "attr") {
+                switch (scope.item.name) {
                     case "status_id":
                         element.html("<strong>Status</strong> changed from "
-                                + "<i>" + BG.getIssues().getStatusNameById(item.old_value) + "</i> to "
-                                + "<i>" + BG.getIssues().getStatusNameById(item.new_value) + "</i>");
+                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.old_value) + "</i> to "
+                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.new_value) + "</i>");
                         break;
                     case "assigned_to_id":
-                        element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(item.new_value));
+                        element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(scope.scope.item.new_value));
                         break;
                     case "category_id":
-                        element.html("<strong>Category</strong> set to: "+item.new_value);
+                        element.html("<strong>Category</strong> set to: "+scope.item.new_value);
                         break;
                     case "done_ratio":
-                        element.html("<strong>% Done</strong> changed from "+item.old_value+" to "+item.new_value);
+                        element.html("<strong>% Done</strong> changed from "+scope.item.old_value+" to "+scope.item.new_value);
                         break;
                     case "estimated_hours":
-                        element.html("<strong>Estimated time</strong> set to: "+item.new_value);
+                        element.html("<strong>Estimated time</strong> set to: "+scope.item.new_value);
                         break;
                     case "tracker_id":
                         element.html("<strong>Tracker</strong> changed from "
-                                        + "<i>"+getTracker(item.old_value)+"</i> to "
-                                        + "<i>"+getTracker(item.new_value)+"</i>");
+                                        + "<i>"+getTracker(scope.item.old_value)+"</i> to "
+                                        + "<i>"+getTracker(scope.item.new_value)+"</i>");
                         break;
                     case "subject": 
                         element.html("<strong>Subject</strong> changed from "
-                                        + "<i><u>"+item.old_value+"</u></i> to "
-                                        + "<i><u>"+item.new_value+"</u></i>");
+                                        + "<i><u>"+scope.item.old_value+"</u></i> to "
+                                        + "<i><u>"+scope.item.new_value+"</u></i>");
                         break;
                     default:
                         element.html("<strong>Sorry</strong> this is under developent.");
                         break;
                 }
-            } else if (item.property == "attachment") {
+            } else if (scope.item.property == "attachment") {
                 element.html("<strong>Attachment</strong> added "
-                                        + "<i><u>"+item.new_value+"</u></i>");
+                                        + "<i>"+getAttachmentUrl()+"</i>");
             }
-        };
-        // watch the expression, and update the UI on change.
-        scope.$watch(attrs.issueHistory, function(value) {
-            item = value;
-            updateText();
-        });
-        
-        // watch the expression, and update the UI on change.
-        scope.$watch(attrs.project, function(value) {
-            project = value;
-            updateText();
-        });
-
-        // listen on DOM destroy (removal) event, and cancel the next UI update
-        // to prevent updating time ofter the DOM element was removed.
-        element.bind('$destroy', function() {
-//        $timeout.cancel(timeoutId);
-        });
+        }
     };
 }).directive('editableList', function factory() {
     return {
