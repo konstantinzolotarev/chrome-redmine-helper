@@ -110,7 +110,7 @@
                         <p class="pointer minify" data-ng-click="toggleMinify(history)">
                             <small>
                                 <strong>Updated by</strong>&nbsp;
-                                <a href="#">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
+                                <a href="" data-ng-click="false;">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
                             </small>
                             <i class="pull-right" data-ng-class="history.minified && 'icon-plus' || 'icon-minus'"></i>
                         </p>
