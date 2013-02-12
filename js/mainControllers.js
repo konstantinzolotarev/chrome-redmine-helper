@@ -37,6 +37,11 @@ function Main($scope) {
     $scope.xhrError = false;
     $scope.projects = BG.getProjects().all();
     $scope.customError = "";
+
+    /**
+     * Sidebar showing flag
+     */
+    $scope.showSidebar = false;
     
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
@@ -119,6 +124,15 @@ function Main($scope) {
         jQuery('#projectFilters').modal('toggle');
     };
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
+}
+
+/**
+ * News screen controller 
+
+ * @param {Object} $scope
+ */
+function News($scope) {
+
 }
 
 /**

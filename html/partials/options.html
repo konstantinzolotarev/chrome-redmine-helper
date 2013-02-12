@@ -16,6 +16,12 @@
                 <div class="tab-pane active" id="connection">
                     <form class="form-horizontal">
                         <div class="control-group">
+                            <label class="control-label" for="chiliProject">ChiliProject</label>
+                            <div class="controls">
+                                <input type="checkbox" id="chiliProject" data-ng-model="options.profile.chiliProject" data-ng-checked="options.profile.chiliProject" />
+                            </div>
+                        </div>
+                        <div class="control-group">
                             <label class="control-label" for="inputHost">Redmine Host</label>
                             <div class="controls">
                                 <input type="text" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />

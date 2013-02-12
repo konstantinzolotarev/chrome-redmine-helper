@@ -6,6 +6,7 @@
  */
 function Config() {
     this.profile = {
+        chiliProject: false,
         host: "",
         apiAccessKey: "",
         useHttpAuth: false,
@@ -179,7 +180,12 @@ Loader.prototype.createXhr = function(method, url, async, preventContentType) {
     } else {
         xhr.open(method, fullUrl, (async || true));
     }
-    xhr.setRequestHeader("X-Redmine-API-Key", getConfig().getApiAccessKey());
+    if (config.getProfile().chiliProject) {
+        //We need another header info for connecting to ChiliProject
+        xhr.setRequestHeader("X-ChiliProject-API-Key", getConfig().getApiAccessKey());
+    } else {
+        xhr.setRequestHeader("X-Redmine-API-Key", getConfig().getApiAccessKey());
+    }
     if (!preventContentType) {
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     }

@@ -1,5 +1,12 @@
 Changelog
 ---------------------------------
+1.6.0 ()
+    - Updated Twitter Bootstrap to version 2.3
+    - Added ChiliProject support
+    - New, updated UI
+    - Latest news
+    - Code optimazation and stability improvements
+
 1.0 (28-Nov-2012)
     - Create new issue from selected text (Context menu)
     - Hints + disable hints in options

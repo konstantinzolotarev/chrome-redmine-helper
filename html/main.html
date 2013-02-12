@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html data-ng-app="issues" data-ng-csp>
     <head>
-        <title></title>
+        <title>Redmine Helper</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=1024, initial-scale=1.0">
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
         <link href="../css/main.css" rel="stylesheet">
@@ -15,14 +16,18 @@
         <script type="text/javascript" src="../js/mainControllers.js"></script>
     </head>
     <body>
-        <div data-ng-controller="Main">
-            <div class="navbar navbar-fixed-top">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <div class="nav-collapse collapse">
-                            <ul class="nav">
+        <div data-ng-controller="Main" class="container-fluid" style="padding-left: 0;">
+            <div class="row-fluid">
+                <div data-ng-class="showSidebar && 'span3' || 'span1'" class="sidebar">
+                    <!--Sidebar content-->
+                    <div class="row-fluid"  data-ng-show="showSidebar">
+                        <div class="span10">
+                            <ul class="nav nav-list bs-docs-sidenav">
                                 <li>
                                     <a href="#/home">Home</a>
+                                </li>
+                                <li>
+                                    <a href="#/news">News</a>
                                 </li>
                                 <li class="divider-vertical"></li>
                                 <li>
@@ -33,24 +38,27 @@
                                 </li>
                             </ul>
                         </div>
+                        <div class="span2 text-center close-sidebar" data-ng-click="showSidebar = false" style="min-height: 900px;">
+                            <i class="icon-resize-horizontal"></i>
+                        </div>
+                    </div>
+                    <div data-ng-hide="showSidebar" class="open-sidebar text-center" data-ng-click="showSidebar = true">
+                        <i class="icon-resize-horizontal"></i>
                     </div>
                 </div>
-            </div>
-            <div class="container">
-                <div class="alert alert-error" style="margin-top: 40px;" data-ng-show="xhrError">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
-                    <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
+                <div data-ng-class="showSidebar && 'span9' || 'span11'">
+                    <!--Body content-->
+                    <div class="alert alert-error" style="margin-top: 40px;" data-ng-show="xhrError">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
+                    </div>
+                    <div class="alert alert-error ng-cloak" style="margin-top: 40px;" data-ng-show="customError != ''">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <div data-ng-bind-html="customError"></div>
+                    </div>
+                    <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
+                    <div data-ng-view></div>
                 </div>
-                <div class="alert alert-error ng-cloak" style="margin-top: 40px;" data-ng-show="customError != ''">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
-                    <div data-ng-bind-html="customError"></div>
-                </div>
-            </div>
-            <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
-        </div>
-        <div id="wrap">
-            <div class="container">
-                <div data-ng-view></div>
             </div>
         </div>
         <div id="footer">
