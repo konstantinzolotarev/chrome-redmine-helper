@@ -4,6 +4,7 @@
         Redmine helper Chrome Extension
     </description>
   <!-- set global properties for this build -->
+  <property name="src" location="."/>
   <property name="js" location="js"/>
   <property name="build" location="build"/>
   <property name="dist"  location="dist"/>
@@ -12,14 +13,39 @@
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${dist}/js"/>
   </target>
 
-  <target name="compile" depends="init"
+  <target name="move-libs" depends="init">
+    <!-- Copy manifest file -->
+    <copy file="${src}/manifest.json" tofile="${dist}/manifest.json" />
+    <!-- Copy js libs -->
+    <copy todir="${dist}/js/lib">
+      <fileset dir="${js}/lib"/>
+    </copy>
+    <!-- Copy icons -->
+    <copy todir="${dist}/icon">
+      <fileset dir="${src}/icon"/>
+    </copy>
+    <!-- Copy images -->
+    <copy todir="${dist}/img">
+      <fileset dir="${src}/img"/>
+    </copy>
+    <!-- Copy css -->
+    <copy todir="${dist}/css">
+      <fileset dir="${src}/css"/>
+    </copy>
+    <!-- Copy html -->
+    <copy todir="${dist}/html">
+      <fileset dir="${src}/html"/>
+    </copy>
+  </target>
+
+  <target name="compile" depends="move-libs"
         description="compile the source " >
-    <mkdir dir="${dist}"/>
     <java jar="${build}/compiler.jar" fork="true" failonerror="true">
-      <arg line="--js ${js}/redmineClasses.js --js_output_file ${dist}/test.js" />
+      <arg line="--js ${js}/redmineClasses.js --js_output_file ${dist}/js/redmineClasses.js" />
     </java>
   </target>
 
