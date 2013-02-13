@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project name="Redmine Helper" default="dist" basedir=".">
+    <description>
+        Redmine helper Chrome Extension
+    </description>
+  <!-- set global properties for this build -->
+  <property name="js" location="js"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <mkdir dir="${dist}"/>
+    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
+      <arg line="--js ${js}/redmineClasses.js --js_output_file ${dist}/test.js" />
+    </java>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the and ${dist} directory trees -->
+    <delete dir="${dist}"/>
+  </target>
+</project>
