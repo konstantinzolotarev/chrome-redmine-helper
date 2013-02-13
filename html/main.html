@@ -16,45 +16,62 @@
         <script type="text/javascript" src="../js/mainControllers.js"></script>
     </head>
     <body>
-        <div data-ng-controller="Main" class="container-fluid" style="padding-left: 0;">
-            <div class="row-fluid">
-                <div data-ng-class="showSidebar && 'span3' || 'span1'" class="sidebar">
-                    <!--Sidebar content-->
-                    <div class="row-fluid"  data-ng-show="showSidebar">
-                        <div class="span10">
-                            <ul class="nav nav-list bs-docs-sidenav">
-                                <li>
-                                    <a href="#/home">Home</a>
-                                </li>
-                                <li>
-                                    <a href="#/news">News</a>
-                                </li>
-                                <li class="divider-vertical"></li>
-                                <li>
-                                    <a href="#/options">Options</a>
-                                </li>
-                                <li>
-                                    <a href="#projectFilters" data-toggle="modal">Projects filtering</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="span2 text-center close-sidebar" data-ng-click="showSidebar = false" style="min-height: 900px;">
-                            <i class="icon-resize-horizontal"></i>
-                        </div>
-                    </div>
-                    <div data-ng-hide="showSidebar" class="open-sidebar text-center" data-ng-click="showSidebar = true">
-                        <i class="icon-resize-horizontal"></i>
+        <div data-ng-controller="Main" style="padding-left: 0;">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <ul class="nav">
+                            <li data-ng-class="$location.path() == '/home' && 'active'">
+                                <a href="#/home">
+                                    <i class="icon-list"></i>
+                                    Issue List&nbsp;
+                                    <span class="badge" data-ng-show="getUnreadCount() > 0">{{getUnreadCount()}}</span>
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/news' && 'active'">
+                                <a href="#/news">
+                                    <i class="icon-briefcase"></i>
+                                    News
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav pull-right">
+                            <li data-ng-class="$location.path() == '/options' && 'active'">
+                                <a href="#/options">
+                                    <i class="icon-wrench"></i>
+                                    Options
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#projectFilters" data-toggle="modal">
+                                    <i class="icon-filter"></i>
+                                    Projects filtering
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div data-ng-class="showSidebar && 'span9' || 'span11'">
+            </div>
+            <div class="container main">
+                <div class="row-fluid">
                     <!--Body content-->
-                    <div class="alert alert-error" style="margin-top: 40px;" data-ng-show="xhrError">
+                    <div class="alert alert-error" data-ng-show="xhrError">
                         <button type="button" class="close" data-dismiss="alert">×</button>
                         <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
                     </div>
-                    <div class="alert alert-error ng-cloak" style="margin-top: 40px;" data-ng-show="customError != ''">
+                    <div class="alert alert-success ng-cloak" data-ng-show="customSuccess != ''">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <div data-ng-bind-html="customSuccess"></div>
+                    </div>
+                    <div class="alert alert-error ng-cloak" data-ng-show="customError != ''">
                         <button type="button" class="close" data-dismiss="alert">×</button>
                         <div data-ng-bind-html="customError"></div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="offset3 span6 alert alert-info center" data-ng-show="loading">
+                            <img src="/img/ajax-loader.gif" alt="Loading..." />
+                            <strong>Loading...</strong>
+                        </div>
                     </div>
                     <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
                     <div data-ng-view></div>

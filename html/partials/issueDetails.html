@@ -86,7 +86,7 @@
         </div>
         -->
         <hr/>
-        <div class="tabbable">
+        <div class="tabbable" id="detailsTabs">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
                 <li class=""><a href="#journals" data-toggle="tab">History</a></li>
@@ -112,7 +112,7 @@
                                 <strong>Updated by</strong>&nbsp;
                                 <a href="" data-ng-click="false;">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
                             </small>
-                            <i class="pull-right" data-ng-class="history.minified && 'icon-plus' || 'icon-minus'"></i>
+                            <i class="pull-right" data-ng-class="history.minified && 'icon-resize-full' || 'icon-resize-small'"></i>
                         </p>
                         <div data-ng-hide="history.minified">
                             <ul data-ng-show="history.details.length > 0">
@@ -120,10 +120,14 @@
                                     <div data-issue-history="item" data-issue="issue" data-project="project"></div>
                                 </li>
                             </ul>
-                            <blockquote data-ng-show="history.notes">
-                                <p>{{history.notes}}</p>
-                                <small>New comment added</small>
-                            </blockquote>
+                            <div data-ng-show="history.notes">
+                                <blockquote>
+                                    <p>{{history.notes}}</p>
+                                    <small class="pointer" data-ng-click="replyComment()">
+                                        <i class="icon-comment"></i>&nbsp;Reply
+                                    </small>
+                                </blockquote>
+                            </div>
                         </div>
                     </div>
                 </div>

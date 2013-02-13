@@ -293,6 +293,15 @@ Issues.prototype.updateUnread = function(updateBadge) {
 };
 
 /**
+ * Get number of unread messages
+
+ * @returns {number}
+ */
+Issues.prototype.getUnreadCount = function() {
+    return this.unread;
+};
+
+/**
  * Load issues list 
  * 
  * @param {int} offset load result offset

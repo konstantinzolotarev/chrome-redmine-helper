@@ -3,9 +3,9 @@
         <table class="table table-hover table-condensed issues">
             <thead>
                 <tr>
-                    <th style="width: 15px; text-align: center;">
+                    <!--<th style="width: 15px; text-align: center;">
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
-                    </th>
+                    </th>-->
                     <th style="width: 250px;" data-ng-show="options.profile.table.author">
                         <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
                     </th>
@@ -31,9 +31,11 @@
             </thead>
             <tbody>
                 <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
+                    <!--
                     <td>
                         <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
                     </td>
+                    -->
                     <td data-ng-show="options.profile.table.author">{{issue.author.name}}</td>
                     <td data-ng-show="options.profile.table.project">
                         {{issue.project.name}}

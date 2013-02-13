@@ -30,19 +30,77 @@ function openAuthorPage(userId) {
  * Main controller
  * 
  * @param {Object} $scope
- * @returns {void}
+ * @param {Object} $location
+ * @param {Object} $timeout
+ * @returns {void} 
  */
-function Main($scope) {
+function Main($scope, $location, $timeout) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
     $scope.projects = BG.getProjects().all();
+    $scope.$location = $location;
+
+    //Custom messages
     $scope.customError = "";
+    $scope.customSuccess = "";
+    /**
+     * Loading dialog flag
+     */
+    $scope.loading = false;
 
     /**
      * Sidebar showing flag
      */
     $scope.showSidebar = false;
-    
+
+    /**
+     * Show loading dialog
+     */
+    $scope.showLoading = function() {
+        $scope.loading = true;
+    }; 
+
+    /**
+     * Hide loading dialog
+     */
+    $scope.hideLoading = function() {
+        $scope.loading = false;
+    };
+
+    /**
+     * Check if loading dialog is shown
+     *
+     * @returns {boolean}
+     */
+    $scope.isLoading = function() {
+        return $scope.loading;
+    }
+
+    /**
+     * Shows custom success message
+     *
+     * @param {String} message HTML message to show
+     * @param {Boolean} persist do not hide success message
+     */
+    $scope.showSuccess = function(message, persist) {
+        $scope.customSuccess = message;
+        if (!persist) {
+            $timeout($scope.hideSuccess, 5000);
+        }
+    };
+
+    $scope.hideSuccess = function() {
+        $scope.customSuccess = "";
+    };
+
+    /**
+     * Get unread issues count
+     * 
+     * @returns {Number}
+     */
+    $scope.getUnreadCount = function() {
+        return BG.getIssues().getUnreadCount();
+    }
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "xhrError" && request.params) {
@@ -61,7 +119,6 @@ function Main($scope) {
     };
 
     $scope.onCustomError = function(request, sender, sendResponse) {
-        console.log(request);
         if (request.errors) {
             var msg = "<ul>";
             for(var i in request.errors.errors) {
@@ -144,22 +201,15 @@ function News($scope) {
  */
 function Options($scope, $timeout) {
     $scope.options = BG.getConfig();
-    $scope.success = false;
     $scope.useHttpAuth = BG.getConfig().getProfile().useHttpAuth;
-    /**
-     * Hide success message
-     */
-    $scope.hideSuccess = function() {
-        $scope.success = false;
-    };
+    
     /**
      * Save new options
      */
     $scope.storeOptions = function() {
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.clearItems();
-        $scope.success = true;
-        $timeout($scope.hideSuccess, 5000);
+        $scope.showSuccess("<strong>Success!</strong> Your setting successfully saved !");
     };
 
     /**
@@ -169,8 +219,7 @@ function Options($scope, $timeout) {
         BG.getConfig().getProfile().notifications.show = document.querySelector(".notification_show:checked").value;
         BG.getConfig().store(BG.getConfig().getProfile());
         $scope.options = BG.getConfig();
-        $scope.success = true;
-        $timeout($scope.hideSuccess, 5000);
+        $scope.showSuccess("<strong>Success!</strong> Your setting successfully saved !");
     };
 
     /**
@@ -178,6 +227,7 @@ function Options($scope, $timeout) {
      */
     $scope.storeMisc = function() {
         BG.getConfig().store(BG.getConfig().getProfile());
+        $scope.showSuccess("<strong>Success!</strong> Your setting successfully saved !");
     };
     
     /**
@@ -202,7 +252,6 @@ function Home($scope) {
     $scope.issues = [];
     $scope.order = "updated_on";
     $scope.reverse = true;
-    $scope.isLoading = false;
     
     $scope.pageSize = 25;
     $scope.page = 0;
@@ -300,14 +349,14 @@ function Home($scope) {
         BG.getIssues().markAllAsRead();
         $scope.updateIssues();
     };
-    
+
     /**
      * Reload issues
      * 
      * @returns {undefined}
      */
     $scope.reload = function() {
-        $scope.isLoading = true;
+        $scope.showLoading();
         BG.getIssues().load();
     };
     
@@ -332,6 +381,10 @@ function Home($scope) {
     $('#issueDetails').modal({
         show: false
     });
+
+    $scope.replyComment = function() {
+        $('#detailsTabs a[href="#addComment"]').tab('show');
+    };
     /**
      * Show issue details
      * 
@@ -423,7 +476,7 @@ function Home($scope) {
     var onIssuesUpdated = function(request, sender, sendResponse) {
         $scope.$apply(function(sc) {
             sc.issues = [];
-            sc.isLoading = false;
+            sc.hideLoading();
             sc.updateIssues();
         });
     };
@@ -463,7 +516,7 @@ function Home($scope) {
         }
         //stop loading
         $scope.$apply(function(sc) {
-            sc.isLoading = false;
+            sc.hideLoading();
         });
     };
     
@@ -513,8 +566,6 @@ function NewIssue($scope) {
     
     //User options
     $scope.options = BG.getConfig();
-
-    $scope.isLoading = false;
     $scope.success = false;
     //List of errors
     $scope.errors = [];
@@ -568,7 +619,7 @@ function NewIssue($scope) {
             return false;
         }
         BG.getIssues().create($scope.issue);
-        $scope.isLoading = true;
+        $scope.showLoading();
     };
 
     /**
@@ -581,7 +632,7 @@ function NewIssue($scope) {
      */
     var onIssueCreated = function(request, sender, sendResponse) {
         $scope.$apply(function(sc) {
-            sc.isLoading = false;
+            sc.hideLoading();
             sc.success = true;
             //clear issue
             sc.issue = {
@@ -623,7 +674,7 @@ function NewIssue($scope) {
         }
         //stop loading
         $scope.$apply(function(sc) {
-            sc.isLoading = false;
+            sc.hideLoading();
         });
     };
 
