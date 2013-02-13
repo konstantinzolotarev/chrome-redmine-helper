@@ -69,3 +69,7 @@ table.issues .unread {
 .minify:hover {
     background-color: #ececec;
 }
+
+.news {
+    margin-top: 20px;
+}

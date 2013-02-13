@@ -5,10 +5,11 @@ var selectedText = "";
 /**
  * Init global variables
  */
-var config = new Config(),
+config = new Config(),
 loader = new Loader(),
 projects = new Projects(),
-issues = new Issues();
+issues = new Issues(),
+news = new News();
 /**
  * 
  * @type Users
@@ -108,6 +109,14 @@ function getUsers() {
         users = new Users();
     }
     return users;
+}
+
+/**
+ * 
+ * @returns {News}
+ */
+function getNews() {
+    return news;
 }
 
 /**

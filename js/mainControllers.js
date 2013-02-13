@@ -189,7 +189,29 @@ function Main($scope, $location, $timeout) {
  * @param {Object} $scope
  */
 function News($scope) {
+    $scope.news = [];
 
+    $scope.newsLoaded = function(json) {
+        console.log(json);
+        $scope.$apply(function(sc) {
+            sc.hideLoading();
+        });
+    };
+
+    $scope.newsError = function(e, resp) {
+        $scope.$apply(function(sc) {
+            sc.hideLoading();
+        });
+    };
+
+    $scope.loadNews = function() {
+        $scope.showLoading();
+        BG.getNews().load($scope.newsLoaded, $scope.newsError);
+    };
+
+    if ($scope.news.length < 1) {
+        $scope.loadNews();
+    }
 }
 
 /**
