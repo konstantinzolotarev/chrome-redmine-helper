@@ -25,8 +25,6 @@
 
   <target name="dist" depends="compile"
         description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
   </target>
 
   <target name="clean"
