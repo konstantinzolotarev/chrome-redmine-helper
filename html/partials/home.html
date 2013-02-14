@@ -34,7 +34,7 @@
 <div class="page-header">
     <h3>Your Latest Issues</h3>
 </div>
-<div class="well well-small row-fluid">
+<div class="well well-small row-fluid" data-ng-show="issues.length > 0">
     <div class="span7">
         <input type="text" class="input-medium search-query" data-ng-model="search.subject" placeholder="Search by subject"/>
     </div>

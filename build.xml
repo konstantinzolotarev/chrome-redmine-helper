@@ -40,12 +40,21 @@
     <copy todir="${dist}/html">
       <fileset dir="${src}/html"/>
     </copy>
+    <!-- Copy JS scripts -->
+    <copy file="${js}/main.js" tofile="${dist}/js/main.js" />
+    <copy file="${js}/mainControllers.js" tofile="${dist}/js/mainControllers.js" />
   </target>
 
   <target name="compile" depends="move-libs"
         description="compile the source " >
     <java jar="${build}/compiler.jar" fork="true" failonerror="true">
       <arg line="--js ${js}/redmineClasses.js --js_output_file ${dist}/js/redmineClasses.js" />
+    </java>
+    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
+      <arg line="--js ${js}/serviceClasses.js --js_output_file ${dist}/js/serviceClasses.js" />
+    </java>
+    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
+      <arg line="--js ${js}/background.js --js_output_file ${dist}/js/background.js" />
     </java>
   </target>
 

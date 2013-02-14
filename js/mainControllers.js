@@ -106,6 +106,7 @@ function Main($scope, $location, $timeout) {
         if (request.action && request.action == "xhrError" && request.params) {
             $scope.$apply(function(sc) {
                 sc.xhrError = true;
+                sc.hideLoading();
             });
         }
     };
