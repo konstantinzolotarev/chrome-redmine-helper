@@ -36,16 +36,16 @@
                             </li>
                         </ul>
                         <ul class="nav pull-right">
-                            <li data-ng-class="$location.path() == '/options' && 'active'">
-                                <a href="#/options">
-                                    <i class="icon-wrench"></i>
-                                    Options
-                                </a>
-                            </li>
                             <li data-ng-show="$location.path() == '/home'">
                                 <a href="#projectFilters" data-toggle="modal">
                                     <i class="icon-filter"></i>
                                     Projects filtering
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/options' && 'active'">
+                                <a href="#/options">
+                                    <i class="icon-wrench"></i>
+                                    Options
                                 </a>
                             </li>
                         </ul>
