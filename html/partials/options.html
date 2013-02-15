@@ -2,64 +2,64 @@
     <h1>Options</h1>
 </div>
 <div>
-        <div class="tabbable tabs-left">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
-                <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
-                <li><a href="#misc" data-toggle="tab">Misc</a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="connection">
-                    <form class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label" for="chiliProject">ChiliProject</label>
-                            <div class="controls">
-                                <input type="checkbox" id="chiliProject" data-ng-model="options.profile.chiliProject" data-ng-checked="options.profile.chiliProject" />
-                            </div>
+    <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
+            <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
+            <li><a href="#misc" data-toggle="tab">Misc</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="connection">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="chiliProject">ChiliProject</label>
+                        <div class="controls">
+                            <input type="checkbox" id="chiliProject" data-ng-model="options.profile.chiliProject" data-ng-checked="options.profile.chiliProject" />
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="inputHost">Redmine Host</label>
-                            <div class="controls">
-                                <input type="text" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />
-                            </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="inputHost">Redmine Host</label>
+                        <div class="controls">
+                            <input type="text" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="inputApiKey">
-                                Api Access Key <i class="help icon-info-sign"  
-                                    data-ng-hide="options.profile.hideHints"
-                                    data-type="popover"
-                                    data-original-title="Notice"
-                                    data-content="Redmine Api Access Key could be found into your Redmine profile. Regulary into right part of the page."></i>
-                            </label>
-                            <div class="controls">
-                                <input type="password" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
-                            </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="inputApiKey">
+                            Api Access Key <i class="help icon-info-sign"  
+                                data-ng-hide="options.profile.hideHints"
+                                data-type="popover"
+                                data-original-title="Notice"
+                                data-content="Redmine Api Access Key could be found into your Redmine profile. Regulary into right part of the page."></i>
+                        </label>
+                        <div class="controls">
+                            <input type="password" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
-                            <div class="controls">
-                                <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
-                            </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
+                        <div class="controls">
+                            <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
                         </div>
-                        <div class="control-group" data-ng-show="options.profile.useHttpAuth">
-                            <label class="control-label" for="httpUser">HTTP Username</label>
-                            <div class="controls">
-                                <input type="text" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
-                            </div>
+                    </div>
+                    <div class="control-group" data-ng-show="options.profile.useHttpAuth">
+                        <label class="control-label" for="httpUser">HTTP Username</label>
+                        <div class="controls">
+                            <input type="text" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
                         </div>
-                        <div class="control-group" data-ng-show="options.profile.useHttpAuth">
-                            <label class="control-label" for="httpPass">HTTP Password</label>
-                            <div class="controls">
-                                <input type="password" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
-                            </div>
+                    </div>
+                    <div class="control-group" data-ng-show="options.profile.useHttpAuth">
+                        <label class="control-label" for="httpPass">HTTP Password</label>
+                        <div class="controls">
+                            <input type="password" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
                         </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="tab-pane" id="notifications">
-                    <form class="form-horizontal">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+                    </div>
+                </form>
+            </div>
+            <div class="tab-pane" id="notifications">
+                <form class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label">Show notifications</label>
                         <div class="controls">

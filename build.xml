@@ -48,14 +48,17 @@
   <target name="compile" depends="move-libs"
         description="compile the source " >
     <java jar="${build}/compiler.jar" fork="true" failonerror="true">
-      <arg line="--js ${js}/redmineClasses.js --js_output_file ${dist}/js/redmineClasses.js" />
+      <arg line="--js ${js}/redmineClasses.js --js ${js}/serviceClasses.js --js ${js}/background.js --js_output_file ${dist}/js/background.js" />
     </java>
-    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
-      <arg line="--js ${js}/serviceClasses.js --js_output_file ${dist}/js/serviceClasses.js" />
-    </java>
-    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
-      <arg line="--js ${js}/background.js --js_output_file ${dist}/js/background.js" />
-    </java>
+
+    <replace file="${dist}/manifest.json">
+      <replacetoken><![CDATA["js/serviceClasses.js",]]></replacetoken>
+      <replacevalue><![CDATA[]]></replacevalue>
+    </replace>
+    <replace file="${dist}/manifest.json">
+      <replacetoken><![CDATA["js/redmineClasses.js",]]></replacetoken>
+      <replacevalue><![CDATA[]]></replacevalue>
+    </replace>
   </target>
 
   <target name="dist" depends="compile"
