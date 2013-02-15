@@ -1,9 +1,9 @@
 Changelog
 ---------------------------------
-1.6.0 ()
+1.6.0 (15-Feb-2013)
     - Updated Twitter Bootstrap to version 2.3
     - Added ChiliProject support
-    - New, updated UI
+    - Updated UI
     - Latest news
     - Code optimazation and stability improvements
 

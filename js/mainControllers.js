@@ -195,6 +195,9 @@ function News($scope) {
     $scope.newsLoaded = function(json) {
         console.log(json);
         $scope.$apply(function(sc) {
+            if (json.total_count > 0) {
+                sc.news = json.news;
+            }
             sc.hideLoading();
         });
     };
@@ -206,6 +209,7 @@ function News($scope) {
     };
 
     $scope.loadNews = function() {
+        $scope.news = [];
         $scope.showLoading();
         BG.getNews().load($scope.newsLoaded, $scope.newsError);
     };
@@ -232,6 +236,7 @@ function Options($scope, $timeout) {
     $scope.storeOptions = function() {
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.clearItems();
+        $scope.xhrError = false;
         $scope.showSuccess("<strong>Success!</strong> Your setting successfully saved !");
     };
 

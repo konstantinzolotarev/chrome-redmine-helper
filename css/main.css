@@ -73,3 +73,8 @@ table.issues .unread {
 .news {
     margin-top: 20px;
 }
+
+.news .read-more {
+    margin-left: 5px;
+    font-style: italic;
+}

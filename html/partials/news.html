@@ -16,7 +16,25 @@
 	</div>
 	<div class="list" data-ng-show="news.length > 0">
 		<div class="news-item" data-ng-repeat="item in news">
-			
+			<h3>
+				{{item.title}}
+				<small>
+					&nbsp;by&nbsp;
+					<a href="">{{item.author.name}}</a>
+					&nbsp;on&nbsp;{{item.created_on|date:'yyyy-MM-dd'}}
+				</small>
+			</h3>
+			<div>
+				<p>
+					{{item.summary}}
+				</p>
+				<a href="" class="read-more" data-ng-click="item.show = true" data-ng-hide="item.show">Read more</a>
+				<p data-ng-show="item.show">
+					{{item.description}}
+				</p>
+				<a href="" class="read-more" data-ng-click="item.show = false" data-ng-show="item.show">Show less</a>
+			</div>
+			<hr/>
 		</div>
 	</div>
 </div>
