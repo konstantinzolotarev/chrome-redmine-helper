@@ -9,12 +9,8 @@ config = new Config(),
 loader = new Loader(),
 projects = new Projects(),
 issues = new Issues(),
+users = new Users(),
 news = new News();
-/**
- * 
- * @type Users
- */
-var users;
 
 /**
  * Get selected text from context menu event
@@ -105,9 +101,6 @@ function getIssues() {
  * @returns {Users}
  */
 function getUsers() {
-    if (!users) {
-        users = new Users();
-    }
     return users;
 }
 

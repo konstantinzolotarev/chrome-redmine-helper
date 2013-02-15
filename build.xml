@@ -48,16 +48,34 @@
   <target name="compile" depends="move-libs"
         description="compile the source " >
     <java jar="${build}/compiler.jar" fork="true" failonerror="true">
-      <arg line="--js ${js}/redmineClasses.js --js ${js}/serviceClasses.js --js ${js}/background.js --js_output_file ${dist}/js/background.js" />
+      <arg line="--js ${js}/config.js --js ${js}/redmine/loader.js --js ${js}/redmine/projects.js --js ${js}/redmine/issues.js --js ${js}/redmine/users.js --js ${js}/redmine/news.js --js ${js}/background.js --js_output_file ${dist}/js/background.js" />
     </java>
 
     <replace file="${dist}/manifest.json">
-      <replacetoken><![CDATA["js/serviceClasses.js",]]></replacetoken>
-      <replacevalue><![CDATA[]]></replacevalue>
-    </replace>
-    <replace file="${dist}/manifest.json">
-      <replacetoken><![CDATA["js/redmineClasses.js",]]></replacetoken>
-      <replacevalue><![CDATA[]]></replacevalue>
+      <replacefilter>
+        <replacetoken><![CDATA["js/config.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/loader.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/projects.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/issues.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/users.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/news.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
     </replace>
   </target>
 
