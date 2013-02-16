@@ -29,7 +29,7 @@ function Config() {
             tracker: false,
             status: false
         },
-        test: "Test passed"
+        time_entries: []
     };
     this.loaded = false;
 }
