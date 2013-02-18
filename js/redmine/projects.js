@@ -46,7 +46,10 @@ Projects.prototype.get = function(id, reload) {
         return p.project;
     }
     (function(obj) {
-        getLoader().get("projects/"+id+".json?include=trackers,issue_categories", function(data) {
+        redmine.projects.get(id, function(error, data) {
+            if (error) {
+                return;
+            }
             data.project.fullyLoaded = true;
             var key = p.key || false;
             if (key !== false) {
@@ -75,20 +78,22 @@ Projects.prototype.getMembers = function(projectId, reload) {
         return proj.project.members;
     }
     (function(obj) {
-        getLoader().get("projects/"+projectId+"/memberships.json", function(json) {
+        redmine.projects.memberships(projectId, function(error, json) {
+            if (error) {
+                if (error.request.status && error.request.status == 403) {
+                    obj.projects[proj.key].membersLoaded = true;
+                    obj.projects[proj.key].members = getUsers().users;
+                    obj.store();
+                    obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
+                }
+                return;
+            }
             if (json.total_count && json.total_count > 0 && json.memberships) {
                 obj.projects[proj.key].members = [];
                 for (var i in json.memberships) {
                     obj.projects[proj.key].members.push(json.memberships[i].user);
                 }
                 obj.projects[proj.key].membersLoaded = true;
-                obj.store();
-                obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
-            }
-        }, function(e, resp) {
-            if (resp.status && resp.status == 403) {
-                obj.projects[proj.key].membersLoaded = true;
-                obj.projects[proj.key].members = getUsers().users;
                 obj.store();
                 obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
             }
@@ -154,7 +159,10 @@ Projects.prototype.loadFromRedmine = function() {
     //update process
     this.projects = [];
     (function(obj) {
-        getLoader().get("projects.json", function(data) {
+        redmine.projects.all(function(error, data) {
+            if (error) {
+                return;
+            }
             if (data.total_count && data.total_count > 0) {
                 obj.projects = data.projects;
                 obj.loaded = true;
@@ -236,7 +244,11 @@ Projects.prototype.getIssues = function(id, offset, reload) {
     offset = offset || 0;
     var limit = 50;
     (function(obj, key, limit) {
-        getLoader().get("issues.json?sort=updated_on:desc&project_id="+id+"&limit="+limit+"&offset="+offset, function(json) {
+        var filters = "sort=updated_on:desc&project_id="+id+"&limit="+limit+"&offset="+offset;
+        redmine.issues.all(filters, function(error, json) {
+            if (error) {
+                return;
+            }
             if (!json.issues || !json.total_count || json.total_count < 1) {
                 return [];
             }

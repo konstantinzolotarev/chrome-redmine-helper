@@ -21,5 +21,11 @@ News.prototype.load = function(success, error) {
     if (!error) {
         error = function() {};
     }
-    getLoader().get("news.json", success, error);
+    redmine.news.all(function(gerror, json) {
+    	if (gerror) {
+    		error(error);
+    		return;
+    	}
+    	success(json);
+    });
 };

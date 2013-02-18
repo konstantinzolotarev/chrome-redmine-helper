@@ -17,11 +17,11 @@
     "background": {
         "scripts": [
             "js/config.js",
-            "js/redmine/loader.js",
             "js/redmine/projects.js",
             "js/redmine/issues.js",
             "js/redmine/users.js",
             "js/redmine/news.js",
+            "js/lib/api.js",
             "js/background.js"
         ],
         "persistent": false

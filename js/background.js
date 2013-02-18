@@ -6,12 +6,18 @@ var selectedText = "";
  * Init global variables
  */
 config = new Config(),
-loader = new Loader(),
 projects = new Projects(),
 issues = new Issues(),
 users = new Users(),
 news = new News();
-
+redmine = new redmine.Api({
+    host: "https://redmine.sibers.com",
+    useHttpAuth: true,
+    httpUser: "zolotarev",
+    httpPassword: "Ai5voiCh",
+    chiliProject: false,
+    apiAccessKey: "5a5b891b32929644db04706508eec1979a27b556"
+});
 /**
  * Get selected text from context menu event
  *
@@ -42,16 +48,6 @@ function merge(obj1,obj2){
 }
 
 /**
- * 
- * @param {ProgressEvent} e
- * @returns {void}
- */
-function requestError(e) {
-    chrome.extension.sendMessage({action: "xhrError", params: {"e": e}});
-    chrome.browserAction.setBadgeText({text: "Err"});
-}
-
-/**
  * Trim string 
  * @param {Strin} string
  */
@@ -67,15 +63,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * Get Loader
- * 
- * @returns {Loader}
- */
-function getLoader() {
-    return loader;
 }
 
 /**
@@ -203,21 +190,34 @@ function scheduleRequest() {
 }
 
 /**
- * 
- * @param {type} onSuccess
+ * Load current user details
+
+ * @param {function()=} onSuccess function that will be called after success loading of user details
  * @returns {void}
  */
 function getCurrentUser(onSuccess) {
-    getLoader().get("users/current.json",
-        function(json) {
-            if (json.user) {
-                getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
-                getConfig().getProfile().currentUserId = json.user.id;
-                getConfig().store(getConfig().getProfile());
-                onSuccess();
-            }
+    redmine.users.me(function(error, json) {
+        if (error) {
+            fireError("Couldn't load user details", true);
         }
-    );
+        if (json.user) {
+            getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
+            getConfig().getProfile().currentUserId = json.user.id;
+            getConfig().store(getConfig().getProfile());
+            onSuccess();
+        }
+    });
+    
+}
+
+/**
+ * Upload file to redmine
+ * 
+ * @param {?} file
+ * @param {function(?Object, ?Object)} callback Callback function
+ */
+function uploadFile(file, callback) {
+    redmine.upload(file, callback);
 }
 
 /**
@@ -241,15 +241,28 @@ function startRequest(params) {
              * Load list of issues
              */
             getIssues().load();
-            /**
-             * Load list of users
-             */
-//            getUsers().load();
         }
     } else {
         chrome.browserAction.setBadgeText({text: "Err"});
     }
 }
+
+/**
+ * Shows new Global error message
+ */
+function fireError(message, global) {
+    if (global) {
+        chrome.browserAction.setBadgeText({text: "Err"});
+    }
+    //send error
+    chrome.extension.sendMessage({
+        action: "globalError", params: {
+            "error": {
+                'message': message
+            }
+        }
+    });
+};
 
 /**
  * handler for click on context menu

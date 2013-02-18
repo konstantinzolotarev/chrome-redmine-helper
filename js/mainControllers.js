@@ -103,7 +103,8 @@ function Main($scope, $location, $timeout) {
     }
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
-        if (request.action && request.action == "xhrError" && request.params) {
+        if (request.action && request.action == "globalError" && request.params) {
+            console.log(request.params);
             $scope.$apply(function(sc) {
                 sc.xhrError = true;
                 sc.hideLoading();
@@ -140,7 +141,7 @@ function Main($scope, $location, $timeout) {
             case "projectsLoaded":
                 $scope.projectsLoadedHandler(request, sender, sendResponse);
                 break;
-            case "xhrError":
+            case "globalError":
                 $scope.xhrErrorHandler(request, sender, sendResponse);
                 break;
             case "customError":
@@ -524,7 +525,6 @@ function Home($scope) {
 
     // Handle file upload to redmine
     var onFileUploaded = function(request, sender, sendResponse) {
-        console.log(request.token, request.file);
         var data = {
             'uploads': [ 
                 {
