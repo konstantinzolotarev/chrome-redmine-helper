@@ -2,25 +2,25 @@
  * Projects actions 
  * 
  * @class
- * @returns {Projects}
+ * @returns {com.rdHelper.Projects}
  */
-function Projects() {
-    this.loaded = false;
-    this.projects = [];
-}
+com.rdHelper.Projects = {
+    loaded: false,
+    projects: []
+};
 
 /**
  * Get list of projects
  * 
- * @param {boolean} reload if set to true list will be updated from server
+ * @param {boolean} reload if set to true project list will be updated from server
  * @returns {Array}
  */
-Projects.prototype.all = function(reload) {
+com.rdHelper.Projects.all = function(reload) {
     if (this.loaded && !reload) {
         return this.projects;
     }
     //Try loading from memory
-    this.loadFromMemory();
+    this.load();
     //If we have no projects there loading from API
     if (this.projects.length < 1 || reload) {
         this.loadFromRedmine();
@@ -35,7 +35,7 @@ Projects.prototype.all = function(reload) {
  * @param {boolean} reload
  * @returns {Object}
  */
-Projects.prototype.get = function(id, reload) {
+com.rdHelper.Projects.get = function(id, reload) {
     var p = this.getById(id);
     if (!p.project) {
         return false;
@@ -69,7 +69,7 @@ Projects.prototype.get = function(id, reload) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Projects.prototype.getMembers = function(projectId, reload) {
+com.rdHelper.Projects.getMembers = function(projectId, reload) {
     var proj = this.getById(projectId);
     if (!proj || !proj.project) {
         return [];
@@ -107,7 +107,7 @@ Projects.prototype.getMembers = function(projectId, reload) {
  * @param {String} ident
  * @returns {Object}
  */
-Projects.prototype.getByIdentifier = function(ident) {
+com.rdHelper.Projects.getByIdentifier = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
             return {'key': pid, 'project': this.projects[pid]};
@@ -122,7 +122,7 @@ Projects.prototype.getByIdentifier = function(ident) {
  * @param {String} id
  * @returns {Object}
  */
-Projects.prototype.getById = function(id) {
+com.rdHelper.Projects.getById = function(id) {
     var project = {
         'key': false,
         'project': false
@@ -141,7 +141,7 @@ Projects.prototype.getById = function(id) {
  * @param {String} ident
  * @returns {int}
  */
-Projects.prototype.getProjectKey = function(ident) {
+com.rdHelper.Projects.getProjectKey = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
             return pid;
@@ -155,7 +155,7 @@ Projects.prototype.getProjectKey = function(ident) {
  * 
  * @returns {void}
  */
-Projects.prototype.loadFromRedmine = function() {
+com.rdHelper.Projects.loadFromRedmine = function() {
     //update process
     this.projects = [];
     (function(obj) {
@@ -178,7 +178,7 @@ Projects.prototype.loadFromRedmine = function() {
  * 
  * @returns {void}
  */
-Projects.prototype.store = function() {
+com.rdHelper.Projects.store = function() {
     if (!this.loaded) {
         return;
     }
@@ -190,7 +190,7 @@ Projects.prototype.store = function() {
  * 
  * @returns {void}
  */
-Projects.prototype.loadFromMemory = function() {
+com.rdHelper.Projects.load = function() {
     if (this.loaded) {
         return;
     }
@@ -203,7 +203,7 @@ Projects.prototype.loadFromMemory = function() {
  * 
  * @returns {void}
  */
-Projects.prototype.clear = function() {
+com.rdHelper.Projects.clear = function() {
     localStorage.removeItem("projects");
     this.projects = [];
     this.loaded = false;
@@ -216,7 +216,7 @@ Projects.prototype.clear = function() {
  * @param {Object} project
  * @returns {void}
  */
-Projects.prototype.sendProjectUpdated = function(id, project) {
+com.rdHelper.Projects.sendProjectUpdated = function(id, project) {
     chrome.extension.sendMessage({"action": "projectUpdated", "project": project});
 };
 
@@ -228,7 +228,7 @@ Projects.prototype.sendProjectUpdated = function(id, project) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Projects.prototype.getIssues = function(id, offset, reload) {
+com.rdHelper.Projects.getIssues = function(id, offset, reload) {
     var proj = this.getById(id);
     if (!proj.key || !proj.project) {
         return [];

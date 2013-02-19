@@ -6,7 +6,6 @@ var selectedText = "";
  * Init global variables
  */
 config = new Config(),
-projects = new Projects(),
 issues = new Issues(),
 users = new Users(),
 news = new News();
@@ -85,14 +84,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * 
- * @returns {Projects}
- */
-function getProjects() {
-    return projects;
 }
 
 /**

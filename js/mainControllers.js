@@ -39,7 +39,7 @@ function openAuthorPage(userId) {
 function Main($scope, $location, $timeout) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
-    $scope.projects = BG.getProjects().all();
+    $scope.projects = BG.com.rdHelper.Projects.all();
     $scope.$location = $location;
 
     //Custom messages
@@ -156,7 +156,7 @@ function Main($scope, $location, $timeout) {
      * On projects updated
      */
     $scope.updateProjects = function() {
-        BG.getProjects().all(true);
+        BG.com.rdHelper.Projects.all(true);
     };
 
     /**
@@ -180,7 +180,7 @@ function Main($scope, $location, $timeout) {
             }
         });
         BG.getConfig().store(BG.getConfig().getProfile());
-        BG.getProjects().store();
+        BG.com.rdHelper.Projects.store();
         BG.getIssues().clearIssues();
         jQuery('#projectFilters').modal('toggle');
     };
@@ -424,7 +424,7 @@ function Home($scope) {
         BG.getIssues().get(issue, !issue.read);
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
-        $scope.project = BG.getProjects().get($scope.issue.project.id);
+        $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
         console.log(issue);
         console.log($scope.project);
         $('#issueDetails').modal('toggle');
@@ -590,7 +590,7 @@ function NewIssue($scope) {
     //clear selected text
     BG.clearSelectedText();
     //list of projects
-    $scope.projects = BG.getProjects().all();
+    $scope.projects = BG.com.rdHelper.Projects.all();
     $scope.project = {};
     
     //User options
@@ -613,9 +613,9 @@ function NewIssue($scope) {
      */
     $scope.projectChanged = function() {
         if ($scope.issue.project_id > 0) {
-            $scope.project = BG.getProjects().get($scope.issue.project_id);
+            $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project_id);
             if (!$scope.project.membersLoaded) {
-                BG.getProjects().getMembers($scope.issue.project_id);
+                BG.com.rdHelper.Projects.getMembers($scope.issue.project_id);
             }
         } else {
             $scope.project = {};

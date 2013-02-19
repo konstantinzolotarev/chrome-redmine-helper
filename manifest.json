@@ -16,6 +16,7 @@
     },
     "background": {
         "scripts": [
+            "js/bg_base.js",
             "js/config.js",
             "js/redmine/projects.js",
             "js/redmine/issues.js",
