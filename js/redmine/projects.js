@@ -170,9 +170,10 @@ com.rdHelper.Projects.loadFromRedmine = function(offset) {
                 }
                 obj.loaded = true;
                 obj.store();
-                chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
                 if (data.total_count > (data.limit + data.offset)) {
                     obj.loadFromRedmine(data.limit + data.offset);
+                } else {
+                    chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
                 }
             }
         });

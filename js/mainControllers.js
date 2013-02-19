@@ -737,6 +737,45 @@ function NewIssue($scope) {
  */
 function Projects($scope) {
     $scope.projects = BG.com.rdHelper.Projects.all();
+    
+    /**
+     * Reload projects list
+     */
+    $scope.reload = function() {
+        $scope.showLoading();
+        BG.com.rdHelper.Projects.clear();
+        BG.com.rdHelper.Projects.all(true);
+    };
+    
+    /**
+     * On projects list updated
+     * 
+     * @param {Object} request
+     * @param {Object} sender
+     * @param {Object} sendResponse
+     * @returns {undefined}
+     */
+    var projectsLoaded = function(request, sender, sendResponse) {
+        $scope.$apply(function(sc) {
+            sc.hideLoading();
+            sc.projects = BG.com.rdHelper.Projects.all();
+        });
+    };
+    
+    //Handle new issue creation
+    var onMessage = function(request, sender, sendResponse) {
+        if (!request.action && request.action != "issueCreated") {
+            return;
+        }
+        switch(request.action) {
+            case "projectsLoaded":
+                return projectsLoaded(request, sender, sendResponse);
+                break;
+        };
+    };
+
+    //Add one global handler for messages from background
+    chrome.extension.onMessage.addListener(onMessage);
 }
 
 
