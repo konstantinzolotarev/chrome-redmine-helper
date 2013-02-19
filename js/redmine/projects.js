@@ -153,21 +153,27 @@ com.rdHelper.Projects.getProjectKey = function(ident) {
 /**
  * Load projects from Redmine API
  * 
+ * @param {number=} offset 
  * @returns {void}
  */
-com.rdHelper.Projects.loadFromRedmine = function() {
+com.rdHelper.Projects.loadFromRedmine = function(offset) {
     //update process
-    this.projects = [];
     (function(obj) {
-        redmineApi.projects.all(function(error, data) {
+        offset = offset || "0";
+        redmineApi.projects.all("offset="+offset, function(error, data) {
             if (error) {
                 return;
             }
             if (data.total_count && data.total_count > 0) {
-                obj.projects = data.projects;
+                for(var i = 0; i < data.projects.length; i++) {
+                    obj.projects.push(data.projects[i]);
+                }
                 obj.loaded = true;
                 obj.store();
                 chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
+                if (data.total_count > (data.limit + data.offset)) {
+                    obj.loadFromRedmine(data.limit + data.offset);
+                }
             }
         });
     })(this);

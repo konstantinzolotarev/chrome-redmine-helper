@@ -34,6 +34,12 @@
                                     News
                                 </a>
                             </li>
+                            <li data-ng-class="$location.path() == '/projects' && 'active'">
+                                <a href="#/projects">
+                                    <i class="icon-book"></i>
+                                    Projects
+                                </a>
+                            </li>
                         </ul>
                         <ul class="nav pull-right">
                             <li data-ng-show="$location.path() == '/home'">

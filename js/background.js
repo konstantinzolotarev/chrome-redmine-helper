@@ -29,6 +29,8 @@ config.load(function() {
  * @returns {@exp;redmine@call;Api}
  */
 function updateRedmineApi() {
+    //clear errors first
+    chrome.browserAction.setBadgeText({text: ""});
     redmineApi = new redmine.Api({
         host: getConfig().profile.host,
         useHttpAuth: getConfig().profile.useHttpAuth,
@@ -248,6 +250,7 @@ function uploadFile(file, callback) {
  * @returns {void}
  */
 function startRequest(params) {
+    chrome.browserAction.setBadgeText({text: ""});
     if (params.scheduleRequest) {
         scheduleRequest();
     }

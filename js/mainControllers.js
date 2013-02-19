@@ -729,7 +729,15 @@ function NewIssue($scope) {
     chrome.extension.onMessage.addListener(onMessage);
 }
 
-
+/**
+ * List of your projects
+ * 
+ * @param {Object} $scope
+ * @returns {?}
+ */
+function Projects($scope) {
+    $scope.projects = BG.com.rdHelper.Projects.all();
+}
 
 
 //Options.$inject = ['$scope', '$timeout'];
