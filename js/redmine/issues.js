@@ -58,111 +58,107 @@ Issues.prototype.load = function(offset, limit, watcher) {
         watcher = false;
     }
     (function(obj) {
-        var url = "";
+        var filter = "";
         if (!watcher) {
-            url = "issues.json?sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId
-                                // +"&watcher_id="+getConfig().getProfile().currentUserId
+            filter = "sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId
                                 +"&limit="+limit
                                 +"&offset="+offset;
         } else {
-            url = "issues.json?sort=updated_on:desc"//&assigned_to_id="+getConfig().getProfile().currentUserId
-                                +"&watcher_id="+getConfig().getProfile().currentUserId
+            filter = "sort=updated_on:desc&watcher_id="+getConfig().getProfile().currentUserId
                                 +"&limit="+limit
                                 +"&offset="+offset
         }
-        getLoader().get(url, 
-            function(data) {
-                var updated = 0;
-                var notifiedIssues = [];
-                if (data.total_count && data.total_count > 0) {
-                    for(var i in data.issues) {
-                        var found = false;
-                        if (getConfig().getProjectsSettings().show_for == "selected"
-                                && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
-                            continue;
-                        }
-                        for(var key in obj.issues) {
-                            //We found this issue
-                            if (obj.issues[key].id == data.issues[i].id) {
-                                found = true;
-                                if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
-                                    //mark as unread
-                                    data.issues[i].read = false;
-                                    //mark as watcher issue
-                                    if (watcher) {
-                                        if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
-                                           data.issues[i].watcher = false; 
-                                        } else {
-                                            data.issues[i].watcher = true; 
-                                        }
+        redmineApi.issues.all(filter, function(error, data) {
+            var updated = 0;
+            var notifiedIssues = [];
+            if (data.total_count && data.total_count > 0) {
+                for(var i in data.issues) {
+                    var found = false;
+                    if (getConfig().getProjectsSettings().show_for == "selected"
+                            && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
+                        continue;
+                    }
+                    for(var key in obj.issues) {
+                        //We found this issue
+                        if (obj.issues[key].id == data.issues[i].id) {
+                            found = true;
+                            if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
+                                //mark as unread
+                                data.issues[i].read = false;
+                                //mark as watcher issue
+                                if (watcher) {
+                                    if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                       data.issues[i].watcher = false; 
+                                    } else {
+                                        data.issues[i].watcher = true; 
                                     }
-                                    obj.issues[key] = data.issues[i];
-                                    updated += 1;
-                                    //Bind users from issue
-                                    getUsers().grabFromIssue(data.issues[i]);
-                                    if (getConfig().getNotifications().show == "updated") {
-                                        notifiedIssues.push(obj.issues[key]);
-                                    }
+                                }
+                                obj.issues[key] = data.issues[i];
+                                updated += 1;
+                                //Bind users from issue
+                                getUsers().grabFromIssue(data.issues[i]);
+                                if (getConfig().getNotifications().show == "updated") {
+                                    notifiedIssues.push(obj.issues[key]);
                                 }
                             }
                         }
-                        if (!found) {
-                            //Bind users from issue
-                            getUsers().grabFromIssue(data.issues[i]);
-                            //mark as unread
-                            data.issues[i].read = false;
-                            //mark as watcher issue
-                            if (watcher) {
-                                if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
-                                   data.issues[i].watcher = false; 
-                                } else {
-                                    data.issues[i].watcher = true; 
-                                }
+                    }
+                    if (!found) {
+                        //Bind users from issue
+                        getUsers().grabFromIssue(data.issues[i]);
+                        //mark as unread
+                        data.issues[i].read = false;
+                        //mark as watcher issue
+                        if (watcher) {
+                            if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                               data.issues[i].watcher = false; 
+                            } else {
+                                data.issues[i].watcher = true; 
                             }
+                        }
 //                            data.issues[i].updated = new Date(data.issues[i].updated_on);
-                            obj.issues.push(data.issues[i]);
-                            updated += 1;
-                            if (getConfig().getNotifications().show == "new") {
-                                notifiedIssues.push(obj.issues[key]);
-                            }
+                        obj.issues.push(data.issues[i]);
+                        updated += 1;
+                        if (getConfig().getNotifications().show == "new") {
+                            notifiedIssues.push(obj.issues[key]);
                         }
-                    }
-                    obj.lastUpdated = new Date();
-                    obj.updateUnread(true);
-                    obj.store();
-                    /**
-                     * Update issue statuses
-                     */
-                    obj.getStatuses();
-                    /**
-                     * Notify
-                     */
-                    chrome.extension.sendMessage({"action": "issuesUpdated"});
-                    /**
-                     * Load rest of issues
-                     */
-                    if (!watcher && data.total_count > (offset + limit) && updated >= limit) {
-                        obj.load((offset + limit), limit);
-                    } else {
-                        //load my watcher issues
-                        if(!watcher) {
-                            obj.load(0, limit, true);
-                        }
-                    }
-                    if (watcher) {
-                        if (data.total_count > (offset + limit) && updated >= limit) {
-                            obj.load((offset + limit), limit, true);
-                        }
-                    }
-                    /**
-                     * Show notifications for issues
-                     */
-                    if (notifiedIssues.length > 0) {
-                        obj.showNotifications(notifiedIssues);
                     }
                 }
+                obj.lastUpdated = new Date();
+                obj.updateUnread(true);
+                obj.store();
+                /**
+                 * Update issue statuses
+                 */
+                obj.getStatuses();
+                /**
+                 * Notify
+                 */
+                chrome.extension.sendMessage({"action": "issuesUpdated"});
+                /**
+                 * Load rest of issues
+                 */
+                if (!watcher && data.total_count > (offset + limit) && updated >= limit) {
+                    obj.load((offset + limit), limit);
+                } else {
+                    //load my watcher issues
+                    if(!watcher) {
+                        obj.load(0, limit, true);
+                    }
+                }
+                if (watcher) {
+                    if (data.total_count > (offset + limit) && updated >= limit) {
+                        obj.load((offset + limit), limit, true);
+                    }
+                }
+                /**
+                 * Show notifications for issues
+                 */
+                if (notifiedIssues.length > 0) {
+                    obj.showNotifications(notifiedIssues);
+                }
             }
-        );
+        });
     })(this);
 };
 
@@ -203,7 +199,7 @@ Issues.prototype.get = function(issue, reload) {
         return;
     }
     (function(obj) {
-        getLoader().get("issues/"+issue.id+".json?include=journals,changesets,attachments", function(json) {
+        redmineApi.issues.get(issue.id, "attachments,journals", function(error, json) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
                 if (is.issue) {
@@ -254,16 +250,15 @@ Issues.prototype.update = function(id, issueData) {
         return;
     }
     (function(obj) {
-        var data = {
-            'issue': issueData
-        };
-        getLoader().put("issues/"+id+".json", JSON.stringify(data), function(json) {
-            obj.get(issue.issue, true);
-        }, function(e, request) {
-            if (request && request.readyState == 4 && request.status == 422) {
-                var json = JSON.parse(request.response);
-                chrome.extension.sendMessage({action: "customError", type: "issueUpdate", errors: json});
+        redmineApi.issues.update(id, issueData, function(error, json) {
+            if (error) {
+                if (error.request && error.request.readyState == 4 && error.request.status == 422) {
+                    var err = JSON.parse(error.request.response);
+                    chrome.extension.sendMessage({action: "customError", type: "issueUpdate", errors: err});
+                }
+                return;
             }
+            obj.get(issue.issue, true);
         });
     })(this);
 };
@@ -276,18 +271,17 @@ Issues.prototype.update = function(id, issueData) {
  */
 Issues.prototype.create = function(issue) {
     (function(obj) {
-        var data = {
-            'issue': issue
-        };
-        getLoader().post("issues.json", JSON.stringify(data), function(json) {
+        redmineApi.issues.create(issue, function(error, json) {
+            if (error) {
+                if (error.request && error.request.readyState == 4 && error.request.status == 422) {
+                    var err = JSON.parse(error.request.response);
+                    chrome.extension.sendMessage({action: "customError", type: "issueCreate", errors: err});
+                }
+                return;
+            }
             var iss = json.issue || issue;
             //notify all listeners
             chrome.extension.sendMessage({action: "issueCreated", issue: iss});
-        }, function(e, request) {
-            if (request && request.readyState == 4 && request.status == 422) {
-                var json = JSON.parse(request.response);
-                chrome.extension.sendMessage({action: "customError", type: "issueCreate", errors: json});
-            }
         });
     })(this);
 };
@@ -372,7 +366,10 @@ Issues.prototype.getStatuses = function(reload) {
         return this.statuses;
     }
     (function(obj) {
-        getLoader().get("issue_statuses.json", function(json) {
+        redmineApi.issues.statuses(function(error, json) {
+            if (error) {
+                return;
+            }
             if (json.issue_statuses && json.issue_statuses.length > 0) {
                 obj.statuses = json.issue_statuses;
                 obj.statusesLoaded = true;
@@ -397,9 +394,8 @@ Issues.prototype.getPriorities = function(reload) {
         return this.priorities;
     }
     (function(obj) {
-        getLoader().get("enumerations/issue_priorities.json", function(json) {
-            console.log(json);
-            return;
+        redmineApi.issues.statuses(function(error, json) {
+            console.log(json);return;
             if (json.issue_statuses && json.issue_statuses.length > 0) {
                 obj.priorities = json.issue_statuses;
                 obj.prioripiesLoaded = true;

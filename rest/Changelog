@@ -1,5 +1,8 @@
 Changelog
 ---------------------------------
+1.6.5 ()
+    - Added config synchronization between devices
+
 1.6.0 (15-Feb-2013)
     - Updated Twitter Bootstrap to version 2.3
     - Added ChiliProject support

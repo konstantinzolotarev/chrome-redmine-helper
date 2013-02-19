@@ -51,13 +51,9 @@ Users.prototype.load = function(reload) {
         return;
     }
     (function(obj) {
-        getLoader().get("users.json", function(json) {
-            console.log(json);
-        }, function(e, resp) {
-            if (resp.status && resp.status == 401) {
-                //Couldn't load users
-            }
-        });
+      redmineApi.users.all(function(error, json) {
+          console.log(json);
+      });
     })(this);
 };
 

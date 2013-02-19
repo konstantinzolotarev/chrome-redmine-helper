@@ -6,11 +6,38 @@ var selectedText = "";
  * Init global variables
  */
 config = new Config(),
-loader = new Loader(),
-projects = new Projects(),
 issues = new Issues(),
 users = new Users(),
 news = new News();
+
+/**
+ * Loading Redmine API
+ * 
+ * @type {redmine.Api}
+ */
+redmineApi = null;
+
+//Load configs on init
+config.load(function() {
+    //handle loading complete
+    //fetch config
+    updateRedmineApi(); 
+});
+
+/**
+ * 
+ * @returns {@exp;redmine@call;Api}
+ */
+function updateRedmineApi() {
+    redmineApi = new redmine.Api({
+        host: getConfig().profile.host,
+        useHttpAuth: getConfig().profile.useHttpAuth,
+        httpUser: getConfig().profile.httpUser,
+        httpPassword: getConfig().profile.httpPass,
+        chiliProject: getConfig().profile.chiliProject,
+        apiAccessKey: getConfig().profile.apiAccessKey
+    });
+}
 
 /**
  * Get selected text from context menu event
@@ -42,16 +69,6 @@ function merge(obj1,obj2){
 }
 
 /**
- * 
- * @param {ProgressEvent} e
- * @returns {void}
- */
-function requestError(e) {
-    chrome.extension.sendMessage({action: "xhrError", params: {"e": e}});
-    chrome.browserAction.setBadgeText({text: "Err"});
-}
-
-/**
  * Trim string 
  * @param {Strin} string
  */
@@ -67,23 +84,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * Get Loader
- * 
- * @returns {Loader}
- */
-function getLoader() {
-    return loader;
-}
-
-/**
- * 
- * @returns {Projects}
- */
-function getProjects() {
-    return projects;
 }
 
 /**
@@ -135,8 +135,7 @@ function setUnreadIssuesCount(count) {
  * 
  * @returns {void}
  */
-function clearItems() {
-    projects.clear();
+function updateItems() {
     if (!config.isEmpty()) {
         startRequest({scheduleRequest:true});
     }
@@ -199,25 +198,47 @@ function openMainPage(page) {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    try {
+        chrome.alarms.get("issues", function(alarm) {
+            if (alarm) {
+                chrome.alarms.clear("issues");
+            }
+            chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});        
+        });
+    } catch(err) {
+        chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    }
 }
 
 /**
- * 
- * @param {type} onSuccess
+ * Load current user details
+
+ * @param {function()=} onSuccess function that will be called after success loading of user details
  * @returns {void}
  */
 function getCurrentUser(onSuccess) {
-    getLoader().get("users/current.json",
-        function(json) {
-            if (json.user) {
-                getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
-                getConfig().getProfile().currentUserId = json.user.id;
-                getConfig().store(getConfig().getProfile());
-                onSuccess();
-            }
+    redmineApi.users.me(function(error, json) {
+        if (error) {
+            fireError("Couldn't load user details", true);
         }
-    );
+        if (json.user) {
+            getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
+            getConfig().getProfile().currentUserId = json.user.id;
+            getConfig().store(getConfig().getProfile());
+            onSuccess();
+        }
+    });
+    
+}
+
+/**
+ * Upload file to redmine
+ * 
+ * @param {?} file
+ * @param {function(?Object, ?Object)} callback Callback function
+ */
+function uploadFile(file, callback) {
+    redmineApi.upload(file, callback);
 }
 
 /**
@@ -241,15 +262,31 @@ function startRequest(params) {
              * Load list of issues
              */
             getIssues().load();
-            /**
-             * Load list of users
-             */
-//            getUsers().load();
         }
     } else {
-        chrome.browserAction.setBadgeText({text: "Err"});
+         fireError("Couldn't connect to server.", true);
     }
 }
+
+/**
+ * Shows new Global error message
+ * 
+ * @param {string=} message 
+ * @param {boolean} global
+ */
+function fireError(message, global) {
+    if (global) {
+        chrome.browserAction.setBadgeText({text: "Err"});
+    }
+    //send error
+    chrome.extension.sendMessage({
+        action: "globalError", params: {
+            "error": {
+                'message': message
+            }
+        }
+    });
+};
 
 /**
  * handler for click on context menu
@@ -263,6 +300,19 @@ function handleContextMenu(info, tab) {
 }
 
 /**
+ * Handle settings update
+ * 
+ * @param {Object} changes
+ * @param {Object} namespace
+ */
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console.log("Settings updated");
+    //Update settings
+    updateRedmineApi();
+    updateItems();
+});
+
+/**
  * Add handler to context menu click
  */
 chrome.contextMenus.onClicked.addListener(handleContextMenu);
@@ -272,6 +322,13 @@ chrome.contextMenus.onClicked.addListener(handleContextMenu);
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
+    if (localStorage.profile) {
+        //sync it with chrome.storage
+        var loadedProfile = JSON.parse(localStorage.profile);
+        getConfig().store(loadedProfile);
+        //clear storage
+        localStorage.removeItem('profile');
+    }
     startRequest({scheduleRequest:true});
 });
 

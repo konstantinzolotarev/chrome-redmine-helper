@@ -285,21 +285,19 @@ angular.module('issues', ['ngSanitize']).
              */
             scope.uploadFile = function(file) {
                 scope.loading = true;
-                BG.getLoader().upload("uploads.json", file, function(resp) {
-                    if (!resp.response || resp.response == "") {
+                BG.uploadFile(file, function (error, json) {
+                    if (error) {
+                        scope.$apply(function(sc) {
+                            sc.error = true;
+                            sc.loading = false;
+                        });
                         return;
                     }
-                    var json = JSON.parse(resp.response);
                     scope.$apply(function(sc) {
                         sc.error = false;
                         sc.loading = false;
                         //Notify listeners that file is uploaded
                         chrome.extension.sendMessage({"action": "fileUploaded", 'token': json.upload.token, 'file': file});
-                    });
-                }, function(e, resp) {
-                    scope.$apply(function(sc) {
-                        sc.error = true;
-                        sc.loading = false;
                     });
                 });
             };
