@@ -28,8 +28,7 @@ function Config() {
             author: true,
             tracker: false,
             status: false
-        },
-        time_entries: []
+        }
     };
     this.loaded = false;
     this.isLoading = false;
