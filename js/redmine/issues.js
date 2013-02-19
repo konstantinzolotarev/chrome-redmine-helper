@@ -68,7 +68,7 @@ Issues.prototype.load = function(offset, limit, watcher) {
                                 +"&limit="+limit
                                 +"&offset="+offset
         }
-        redmine.issues.all(filter, function(error, data) {
+        redmineApi.issues.all(filter, function(error, data) {
             var updated = 0;
             var notifiedIssues = [];
             if (data.total_count && data.total_count > 0) {
@@ -199,7 +199,7 @@ Issues.prototype.get = function(issue, reload) {
         return;
     }
     (function(obj) {
-        redmine.issues.get(issue.id, "attachments,journals", function(error, json) {
+        redmineApi.issues.get(issue.id, "attachments,journals", function(error, json) {
             if (json.issue) {
                 var is = obj.getById(json.issue.id);
                 if (is.issue) {
@@ -250,7 +250,7 @@ Issues.prototype.update = function(id, issueData) {
         return;
     }
     (function(obj) {
-        redmine.issues.update(id, issueData, function(error, json) {
+        redmineApi.issues.update(id, issueData, function(error, json) {
             if (error) {
                 if (error.request && error.request.readyState == 4 && error.request.status == 422) {
                     var err = JSON.parse(error.request.response);
@@ -271,7 +271,7 @@ Issues.prototype.update = function(id, issueData) {
  */
 Issues.prototype.create = function(issue) {
     (function(obj) {
-        redmine.issues.create(issue, function(error, json) {
+        redmineApi.issues.create(issue, function(error, json) {
             if (error) {
                 if (error.request && error.request.readyState == 4 && error.request.status == 422) {
                     var err = JSON.parse(error.request.response);
@@ -366,7 +366,7 @@ Issues.prototype.getStatuses = function(reload) {
         return this.statuses;
     }
     (function(obj) {
-        redmine.issues.statuses(function(error, json) {
+        redmineApi.issues.statuses(function(error, json) {
             if (error) {
                 return;
             }
@@ -394,7 +394,7 @@ Issues.prototype.getPriorities = function(reload) {
         return this.priorities;
     }
     (function(obj) {
-        redmine.issues.statuses(function(error, json) {
+        redmineApi.issues.statuses(function(error, json) {
             console.log(json);return;
             if (json.issue_statuses && json.issue_statuses.length > 0) {
                 obj.priorities = json.issue_statuses;

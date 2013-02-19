@@ -10,14 +10,32 @@ projects = new Projects(),
 issues = new Issues(),
 users = new Users(),
 news = new News();
-redmine = new redmine.Api({
-    host: "https://redmine.sibers.com",
-    useHttpAuth: true,
-    httpUser: "zolotarev",
-    httpPassword: "Ai5voiCh",
-    chiliProject: false,
-    apiAccessKey: "5a5b891b32929644db04706508eec1979a27b556"
-});
+
+/**
+ * Loading Redmine API
+ * 
+ * @type {redmine.Api}
+ */
+redmineApi = null;
+
+//fetch config
+updateRedmineApi(); 
+
+/**
+ * 
+ * @returns {@exp;redmine@call;Api}
+ */
+function updateRedmineApi() {
+    redmineApi = new redmine.Api({
+        host: getConfig().profile.host,
+        useHttpAuth: getConfig().profile.useHttpAuth,
+        httpUser: getConfig().profile.httpUser,
+        httpPassword: getConfig().profile.httpPass,
+        chiliProject: getConfig().profile.chiliProject,
+        apiAccessKey: getConfig().profile.apiAccessKey
+    });
+}
+
 /**
  * Get selected text from context menu event
  *
@@ -125,6 +143,7 @@ function setUnreadIssuesCount(count) {
 function clearItems() {
     projects.clear();
     if (!config.isEmpty()) {
+        updateRedmineApi();
         startRequest({scheduleRequest:true});
     }
 }
@@ -196,7 +215,7 @@ function scheduleRequest() {
  * @returns {void}
  */
 function getCurrentUser(onSuccess) {
-    redmine.users.me(function(error, json) {
+    redmineApi.users.me(function(error, json) {
         if (error) {
             fireError("Couldn't load user details", true);
         }
@@ -217,7 +236,7 @@ function getCurrentUser(onSuccess) {
  * @param {function(?Object, ?Object)} callback Callback function
  */
 function uploadFile(file, callback) {
-    redmine.upload(file, callback);
+    redmineApi.upload(file, callback);
 }
 
 /**
@@ -243,12 +262,15 @@ function startRequest(params) {
             getIssues().load();
         }
     } else {
-        chrome.browserAction.setBadgeText({text: "Err"});
+         fireError("Couldn't connect to server.", true);
     }
 }
 
 /**
  * Shows new Global error message
+ * 
+ * @param {string=} message 
+ * @param {boolean} global
  */
 function fireError(message, global) {
     if (global) {

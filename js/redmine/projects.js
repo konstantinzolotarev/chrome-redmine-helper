@@ -46,7 +46,7 @@ Projects.prototype.get = function(id, reload) {
         return p.project;
     }
     (function(obj) {
-        redmine.projects.get(id, function(error, data) {
+        redmineApi.projects.get(id, function(error, data) {
             if (error) {
                 return;
             }
@@ -78,7 +78,7 @@ Projects.prototype.getMembers = function(projectId, reload) {
         return proj.project.members;
     }
     (function(obj) {
-        redmine.projects.memberships(projectId, function(error, json) {
+        redmineApi.projects.memberships(projectId, function(error, json) {
             if (error) {
                 if (error.request.status && error.request.status == 403) {
                     obj.projects[proj.key].membersLoaded = true;
@@ -159,7 +159,7 @@ Projects.prototype.loadFromRedmine = function() {
     //update process
     this.projects = [];
     (function(obj) {
-        redmine.projects.all(function(error, data) {
+        redmineApi.projects.all(function(error, data) {
             if (error) {
                 return;
             }
@@ -245,7 +245,7 @@ Projects.prototype.getIssues = function(id, offset, reload) {
     var limit = 50;
     (function(obj, key, limit) {
         var filters = "sort=updated_on:desc&project_id="+id+"&limit="+limit+"&offset="+offset;
-        redmine.issues.all(filters, function(error, json) {
+        redmineApi.issues.all(filters, function(error, json) {
             if (error) {
                 return;
             }

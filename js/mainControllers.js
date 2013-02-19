@@ -2,6 +2,8 @@ var BG = chrome.extension.getBackgroundPage();
 
 /**
  * Bind tooltips
+ * 
+ * @param {jQuery} $
  */
 jQuery(document).ready(function($) {
     $('.container').tooltip({

@@ -21,7 +21,7 @@ News.prototype.load = function(success, error) {
     if (!error) {
         error = function() {};
     }
-    redmine.news.all(function(gerror, json) {
+    redmineApi.news.all(function(gerror, json) {
     	if (gerror) {
     		error(error);
     		return;

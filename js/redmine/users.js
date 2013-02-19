@@ -51,7 +51,7 @@ Users.prototype.load = function(reload) {
         return;
     }
     (function(obj) {
-      redmine.users.all(function(error, json) {
+      redmineApi.users.all(function(error, json) {
           console.log(json);
       });
     })(this);
