@@ -32,6 +32,7 @@ function Config() {
         time_entries: []
     };
     this.loaded = false;
+    this.isLoading = false;
 }
 
 /**
@@ -63,21 +64,32 @@ Config.prototype.isLoaded = function() {
 
 /**
  * Load config from locaStorage
+ * 
+ * @param {function()} onLoad
  */
-Config.prototype.load = function() {
-    if (this.isLoaded()) {
+Config.prototype.load = function(onLoad) {
+    if (this.isLoaded() || this.isLoading) {
         return;
     }
-    var profile = localStorage.profile || false;
-    if (!profile) {
-        this.initNew();
-        this.loaded = true;
-        return;
-    }
-    var loadedProfile = JSON.parse(profile);
-    this.profile = merge(this.profile, loadedProfile);
-    this.loaded = true;
-    return;
+    onLoad = onLoad || function() {};
+    this.isLoading = true;
+    (function(conf) {
+        //loading profile data
+        chrome.storage.sync.get('profile', function(items) {
+            var profile = items.profile || false;
+            console.log(profile);
+            if (!profile) {
+                conf.initNew();
+                conf.loaded = true;
+                return;
+            }
+//            var loadedProfile = JSON.parse(profile);
+            conf.profile = merge(conf.profile, profile);
+            conf.loaded = true;
+            conf.isLoading = false;
+            onLoad();
+        });
+    })(this);
 };
 
 /**
@@ -90,7 +102,9 @@ Config.prototype.store = function(profile) {
     if (profile.host.lastIndexOf("/") != (profile.host.length - 1)) {
         profile.host += "/";
     }
-    localStorage['profile'] = JSON.stringify(profile);
+    this.loaded = false;
+    chrome.storage.sync.set({'profile': profile});
+//    localStorage['profile'] = JSON.stringify(profile);
 };
 
 /**

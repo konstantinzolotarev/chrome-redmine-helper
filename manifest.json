@@ -27,6 +27,7 @@
         "persistent": false
     },
     "permissions": [
+        "storage",
         "alarms",
         "tabs",
         "notifications",

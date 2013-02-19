@@ -238,7 +238,6 @@ function Options($scope, $timeout) {
      */
     $scope.storeOptions = function() {
         BG.getConfig().store(BG.getConfig().getProfile());
-        BG.clearItems();
         $scope.xhrError = false;
         $scope.showSuccess("<strong>Success!</strong> Your setting successfully saved !");
     };

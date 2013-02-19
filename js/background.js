@@ -18,8 +18,12 @@ news = new News();
  */
 redmineApi = null;
 
-//fetch config
-updateRedmineApi(); 
+//Load configs on init
+config.load(function() {
+    //handle loading complete
+    //fetch config
+    updateRedmineApi(); 
+});
 
 /**
  * 
@@ -140,10 +144,8 @@ function setUnreadIssuesCount(count) {
  * 
  * @returns {void}
  */
-function clearItems() {
-    projects.clear();
+function updateItems() {
     if (!config.isEmpty()) {
-        updateRedmineApi();
         startRequest({scheduleRequest:true});
     }
 }
@@ -205,7 +207,13 @@ function openMainPage(page) {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    chrome.alarms.get("issues", function(alarm) {
+        console.log(alarm);
+        if (alarm) {
+            chrome.alarms.clear("issues");
+        }
+        chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});        
+    });
 }
 
 /**
@@ -296,6 +304,19 @@ function handleContextMenu(info, tab) {
     //open new tab to create issue 
     openMainPage("/new_issue");
 }
+
+/**
+ * Handle settings update
+ * 
+ * @param {Object} changes
+ * @param {Object} namespace
+ */
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console.log("Settings updated");
+    //Update settings
+    updateRedmineApi();
+    updateItems();
+});
 
 /**
  * Add handler to context menu click
