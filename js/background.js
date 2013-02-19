@@ -207,13 +207,16 @@ function openMainPage(page) {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.get("issues", function(alarm) {
-        console.log(alarm);
-        if (alarm) {
-            chrome.alarms.clear("issues");
-        }
-        chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});        
-    });
+    try {
+        chrome.alarms.get("issues", function(alarm) {
+            if (alarm) {
+                chrome.alarms.clear("issues");
+            }
+            chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});        
+        });
+    } catch(err) {
+        chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    }
 }
 
 /**
@@ -328,6 +331,13 @@ chrome.contextMenus.onClicked.addListener(handleContextMenu);
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
+    if (localStorage.profile) {
+        //sync it with chrome.storage
+        var loadedProfile = JSON.parse(localStorage.profile);
+        getConfig().store(loadedProfile);
+        //clear storage
+        localStorage.removeItem('profile');
+    }
     startRequest({scheduleRequest:true});
 });
 
