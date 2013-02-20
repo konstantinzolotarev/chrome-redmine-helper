@@ -92,6 +92,7 @@
                     <a href="#attachments" data-toggle="tab">Attachments</a>
                 </li>
                 <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
+                <li class=""><a href="#timelines" data-toggle="tab">Work history</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="description">
@@ -151,6 +152,20 @@
                             <button class="btn" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
                         </div>
                     </form>
+                </div>
+                <!-- Timelines -->
+                <div class="tab-pane active" id="timelines">
+                    <div class="issue-timelines">
+                        <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
+                            No logs available.
+                        </div>
+                        <div class="well well-small" data-ng-show="issue.timelines.length > 0">
+                            <a href="" class="btn" data-ng-click="clearTimeline(issue)">Clear work log</a>
+                        </div>
+                        <div class="timeline" data-ng-repeat="timeline in issue.timelines">
+                            {{timeline.start|date:'dd-MM-yyyy'}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

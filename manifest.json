@@ -30,6 +30,7 @@
     },
     "permissions": [
         "storage",
+        "unlimitedStorage",
         "alarms",
         "tabs",
         "notifications",

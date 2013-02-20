@@ -32,7 +32,7 @@ com.rdHelper.Timeline.callback = function(key, timeline) {};
  * @param {function()} onSuccess
  */
 com.rdHelper.Timeline.store = function(onSuccess) {
-    chrome.storage.sync.set({'timelines': this.timelines}, onSuccess);
+    chrome.storage.local.set({'timelines': this.timelines}, onSuccess);
 };
 
 /**
@@ -70,7 +70,7 @@ com.rdHelper.Timeline.allGroupedByIssues = function(onSuccess) {
 com.rdHelper.Timeline.load = function(onLoad) {
     onLoad = onLoad || function() {};
     (function(obj) {
-        chrome.storage.sync.get('timelines', function(items) {
+        chrome.storage.local.get('timelines', function(items) {
             console.log(items);
             obj.loaded = true;
             if (items.timelines) {
@@ -101,8 +101,9 @@ com.rdHelper.Timeline.add = function(timeline, onSuccess) {
     if (arguments.length < 2 && typeof timeline != "object" || !timeline.issueId) {
         throw new Error("please provide timeline details.");
     }
+    var date = new Date();
     if (!timeline.start) {
-        timeline.start = new Date();
+        timeline.start = date.toJSON();
     }
     onSuccess = onSuccess || function() {};
     //check for existance
@@ -110,7 +111,7 @@ com.rdHelper.Timeline.add = function(timeline, onSuccess) {
         obj.getActiveByIssueId(timeline.issueId, function(key, res) {
             if (key !== null) {
                 if (!obj.timelines[key].end) {
-                    obj.timelines[key].end = new Date();
+                    obj.timelines[key].end = date.toJSON();
                 }
             }
             obj.timelines.push(timeline);
@@ -178,6 +179,26 @@ com.rdHelper.Timeline.getActiveByIssueId = function(issueId, callback) {
                 }
             }
             callback(null, null);
+        });
+    })(this);
+};
+
+/**
+ * Searches Timeline by issue ID 
+ * 
+ * @param {(number|string)} issueId
+ * @param {function(?Array)} callback
+ */
+com.rdHelper.Timeline.clearByIssueId = function(issueId, callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        obj.all(function(timelines) {
+            for(var i in obj.timelines) {
+                if (obj.timelines[i].issueId == issueId) {
+                    delete obj.timelines[i];
+                }
+            }
+            callback();
         });
     })(this);
 };

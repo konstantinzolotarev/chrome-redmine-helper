@@ -407,17 +407,36 @@ function Home($scope) {
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
-        BG.com.rdHelper.Timeline.getActiveByIssueId(issue.id, function(key, timeline) {
-            if (key === null) {
-                $scope.issue.tracking = false;
-            } else {
-                $scope.issue.tracking = true;
-            }            
+        BG.com.rdHelper.Timeline.getByIssueId(issue.id, function(list) {
+            console.log(list);
+            $scope.issue.tracking = false;
+            $scope.issue.timelines = [];
+            for(var i in list) {
+                if (list[i].end && list[i].spent) {
+                    $scope.issue.timelines.push(list[i]);
+                } else {
+                    $scope.issue.tracking = true;
+                }
+            }
             if (!$scope.$$phase) {
                 $scope.$digest();
             }
         });
         $('#issueDetails').modal('toggle');
+    };
+    
+    /**
+     * Clear timeline for selected issue
+     */
+    $scope.clearTimeline = function(issue) {
+        BG.com.rdHelper.Timeline.clearByIssueId(issue.id, function() {
+            BG.com.rdHelper.Timeline.store();
+            $scope.issue.tracking = false;
+            $scope.issue.timelines = [];
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
     };
     
     /**
@@ -444,7 +463,13 @@ function Home($scope) {
      */
     $scope.stopTrackingTime = function() {
         BG.com.rdHelper.Timeline.getActiveByIssueId($scope.issue.id, function(key, timeline) {
-            BG.com.rdHelper.Timeline.timelines[key].end = new Date();
+            if (key === null) {
+                return;
+            }
+            var date = new Date();
+            var start = new Date(timeline.start);
+            BG.com.rdHelper.Timeline.timelines[key].end = date.toJSON();
+            BG.com.rdHelper.Timeline.timelines[key].spent = date.getTime() - start.getTime();
             BG.com.rdHelper.Timeline.store(function() {
                 $scope.issue.tracking = false;
                 if (!$scope.$$phase) {
