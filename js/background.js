@@ -309,6 +309,10 @@ function handleContextMenu(info, tab) {
  * @param {Object} namespace
  */
 chrome.storage.onChanged.addListener(function(changes, namespace) {
+    //handle only profile update
+    if (!changes.profile) {
+        return;
+    }
     console.log("Settings updated");
     //Update settings
     updateRedmineApi();

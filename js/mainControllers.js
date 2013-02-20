@@ -291,24 +291,6 @@ function Home($scope) {
     $scope.project = {};
 
     /**
-     * Time tracking 
-     */
-
-    /**
-     * Starts time tracking 
-     */
-    $scope.startTrackingTime = function() {
-        $scope.issue.tracking = true;
-    };
-
-    /**
-     * Stop time tracking 
-     */
-    $scope.stopTrackingTime = function() {
-        $scope.issue.tracking = false;
-    };
-
-    /**
      * On new file selected for upload
      */
     $scope.fileSubmitted = function(file) {
@@ -425,9 +407,46 @@ function Home($scope) {
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
-        console.log(issue);
-        console.log($scope.project);
+        BG.com.rdHelper.Timeline.getActiveByIssueId(issue.id, function(key, timeline) {
+            if (key === null) {
+                $scope.issue.tracking = false;
+            } else {
+                $scope.issue.tracking = true;
+            }            
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
         $('#issueDetails').modal('toggle');
+    };
+    
+    /**
+     * Time tracking 
+     */
+
+    /**
+     * Starts time tracking 
+     */
+    $scope.startTrackingTime = function() {
+        var timeline = {
+            issueId: $scope.issue.id
+        };
+        BG.com.rdHelper.Timeline.add(timeline, function() {
+            $scope.issue.tracking = true;
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+
+    /**
+     * Stop time tracking 
+     */
+    $scope.stopTrackingTime = function() {
+        $scope.issue.tracking = false;
+        BG.com.rdHelper.Timeline.getActiveByIssueId($scope.issue.id, function(key, timeline) {
+            
+        });
     };
 
     /**
@@ -793,9 +812,11 @@ function Timelines($scope) {
      * @param {Array} timelines
      */
     function timelinesLoaded(timelines) {
-        $scope.$apply(function(sc) {
-            sc.timelines = timelines;
-        });
+        $scope.timelines = timelines;
+        if(!$scope.$$phase) {
+            $scope.$digest();
+        }
+        console.log($scope.timelines);
     }
 }
 

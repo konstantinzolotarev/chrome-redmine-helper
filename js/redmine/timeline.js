@@ -8,6 +8,25 @@ com.rdHelper.Timeline = {
 };
 
 /**
+ * Default timeline object
+ * 
+ * @type Object
+ */
+com.rdHelper.Timeline.timelineBase = {
+    'id': 0,
+    'issueId': 0,
+    'start': new Date(),
+    'end': null
+};
+
+/**
+ * Default callback for Timeline API
+ * @param {number} key
+ * @param {Object} timeline
+ */
+com.rdHelper.Timeline.callback = function(key, timeline) {};
+
+/**
  * Store timelines 
  * 
  * @param {function()} onSuccess
@@ -58,9 +77,106 @@ com.rdHelper.Timeline.load = function(onLoad) {
     })(this);
 };
 
-com.rdHelper.Timeline.add = function(timeline) {};
+/**
+ * Check if loaded
+ * 
+ * @returns {boolean}
+ */
+com.rdHelper.Timeline.isLoaded = function() {
+    return this.loaded;
+};
 
-com.rdHelper.Timeline.get = function() {};
+/**
+ * Add new Timeline
+ * 
+ * @throws {Error} if no timeline details passed
+ * @param {Object} timeline Timeline details
+ * @param {function()=} onSuccess success handler
+ */
+com.rdHelper.Timeline.add = function(timeline, onSuccess) {
+    if (arguments.length < 2 && typeof timeline != "object" || !timeline.issueId) {
+        throw new Error("please provide timeline details.");
+    }
+    if (!timeline.start) {
+        timeline.start = new Date();
+    }
+    onSuccess = onSuccess || function() {};
+    //check for existance
+    (function(obj) {
+        obj.getActiveByIssueId(timeline.issueId, function(key, res) {
+            if (key !== null) {
+                if (!obj.timelines[key].end) {
+                    obj.timelines[key].end = new Date();
+                }
+            }
+            obj.timelines.push(timeline);
+            obj.store(onSuccess);
+        });
+    })(this);
+};
+
+/**
+ * Get timeline By id
+ * 
+ * @param {type} id
+ * @param {function(?number, ?Object)} callback
+ */
+com.rdHelper.Timeline.get = function(id, callback) {
+    callback = callback || this.callback;
+    (function(obj) {
+        obj.all(function(timelines) {
+            for(var i in timelines) {
+                if (timelines[i].id == id) {
+                    callback(i, timelines[i]);
+                    return;
+                }
+            }
+            callback(null, null);
+        });
+    })(this);
+};
+
+/**
+ * Searches Timeline by issue ID 
+ * 
+ * @param {(number|string)} issueId
+ * @param {function(?Array)} callback
+ */
+com.rdHelper.Timeline.getByIssueId = function(issueId, callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        obj.all(function(timelines) {
+            var result = [];
+            for(var i in timelines) {
+                if (timelines[i].issueId == issueId) {
+                    result.push(timelines[i]);
+                }
+            }
+            callback(result);
+        });
+    })(this);
+};
+
+/**
+ * Searches Timeline by issue ID 
+ * 
+ * @param {(number|string)} issueId
+ * @param {function(?Array)} callback
+ */
+com.rdHelper.Timeline.getActiveByIssueId = function(issueId, callback) {
+    callback = callback || this.callback;
+    (function(obj) {
+        obj.all(function(timelines) {
+            for(var i in timelines) {
+                if (timelines[i].issueId == issueId && !timelines[i].end) {
+                    callback(i, timelines[i]);
+                    return;
+                }
+            }
+            callback(null, null);
+        });
+    })(this);
+};
 
 /**
  * Clear all timelines
