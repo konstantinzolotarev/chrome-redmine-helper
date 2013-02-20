@@ -128,7 +128,7 @@ angular.module('issues', ['ngSanitize']).
                                 + "<i>" + BG.getIssues().getStatusNameById(scope.item.new_value) + "</i>");
                         break;
                     case "assigned_to_id":
-                        element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(scope.scope.item.new_value));
+                        element.html("<strong>Assignee</strong> set to: "+BG.com.rdHelper.Users.getNameById(scope.item.new_value));
                         break;
                     case "category_id":
                         element.html("<strong>Category</strong> set to: "+scope.item.new_value);

@@ -100,7 +100,7 @@ Issues.prototype.load = function(offset, limit, watcher) {
                                 obj.issues[key] = data.issues[i];
                                 updated += 1;
                                 //Bind users from issue
-                                getUsers().grabFromIssue(data.issues[i]);
+                                com.rdHelper.Users.grabFromIssue(data.issues[i]);
                                 if (getConfig().getNotifications().show == "updated") {
                                     notifiedIssues.push(obj.issues[key]);
                                 }
@@ -109,7 +109,7 @@ Issues.prototype.load = function(offset, limit, watcher) {
                     }
                     if (!found) {
                         //Bind users from issue
-                        getUsers().grabFromIssue(data.issues[i]);
+                        com.rdHelper.Users.grabFromIssue(data.issues[i]);
                         //mark as unread
                         data.issues[i].read = false;
                         //mark as watcher issue
@@ -208,7 +208,7 @@ Issues.prototype.get = function(issue, reload) {
                 var is = obj.getById(json.issue.id);
                 if (is.issue) {
                     //Grab users from issue
-                    getUsers().grabFromIssue(json.issue);
+                    com.rdHelper.Users.grabFromIssue(json.issue);
                     //update issue
                     json.issue.detailsLoaded = true;
                     obj.issues[is.key] = merge(obj.issues[is.key], json.issue);

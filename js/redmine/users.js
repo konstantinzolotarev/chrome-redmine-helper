@@ -5,9 +5,9 @@
  * @class 
  * @returns {Users}
  */
-function Users() {
-    this.loaded = localStorage.users_loaded || false;
-    this.users = JSON.parse(localStorage.users || "[]");
+com.rdHelper.Users = {
+    loaded: localStorage.users_loaded || false,
+    users: JSON.parse(localStorage.users || "[]")
 }
 
 /**
@@ -16,7 +16,7 @@ function Users() {
  * @param {Object} issue
  * @returns {undefined}
  */
-Users.prototype.grabFromIssue = function(issue) {
+com.rdHelper.Users.grabFromIssue = function(issue) {
     this.push(issue.assigned_to);
     this.push(issue.author);
 };
@@ -27,7 +27,7 @@ Users.prototype.grabFromIssue = function(issue) {
  * @param {Object} user
  * @returns {undefined}
  */
-Users.prototype.push = function(user) {
+com.rdHelper.Users.push = function(user) {
     if (!user || !user.id || !user.name) {
         return;
     }
@@ -46,7 +46,7 @@ Users.prototype.push = function(user) {
  * @param {boolean} reload 
  * @returns {undefined}
  */
-Users.prototype.load = function(reload) {
+com.rdHelper.Users.load = function(reload) {
     if (!reload && this.loaded) {
         return;
     }
@@ -63,7 +63,7 @@ Users.prototype.load = function(reload) {
  * @param {int} userId
  * @returns {String} 
  */
-Users.prototype.getNameById = function(userId) {
+com.rdHelper.Users.getNameById = function(userId) {
    for (var i in this.users) {
        if (this.users[i].id == userId) {
            return this.users[i].name;
@@ -75,9 +75,8 @@ Users.prototype.getNameById = function(userId) {
 /**
  * Store user data 
  * 
- * @returns {undefined}
  */
-Users.prototype.store = function() {
+com.rdHelper.Users.store = function() {
    localStorage['users'] = JSON.stringify(this.users);
    localStorage['users_loaded'] = this.loaded;
 };

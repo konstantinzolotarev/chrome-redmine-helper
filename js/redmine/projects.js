@@ -82,7 +82,7 @@ com.rdHelper.Projects.getMembers = function(projectId, reload) {
             if (error) {
                 if (error.request.status && error.request.status == 403) {
                     obj.projects[proj.key].membersLoaded = true;
-                    obj.projects[proj.key].members = getUsers().users;
+                    obj.projects[proj.key].members = com.rdHelper.Users.users;
                     obj.store();
                     obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
                 }

@@ -6,8 +6,7 @@ var selectedText = "";
  * Init global variables
  */
 config = new Config(),
-issues = new Issues(),
-users = new Users();
+issues = new Issues();
 
 /**
  * Loading Redmine API
@@ -94,15 +93,6 @@ function getConfig() {
  */
 function getIssues() {
     return issues;
-}
-
-/**
- * Get Users
- * 
- * @returns {Users}
- */
-function getUsers() {
-    return users;
 }
 
 /**
