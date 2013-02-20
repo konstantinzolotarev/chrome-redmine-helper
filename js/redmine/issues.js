@@ -69,6 +69,10 @@ Issues.prototype.load = function(offset, limit, watcher) {
                                 +"&offset="+offset
         }
         redmineApi.issues.all(filter, function(error, data) {
+            if (error) {
+                fireError("Server is unavailable.", true);
+                return;
+            }
             var updated = 0;
             var notifiedIssues = [];
             if (data.total_count && data.total_count > 0) {
