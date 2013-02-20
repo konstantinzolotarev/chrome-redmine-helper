@@ -407,7 +407,18 @@ function Home($scope) {
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
-        BG.com.rdHelper.Timeline.getByIssueId(issue.id, function(list) {
+        $scope.updateIssueTimeline();
+        $('#issueDetails').modal('toggle');
+    };
+    
+    /**
+     * Update timeline for issue now selected
+     */
+    $scope.updateIssueTimeline = function() {
+        if (!$scope.issue) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.getByIssueId($scope.issue.id, function(list) {
             console.log(list);
             $scope.issue.tracking = false;
             $scope.issue.timelines = [];
@@ -422,7 +433,6 @@ function Home($scope) {
                 $scope.$digest();
             }
         });
-        $('#issueDetails').modal('toggle');
     };
     
     /**
@@ -472,6 +482,7 @@ function Home($scope) {
             BG.com.rdHelper.Timeline.timelines[key].spent = date.getTime() - start.getTime();
             BG.com.rdHelper.Timeline.store(function() {
                 $scope.issue.tracking = false;
+                $scope.updateIssueTimeline();
                 if (!$scope.$$phase) {
                     $scope.$digest();
                 }

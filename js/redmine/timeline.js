@@ -184,6 +184,26 @@ com.rdHelper.Timeline.getActiveByIssueId = function(issueId, callback) {
 };
 
 /**
+ * 
+ * @param {} key
+ * @param {function} callback
+ */
+com.rdHelper.Timeline.removeByKey = function(key, callback) {
+    if(!key) {
+        return;
+    }
+    callback = callback || function() {};
+    (function(obj) {
+        obj.all(function() {
+            if (obj.timelines[key]) {
+                delete obj.timelines[key];
+            }
+            callback();
+        });
+    })(this);
+};
+
+/**
  * Searches Timeline by issue ID 
  * 
  * @param {(number|string)} issueId

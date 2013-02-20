@@ -162,8 +162,16 @@
                         <div class="well well-small" data-ng-show="issue.timelines.length > 0">
                             <a href="" class="btn" data-ng-click="clearTimeline(issue)">Clear work log</a>
                         </div>
-                        <div class="timeline" data-ng-repeat="timeline in issue.timelines">
-                            {{timeline.start|date:'dd-MM-yyyy'}}
+                        <div class="timeline row-fluid" data-ng-repeat="timeline in issue.timelines">
+                            <div class="span11">
+                                <a href="" class="date">{{timeline.start|date:'dd-MM-yyyy'}}</a>
+                                <div class="spent">
+                                    Spent:&nbsp;{{timeline.spent}}
+                                </div>
+                            </div>
+                            <div class="span1">
+                                <i class="icon-trash pointer remove-hidden"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
