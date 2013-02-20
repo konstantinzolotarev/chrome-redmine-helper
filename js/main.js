@@ -59,6 +59,7 @@ angular.module('issues', ['ngSanitize']).
             when('/home', {templateUrl: 'partials/home.html', controller: Home}).
             when('/news', {templateUrl: 'partials/news.html', controller: News}).
             when('/projects', {templateUrl: 'partials/projects.html', controller: Projects}).
+            when('/timelines', {templateUrl: 'partials/timelines.html', controller: Timelines}).
             when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
             otherwise({redirectTo: '/home'});
 }])

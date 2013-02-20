@@ -19,6 +19,7 @@
             "js/bg_base.js",
             "js/config.js",
             "js/redmine/projects.js",
+            "js/redmine/timeline.js",
             "js/redmine/issues.js",
             "js/redmine/users.js",
             "js/redmine/news.js",

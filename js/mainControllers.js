@@ -778,6 +778,27 @@ function Projects($scope) {
     chrome.extension.onMessage.addListener(onMessage);
 }
 
+/**
+ * Timelines controller 
+ * 
+ * @param {Object} $scope
+ * @returns {?}
+ */
+function Timelines($scope) {
+    $scope.timelines = BG.com.rdHelper.Timeline.all(timelinesLoaded);
+    
+    /**
+     * Handle Timelines loaded
+     * 
+     * @param {Array} timelines
+     */
+    function timelinesLoaded(timelines) {
+        $scope.$apply(function(sc) {
+            sc.timelines = timelines;
+        });
+    }
+}
+
 
 //Options.$inject = ['$scope', '$timeout'];
 //Home.$inject = ['$scope'];
