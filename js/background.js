@@ -7,8 +7,7 @@ var selectedText = "";
  */
 config = new Config(),
 issues = new Issues(),
-users = new Users(),
-news = new News();
+users = new Users();
 
 /**
  * Loading Redmine API
@@ -104,14 +103,6 @@ function getIssues() {
  */
 function getUsers() {
     return users;
-}
-
-/**
- * 
- * @returns {News}
- */
-function getNews() {
-    return news;
 }
 
 /**

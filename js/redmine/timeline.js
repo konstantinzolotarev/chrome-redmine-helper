@@ -58,6 +58,10 @@ com.rdHelper.Timeline.all = function(reload, onLoad) {
     return this.timelines;
 };
 
+com.rdHelper.Timeline.allGroupedByIssues = function(onSuccess) {
+    
+};
+
 /**
  * Load timelines from storage
  * 

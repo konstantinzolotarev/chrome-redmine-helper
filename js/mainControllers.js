@@ -214,7 +214,7 @@ function News($scope) {
     $scope.loadNews = function() {
         $scope.news = [];
         $scope.showLoading();
-        BG.getNews().load($scope.newsLoaded, $scope.newsError);
+        BG.com.rdHelper.News.load($scope.newsLoaded, $scope.newsError);
     };
 
     if ($scope.news.length < 1) {
@@ -443,9 +443,14 @@ function Home($scope) {
      * Stop time tracking 
      */
     $scope.stopTrackingTime = function() {
-        $scope.issue.tracking = false;
         BG.com.rdHelper.Timeline.getActiveByIssueId($scope.issue.id, function(key, timeline) {
-            
+            BG.com.rdHelper.Timeline.timelines[key].end = new Date();
+            BG.com.rdHelper.Timeline.store(function() {
+                $scope.issue.tracking = false;
+                if (!$scope.$$phase) {
+                    $scope.$digest();
+                }
+            });
         });
     };
 
@@ -494,7 +499,6 @@ function Home($scope) {
      * @param {int} value
      */
     $scope.estimatedOk = function(value) {
-        console.log(value);
         $scope.issue.detailsLoaded = false;
         BG.getIssues().update($scope.issue.id, {'estimated_hours': parseInt(value)});
     };

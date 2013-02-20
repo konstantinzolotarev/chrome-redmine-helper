@@ -2,5 +2,7 @@
     <h3>Your Timelines</h3>
 </div>
 <div>
-    
+    <div data-ng-repeat="timeline in timelines">
+        {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}
+    </div>
 </div>
