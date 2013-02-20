@@ -54,7 +54,7 @@ table.issues .unread {
     border-radius: 5px;
     background-color: #f5f5f5;
     padding: 5px;
-    margin: 13px 4px;
+    margin: 13px 2px;
     box-shadow: -1px 1px 7px -1px #a6acb3;
 }
 
@@ -68,6 +68,17 @@ table.issues .unread {
 
 .issue-timelines .timeline:hover .remove-hidden {
     display: block;
+    -webkit-animation-name: 'toggle';
+    -webkit-animation-duration: .3s;
+}
+
+@-webkit-keyframes 'toggle' {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .attach {
