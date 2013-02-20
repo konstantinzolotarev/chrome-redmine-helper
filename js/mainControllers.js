@@ -101,7 +101,7 @@ function Main($scope, $location, $timeout) {
      * @returns {Number}
      */
     $scope.getUnreadCount = function() {
-        return BG.getIssues().getUnreadCount();
+        return BG.com.rdHelper.Issues.getUnreadCount();
     }
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
@@ -181,7 +181,7 @@ function Main($scope, $location, $timeout) {
         });
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.com.rdHelper.Projects.store();
-        BG.getIssues().clearIssues();
+        BG.com.rdHelper.Issues.clearIssues();
         jQuery('#projectFilters').modal('toggle');
     };
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
@@ -278,7 +278,7 @@ function Options($scope, $timeout) {
  */
 function Home($scope) {
     $scope.options = BG.getConfig();
-    $scope.availStatuses = BG.getIssues().getStatuses();
+    $scope.availStatuses = BG.com.rdHelper.Issues.getStatuses();
     $scope.issues = [];
     $scope.order = "updated_on";
     $scope.reverse = true;
@@ -318,8 +318,8 @@ function Home($scope) {
      */
     $scope.updateIssues = function() {
         $scope.issues = [];
-        for(var key in BG.getIssues().issues) {
-            $scope.issues.push(BG.getIssues().issues[key]);
+        for(var key in BG.com.rdHelper.Issues.issues) {
+            $scope.issues.push(BG.com.rdHelper.Issues.issues[key]);
         }
     };
     //Run update issues action
@@ -335,7 +335,7 @@ function Home($scope) {
         if (issue.read) {
             return;
         }
-        BG.getIssues().markAsRead(issue.id);
+        BG.com.rdHelper.Issues.markAsRead(issue.id);
         issue.read = true;
     };
 
@@ -348,7 +348,7 @@ function Home($scope) {
         if (!issue.read) {
             return;
         }
-        BG.getIssues().markAsUnRead(issue.id);
+        BG.com.rdHelper.Issues.markAsUnRead(issue.id);
         issue.read = false;
     };
     
@@ -358,7 +358,7 @@ function Home($scope) {
      * @returns {undefined}
      */
     $scope.markAllRead = function() {
-        BG.getIssues().markAllAsRead();
+        BG.com.rdHelper.Issues.markAllAsRead();
         $scope.updateIssues();
     };
 
@@ -369,7 +369,7 @@ function Home($scope) {
      */
     $scope.reload = function() {
         $scope.showLoading();
-        BG.getIssues().load();
+        BG.com.rdHelper.Issues.load();
     };
     
     /**
@@ -403,7 +403,7 @@ function Home($scope) {
      * @param {Object} issue
      */
     $scope.showDetails = function(issue) {
-        BG.getIssues().get(issue, !issue.read);
+        BG.com.rdHelper.Issues.get(issue, !issue.read);
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
@@ -459,7 +459,7 @@ function Home($scope) {
      */
     $scope.toggleMinify = function(history) {
         history.minified = !history.minified;
-        BG.getIssues().store();
+        BG.com.rdHelper.Issues.store();
     };
 
     /**
@@ -470,7 +470,7 @@ function Home($scope) {
      */
     $scope.stausOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'status_id': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'status_id': parseInt(value)});
     };
 
     /**
@@ -480,7 +480,7 @@ function Home($scope) {
      */
     $scope.trackOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'tracker_id': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'tracker_id': parseInt(value)});
     };
 
     /**
@@ -490,7 +490,7 @@ function Home($scope) {
      */
     $scope.doneOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'done_ratio': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'done_ratio': parseInt(value)});
     };
 
     /**
@@ -500,7 +500,7 @@ function Home($scope) {
      */
     $scope.estimatedOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'estimated_hours': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'estimated_hours': parseInt(value)});
     };
 
     /**
@@ -510,7 +510,7 @@ function Home($scope) {
      */
     $scope.addComment = function(comment) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().comment($scope.issue.id, comment);
+        BG.com.rdHelper.Issues.comment($scope.issue.id, comment);
     };
     
     //Handle update issue details
@@ -558,7 +558,7 @@ function Home($scope) {
                 }
             ]
         };
-        BG.getIssues().update($scope.issue.id, data);
+        BG.com.rdHelper.Issues.update($scope.issue.id, data);
     };
 
     //Handle error on update issue
@@ -670,7 +670,7 @@ function NewIssue($scope) {
         if ($scope.errors.length > 0) {
             return false;
         }
-        BG.getIssues().create($scope.issue);
+        BG.com.rdHelper.Issues.create($scope.issue);
         $scope.showLoading();
     };
 

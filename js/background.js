@@ -5,8 +5,7 @@ var selectedText = "";
 /**
  * Init global variables
  */
-config = new Config(),
-issues = new Issues();
+config = new Config();
 
 /**
  * Loading Redmine API
@@ -84,15 +83,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * Get Issues
- * 
- * @returns {Issues}
- */
-function getIssues() {
-    return issues;
 }
 
 /**
@@ -245,7 +235,7 @@ function startRequest(params) {
             /**
              * Load list of issues
              */
-            getIssues().load();
+            com.rdHelper.Issues.load();
         }
     } else {
          fireError("Couldn't connect to server.", true);

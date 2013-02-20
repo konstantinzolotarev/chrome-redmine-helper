@@ -4,24 +4,19 @@
  * @class
  * @returns {Issues}
  */
-function Issues() {
-    this.lastUpdated = false;
-    if (localStorage.lastUpdated) {
-        this.lastUpdated = new Date(localStorage.lastUpdated);
-    }
-    this.issues = JSON.parse(localStorage.issues || "[]");
-    this.unread = 0;
+com.rdHelper.Issues = {
+    lastUpdated: localStorage.lastUpdated ? new Date(localStorage.lastUpdated) : false,
+    issues: JSON.parse(localStorage.issues || "[]"),
+    unread: 0,
     //Global issue statuses
-    this.statuses = JSON.parse(localStorage.issueStatuses || "[]");
-    this.statusesLoaded = localStorage.statusesLoaded || false;
+    statuses: JSON.parse(localStorage.issueStatuses || "[]"),
+    statusesLoaded: localStorage.statusesLoaded || false,
     //Global issue Priorities
-    this.priorities = JSON.parse(localStorage.priorities || "[]");
-    this.prioripiesLoaded = localStorage.prioripiesLoaded || false;;
-    
-    this.updateUnread(true);
-}
+    priorities: JSON.parse(localStorage.priorities || "[]"),
+    prioripiesLoaded: localStorage.prioripiesLoaded || false
+};
 
-Issues.prototype.updateUnread = function(updateBadge) {
+com.rdHelper.Issues.updateUnread = function(updateBadge) {
     this.unread = 0;
     for(var i in this.issues) {
         if(!this.issues[i].read) {
@@ -38,7 +33,7 @@ Issues.prototype.updateUnread = function(updateBadge) {
 
  * @returns {number}
  */
-Issues.prototype.getUnreadCount = function() {
+com.rdHelper.Issues.getUnreadCount = function() {
     return this.unread;
 };
 
@@ -50,7 +45,7 @@ Issues.prototype.getUnreadCount = function() {
  * @param {Boolean} watcher
  * @returns {void}
  */
-Issues.prototype.load = function(offset, limit, watcher) {
+com.rdHelper.Issues.load = function(offset, limit, watcher) {
     offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
@@ -172,7 +167,7 @@ Issues.prototype.load = function(offset, limit, watcher) {
  * @param {Array} notifications
  * @returns {undefined}
  */
-Issues.prototype.showNotifications = function(notifications) {
+com.rdHelper.Issues.showNotifications = function(notifications) {
     var text = "";
     var subject = "";
     if (notifications.length == 1) {
@@ -198,7 +193,7 @@ Issues.prototype.showNotifications = function(notifications) {
  * @param {boolean} reload
  * @returns {undefined}
  */
-Issues.prototype.get = function(issue, reload) {
+com.rdHelper.Issues.get = function(issue, reload) {
     if (issue.detailsLoaded && !reload) {
         return;
     }
@@ -228,7 +223,7 @@ Issues.prototype.get = function(issue, reload) {
  * @param {String} comment
  * @returns {undefined}
  */
-Issues.prototype.comment = function(id, comment) {
+com.rdHelper.Issues.comment = function(id, comment) {
     var issue = this.getById(id);
     if (!issue.issue) {
         return;
@@ -243,7 +238,7 @@ Issues.prototype.comment = function(id, comment) {
  * @param {Object} issueData
  * @returns {undefined}
  */
-Issues.prototype.update = function(id, issueData) {
+com.rdHelper.Issues.update = function(id, issueData) {
     //check input data
     if (issueData === null || typeof issueData != "object") {
         return;
@@ -273,7 +268,7 @@ Issues.prototype.update = function(id, issueData) {
  * @param {Object} issue
  * @returns {undefined}
  */
-Issues.prototype.create = function(issue) {
+com.rdHelper.Issues.create = function(issue) {
     (function(obj) {
         redmineApi.issues.create(issue, function(error, json) {
             if (error) {
@@ -296,7 +291,7 @@ Issues.prototype.create = function(issue) {
  * @param {int} id
  * @returns {undefined}
  */
-Issues.prototype.markAsUnRead = function(id) {
+com.rdHelper.Issues.markAsUnRead = function(id) {
     var issue = this.getById(id);
     if (!issue.issue) {
         return;
@@ -313,7 +308,7 @@ Issues.prototype.markAsUnRead = function(id) {
  * @param {int} id
  * @returns {undefined}
  */
-Issues.prototype.markAsRead = function(id) {
+com.rdHelper.Issues.markAsRead = function(id) {
     var issue = this.getById(id);
     if (!issue.issue) {
         return;
@@ -329,7 +324,7 @@ Issues.prototype.markAsRead = function(id) {
  * 
  * @returns {undefined}
  */
-Issues.prototype.markAllAsRead = function() {
+com.rdHelper.Issues.markAllAsRead = function() {
     for(var i in this.issues) {
         this.issues[i].read = true;
     }
@@ -343,7 +338,7 @@ Issues.prototype.markAllAsRead = function() {
  * @param {int} id
  * @returns {Boolean}
  */
-Issues.prototype.getById = function(id) {
+com.rdHelper.Issues.getById = function(id) {
     var issue = {
         'key': false,
         'issue': false
@@ -365,7 +360,7 @@ Issues.prototype.getById = function(id) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Issues.prototype.getStatuses = function(reload) {
+com.rdHelper.Issues.getStatuses = function(reload) {
     if (this.statusesLoaded && !reload) {
         return this.statuses;
     }
@@ -392,7 +387,7 @@ Issues.prototype.getStatuses = function(reload) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Issues.prototype.getPriorities = function(reload) {
+com.rdHelper.Issues.getPriorities = function(reload) {
     return; //Now not working in Redmine
     if (this.prioripiesLoaded && !reload) {
         return this.priorities;
@@ -417,7 +412,7 @@ Issues.prototype.getPriorities = function(reload) {
  * @param {int} id
  * @returns {String}
  */
-Issues.prototype.getStatusNameById = function(id) {
+com.rdHelper.Issues.getStatusNameById = function(id) {
     if (!this.statusesLoaded) {
         this.getStatuses();
         return id;
@@ -435,7 +430,7 @@ Issues.prototype.getStatusNameById = function(id) {
  * 
  * @returns {undefined}
  */
-Issues.prototype.clearIssues = function() {
+com.rdHelper.Issues.clearIssues = function() {
     this.issues = [];
     this.store();
     this.load();
@@ -446,7 +441,7 @@ Issues.prototype.clearIssues = function() {
  * 
  * @returns {void}
  */
-Issues.prototype.store = function() {
+com.rdHelper.Issues.store = function() {
     localStorage['issues'] = JSON.stringify(this.issues);
     if (!this.lastUpdated) {
         this.lastUpdated = new Date();

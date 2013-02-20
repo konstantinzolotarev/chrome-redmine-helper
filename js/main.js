@@ -124,8 +124,8 @@ angular.module('issues', ['ngSanitize']).
                 switch (scope.item.name) {
                     case "status_id":
                         element.html("<strong>Status</strong> changed from "
-                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.old_value) + "</i> to "
-                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.new_value) + "</i>");
+                                + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.old_value) + "</i> to "
+                                + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.new_value) + "</i>");
                         break;
                     case "assigned_to_id":
                         element.html("<strong>Assignee</strong> set to: "+BG.com.rdHelper.Users.getNameById(scope.item.new_value));
