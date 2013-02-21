@@ -475,21 +475,15 @@ function Home($scope) {
      * Stop time tracking 
      */
     $scope.stopTrackingTime = function() {
-        BG.com.rdHelper.Timeline.getActiveByIssueId($scope.issue.id, function(key, timeline) {
-            if (key === null) {
-                return;
+        if (!$scope.issue.id) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.stopPoccess($scope.issue.id, function() {
+            $scope.issue.tracking = false;
+            $scope.updateIssueTimeline();
+            if (!$scope.$$phase) {
+                $scope.$digest();
             }
-            var date = new Date();
-            var start = new Date(timeline.start);
-            BG.com.rdHelper.Timeline.timelines[key].end = date.toJSON();
-            BG.com.rdHelper.Timeline.timelines[key].spent = date.getTime() - start.getTime();
-            BG.com.rdHelper.Timeline.store(function() {
-                $scope.issue.tracking = false;
-                $scope.updateIssueTimeline();
-                if (!$scope.$$phase) {
-                    $scope.$digest();
-                }
-            });
         });
     };
 
@@ -850,6 +844,14 @@ function Timelines($scope) {
     $scope.timelines = [];
     $scope.timelinesActive = [];
     $scope.limit = 10;
+    
+    $scope.clear = function() {
+        BG.com.rdHelper.Timeline.clear();
+        BG.com.rdHelper.Timeline.store();
+        $scope.timelines = [];
+        $scope.timelinesActive = [];
+    };
+    
     BG.com.rdHelper.Timeline.all(timelinesLoaded);
     
     /**
