@@ -847,7 +847,10 @@ function Projects($scope) {
  * @returns {?}
  */
 function Timelines($scope) {
-    $scope.timelines = BG.com.rdHelper.Timeline.all(timelinesLoaded);
+    $scope.timelines = [];
+    $scope.timelinesActive = [];
+    $scope.limit = 10;
+    BG.com.rdHelper.Timeline.all(timelinesLoaded);
     
     /**
      * Handle Timelines loaded
@@ -855,11 +858,18 @@ function Timelines($scope) {
      * @param {Array} timelines
      */
     function timelinesLoaded(timelines) {
-        $scope.timelines = timelines;
+        $scope.timelines = [];
+        $scope.timelinesActive = [];
+        for(var i in timelines) {
+            if (!timelines[i].spent || !timelines[i].end) {
+                $scope.timelinesActive.push(timelines[i]);
+            } else {
+                $scope.timelines.push(timelines[i]);
+            }
+        }
         if(!$scope.$$phase) {
             $scope.$digest();
         }
-        console.log($scope.timelines);
     }
 }
 

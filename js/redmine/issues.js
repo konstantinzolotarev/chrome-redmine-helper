@@ -349,6 +349,7 @@ com.rdHelper.Issues.getById = function(id) {
     for(var i in this.issues) {
         if (this.issues[i].id == id) {
             issue = {'key': i, 'issue': this.issues[i]};
+            break;
         }
     }
     return issue;

@@ -4,7 +4,7 @@
  */
 com.rdHelper.Timeline = {
     laoded: false,
-    timelines: []
+    timelines: {}
 };
 
 /**
@@ -71,7 +71,6 @@ com.rdHelper.Timeline.load = function(onLoad) {
     onLoad = onLoad || function() {};
     (function(obj) {
         chrome.storage.local.get('timelines', function(items) {
-            console.log(items);
             obj.loaded = true;
             if (items.timelines) {
                 obj.timelines = items.timelines;

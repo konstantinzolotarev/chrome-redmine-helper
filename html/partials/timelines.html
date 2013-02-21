@@ -2,7 +2,21 @@
     <h3>Your Timelines</h3>
 </div>
 <div>
-    <div data-ng-repeat="timeline in timelines">
-        {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}
+    <div class="alert text-center" data-ng-hide="timelines.length > 0">
+        You are no working on issues.
+    </div>
+    <div data-ng-show="timelinesActive.length > 0">
+        <div data-ng-repeat="timeline in timelinesActive" class="wall">
+            {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}&nbsp;
+            <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+        </div>
+        <hr/>
+    </div>
+    <div data-ng-repeat="timeline in timelines|limitTo:limit|orderBy:'issueId'" class="wall">
+        {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}&nbsp;
+        <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+    </div>
+    <div data-ng-show="timelines.length > limit">
+        <a href="" data-ng-click="limit = limit+10">Show more...</a>
     </div>
 </div>
