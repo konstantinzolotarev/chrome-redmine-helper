@@ -422,13 +422,16 @@ function Home($scope) {
             console.log(list);
             $scope.issue.tracking = false;
             $scope.issue.timelines = [];
+            var total = 0;
             for(var i in list) {
                 if (list[i].end && list[i].spent) {
                     $scope.issue.timelines.push(list[i]);
+                    total += list[i].spent;
                 } else {
                     $scope.issue.tracking = true;
                 }
             }
+            $scope.issue.timelineTotal = total;
             if (!$scope.$$phase) {
                 $scope.$digest();
             }

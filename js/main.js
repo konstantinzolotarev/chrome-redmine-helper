@@ -37,6 +37,7 @@ var linkFunction = function(scope, element, attrs) {
         scope.editing = true;
         scope.visible = false;
         defaultValue = scope.value;
+        console.log(scope.value, scope.list);
     };
     
     /**
@@ -63,7 +64,15 @@ angular.module('issues', ['ngSanitize']).
             when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
             otherwise({redirectTo: '/home'});
 }])
-.filter('nl2br', function() {
+.filter('tohours', function() {
+	return function(time) { 
+        var hours = time / (100*60*60);
+        if (hours < 0.5) {
+            return Math.round(time / (100*60))+" min.";
+        }
+	    return (hours).toFixed(1) + " h.";
+	};
+}).filter('nl2br', function() {
 	return function(string,is_xhtml) { 
 	    var is_xhtml = is_xhtml || true;
 	    var breakTag = (is_xhtml) ? '<br />' : '<br>';    
@@ -169,8 +178,7 @@ angular.module('issues', ['ngSanitize']).
                             +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
                         +'</span>'
                         +'<span data-ng-show="editing">'
-                                +'<select class="input-small" data-ng-model="value">'
-                                    +'<option data-ng-repeat="item in list" value="{{item.id}}">{{item.name}}</option>'
+                                +'<select class="input-small" data-ng-model="value" data-ng-options="c.id as c.name for c in list">'
                                 +'</select>'
                                 +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
                                 +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'

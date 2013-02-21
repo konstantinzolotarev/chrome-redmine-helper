@@ -159,15 +159,23 @@
                         <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
                             No logs available.
                         </div>
-                        <div class="well well-small" data-ng-show="issue.timelines.length > 0">
-                            <a href="" class="btn" data-ng-click="clearTimeline(issue)">Clear work log</a>
-                        </div>
+                        <div data-ng-show="issue.timelines.length > 0">
+                            <div class="row-fluid">
+                                <div class="span9">
+                                    <span class="label label-info">Total spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
+                                </div>
+                                <div class="span3">
+                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)">Clear work log</a>
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>                        
                         <div class="timeline" data-ng-repeat="timeline in issue.timelines">
                             <div class="row-fluid">
                                 <div class="span11">
                                     <a href="" class="date">{{timeline.start|date:'dd-MM-yyyy'}}</a>
                                     <div class="spent">
-                                        Spent:&nbsp;{{timeline.spent}}
+                                        Spent:&nbsp;{{timeline.spent|tohours}}
                                     </div>
                                 </div>
                                 <div class="span1">
