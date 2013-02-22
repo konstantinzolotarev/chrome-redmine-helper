@@ -4,7 +4,21 @@
  */
 com.rdHelper.Timeline = {
     laoded: false,
-    timelines: {}
+    timelines: {
+//        'updated': (new Date()).toJSON()
+    }
+};
+
+/**
+ * Clear all timelines
+ * 
+ * @returns {undefined}
+ */
+com.rdHelper.Timeline.clear = function() {
+    this.timelines = {
+//        'updated': (new Date()).toJSON()
+    };
+    this.loaded = false;
 };
 
 /**
@@ -104,16 +118,16 @@ com.rdHelper.Timeline.add = function(timeline, onSuccess) {
     //check for existance
     (function(obj) {
         //Create new timeline array if  it not exist
-        if (!obj.timelines["i"+timeline.issueId]) {
-            obj.timelines["i"+timeline.issueId] = [];
+        if (!obj.timelines[timeline.issueId]) {
+            obj.timelines[timeline.issueId] = [];
         }
         obj.getActiveByIssueId(timeline.issueId, function(key, res) {
             if (key !== null) {
-                if (!obj.timelines["i"+timeline.issueId][key].end) {
-                    obj.timelines["i"+timeline.issueId][key].end = date.toJSON();
+                if (!obj.timelines[timeline.issueId][key].end) {
+                    obj.timelines[timeline.issueId][key].end = date.toJSON();
                 }
             }
-            obj.timelines["i"+timeline.issueId].push(timeline);
+            obj.timelines[timeline.issueId].push(timeline);
             obj.store(onSuccess);
         });
     })(this);
@@ -137,9 +151,9 @@ com.rdHelper.Timeline.stopPoccess = function(issueId, callback) {
                 return;
             }
             var date = new Date();
-            var start = new Date(obj.timelines["i"+issueId][key].start);
-            obj.timelines["i"+issueId][key].end = date.toJSON();
-            obj.timelines["i"+issueId][key].spent = date.getTime() - start.getTime();
+            var start = new Date(obj.timelines[issueId][key].start);
+            obj.timelines[issueId][key].end = date.toJSON();
+            obj.timelines[issueId][key].spent = date.getTime() - start.getTime();
             obj.store();
             callback();
         });
@@ -181,10 +195,10 @@ com.rdHelper.Timeline.getByIssueId = function(issueId, callback) {
     callback = callback || function() {};
     (function(obj) {
         obj.all(function(timelines) {
-            if (!obj.timelines["i"+issueId]) {
-                obj.timelines["i"+issueId] = [];
+            if (!obj.timelines[issueId]) {
+                obj.timelines[issueId] = [];
             }
-            callback(obj.timelines["i"+issueId]);
+            callback(obj.timelines[issueId]);
             return;
         });
     })(this);
@@ -203,12 +217,12 @@ com.rdHelper.Timeline.getActiveByIssueId = function(issueId, callback) {
     (function(obj) {
         obj.all(function(timelines) {
             //Check for timeline existance
-            if (!obj.timelines["i"+issueId]) {
+            if (!obj.timelines[issueId]) {
                 callback(null, null);
             }
-            for(var i in obj.timelines["i"+issueId]) {
-                if (obj.timelines["i"+issueId][i].issueId == issueId && !obj.timelines["i"+issueId][i].end) {
-                    callback(i, obj.timelines["i"+issueId][i]);
+            for(var i in obj.timelines[issueId]) {
+                if (obj.timelines[issueId][i].issueId == issueId && !obj.timelines[issueId][i].end) {
+                    callback(i, obj.timelines[issueId][i]);
                     return;
                 }
             }
@@ -247,20 +261,10 @@ com.rdHelper.Timeline.clearByIssueId = function(issueId, callback) {
     callback = callback || function() {};
     (function(obj) {
         obj.all(function(timelines) {
-            if (obj.timelines["i"+issueId]) {
-                delete obj.timelines["i"+issueId];
+            if (obj.timelines[issueId]) {
+                delete obj.timelines[issueId];
             }
             callback();
         });
     })(this);
-};
-
-/**
- * Clear all timelines
- * 
- * @returns {undefined}
- */
-com.rdHelper.Timeline.clear = function() {
-    this.timelines = {};
-    this.loaded = false;
 };

@@ -863,10 +863,22 @@ function Timelines($scope) {
         $scope.timelines = [];
         $scope.timelinesActive = [];
         for(var i in timelines) {
-            if (!timelines[i].spent || !timelines[i].end) {
-                $scope.timelinesActive.push(timelines[i]);
-            } else {
-                $scope.timelines.push(timelines[i]);
+            //issues
+            var total = 0;
+            if (timelines[i].length > 0) {
+                for(var j in timelines[i]) {
+                    if (!timelines[i][j].end || !timelines[i][j].spent) {
+                        $scope.timelinesActive.push(timelines[i][j]);
+                    } else {
+                        total += timelines[i][j].spent;
+                    }
+                }
+                var issue = BG.com.rdHelper.Issues.getById(i);
+                if (issue && issue.issue) {
+                    $scope.timelines.push({'issue': issue.issue, 'total': total, 'times': timelines[i]});
+                } else {
+                    $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
+                }
             }
         }
         if(!$scope.$$phase) {

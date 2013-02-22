@@ -70,10 +70,9 @@
         </div>
         <div class="well well-small">
             <div data-ng-show="issue.tracking">
-                <small>Time tracking</small>
                 <a href="" class="btn btn-danger" data-ng-click="stopTrackingTime()">
                     <i class="icon-remove-circle"></i>
-                    Stop work
+                    Finish working on this issue
                 </a>
             </div>
             <div data-ng-hide="issue.tracking">
@@ -154,7 +153,7 @@
                     </form>
                 </div>
                 <!-- Timelines -->
-                <div class="tab-pane active" id="timelines">
+                <div class="tab-pane" id="timelines">
                     <div class="issue-timelines">
                         <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
                             No logs available.

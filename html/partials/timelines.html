@@ -17,9 +17,18 @@
         </div>
         <hr/>
     </div>
-    <div data-ng-repeat="timeline in timelines|limitTo:limit|orderBy:'issueId'" class="wall">
-        {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}&nbsp;
-        <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+    <div data-ng-repeat="timeline in timelines|limitTo:limit" class="wall">
+        <i data-ng-class="timeline.open && 'icon-minus-sign' || 'icon-plus-sign'" class="pointer" data-ng-click="timeline.open = !timeline.open"></i>
+        {{timeline.issue.subject}}&nbsp;<span style="margin-left: 15px;" class="label label-warning">total: {{timeline.total|tohours}}</span>
+        <div data-ng-show="timeline.open" class="time-entries">
+            <div data-ng-repeat="t in timeline.times" class="entry">
+                <p>
+                    <span class="label label-success">{{t.spent|tohours}}</span>
+                    Some comment
+                </p>
+                <small class="muted">on&nbsp;{{t.start|date:'yyyy-MM-dd'}}</small>
+            </div>
+        </div>
     </div>
     <div data-ng-show="timelines.length > limit">
         <a href="" data-ng-click="limit = limit+10">Show more...</a>

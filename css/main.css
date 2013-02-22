@@ -72,6 +72,31 @@ table.issues .unread {
     -webkit-animation-duration: .3s;
 }
 
+.time-entries {
+    margin: 10px;
+}
+
+.time-entries .entry {
+    margin: 8px 0;
+    border-radius: 6px;
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.time-entries .entry:hover {
+    background-color: #fefefe;
+}
+
+.time-entries .entry p {
+    margin: 0 0 5px;
+}
+
+.time-entries span.label {
+    width: 70px;
+    text-align: center;
+    margin-right: 10px;
+}
+
 @-webkit-keyframes 'toggle' {
     from {
         opacity: 0;
