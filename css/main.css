@@ -91,7 +91,7 @@ table.issues .unread {
     margin: 0 0 5px;
 }
 
-.time-entries span.label {
+.entry span.label {
     width: 70px;
     text-align: center;
     margin-right: 10px;

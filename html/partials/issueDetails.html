@@ -160,22 +160,26 @@
                         </div>
                         <div data-ng-show="issue.timelines.length > 0">
                             <div class="row-fluid">
-                                <div class="span9">
+                                <div class="span8">
                                     <span class="label label-info">Total spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
                                 </div>
-                                <div class="span3">
-                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)">Clear work log</a>
+                                <div class="span4">
+                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)">
+                                        <i class="icon-trash"></i>&nbsp;
+                                        Clear work log
+                                    </a>
                                 </div>
                             </div>
                             <hr/>
                         </div>                        
                         <div class="timeline" data-ng-repeat="timeline in issue.timelines">
                             <div class="row-fluid">
-                                <div class="span11">
-                                    <a href="" class="date">{{timeline.start|date:'dd-MM-yyyy'}}</a>
-                                    <div class="spent">
-                                        Spent:&nbsp;{{timeline.spent|tohours}}
-                                    </div>
+                                <div class="span11 entry">
+                                    <p>
+                                        <span class="label label-success">{{timeline.spent|tohours}}</span>
+                                        Some comment
+                                    </p>
+                                    <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                 </div>
                                 <div class="span1">
                                     <i class="icon-trash pointer remove-hidden"></i>

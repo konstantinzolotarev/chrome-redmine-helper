@@ -846,6 +846,9 @@ function Timelines($scope) {
     $scope.limit = 10;
     
     $scope.clear = function() {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
         BG.com.rdHelper.Timeline.clear();
         BG.com.rdHelper.Timeline.store();
         $scope.timelines = [];
