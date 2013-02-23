@@ -121,7 +121,7 @@ com.rdHelper.Users.grabFromIssue = function(issue) {
  */
 com.rdHelper.Users.getNameById = function(userId) {
     if (!this.loaded) {
-        throw new Error("Users are not loaded !");
+        throw Error("Users are not loaded !");
     }
     if (!this.users[userId]) {
         return userId;

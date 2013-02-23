@@ -108,7 +108,7 @@ com.rdHelper.Timeline.isLoaded = function() {
  */
 com.rdHelper.Timeline.add = function(timeline, onSuccess) {
     if (arguments.length < 2 && typeof timeline != "object" || !timeline.issueId) {
-        throw new Error("please provide timeline details.");
+        throw Error("please provide timeline details.");
     }
     var date = new Date();
     if (!timeline.start) {
