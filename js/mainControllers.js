@@ -637,7 +637,6 @@ function Home($scope) {
  * New issue controller
  * 
  * @param {Scope} $scope
- * @param {RouteParams} $routeParams
  * @returns {undefined}
  */
 function NewIssue($scope) {
@@ -646,8 +645,9 @@ function NewIssue($scope) {
     //clear selected text
     BG.clearSelectedText();
     //list of projects
-    $scope.projects = BG.com.rdHelper.Projects.all();
+    $scope.projects = {};
     $scope.project = {};
+    BG.com.rdHelper.Projects.all();
     
     //User options
     $scope.options = BG.getConfig();
@@ -792,7 +792,15 @@ function NewIssue($scope) {
  * @returns {?}
  */
 function Projects($scope) {
-    $scope.projects = BG.com.rdHelper.Projects.all();
+    //list of projects
+    $scope.projects = {};
+    BG.com.rdHelper.all(function(projects) {
+        $scope.$apply(function(sc) {
+            for(var i in projects) {
+                sc.projects[i] = projects[i];
+            }
+        });
+    });
     
     /**
      * Reload projects list
@@ -814,20 +822,15 @@ function Projects($scope) {
     var projectsLoaded = function(request, sender, sendResponse) {
         $scope.$apply(function(sc) {
             sc.hideLoading();
-            sc.projects = BG.com.rdHelper.Projects.all();
+            sc.projects = BG.com.rdHelper.Projects.projects;
         });
     };
     
     //Handle new issue creation
     var onMessage = function(request, sender, sendResponse) {
-        if (!request.action && request.action != "issueCreated") {
-            return;
+        if (!request.action && request.action == "projectsLoaded") {
+            return projectsLoaded(request, sender, sendResponse);
         }
-        switch(request.action) {
-            case "projectsLoaded":
-                return projectsLoaded(request, sender, sendResponse);
-                break;
-        };
     };
 
     //Add one global handler for messages from background

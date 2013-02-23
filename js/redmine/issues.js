@@ -61,7 +61,7 @@ com.rdHelper.Issues.load = function(offset, limit, watcher) {
         } else {
             filter = "sort=updated_on:desc&watcher_id="+getConfig().getProfile().currentUserId
                                 +"&limit="+limit
-                                +"&offset="+offset
+                                +"&offset="+offset;
         }
         redmineApi.issues.all(filter, function(error, data) {
             if (error) {
@@ -86,7 +86,8 @@ com.rdHelper.Issues.load = function(offset, limit, watcher) {
                                 data.issues[i].read = false;
                                 //mark as watcher issue
                                 if (watcher) {
-                                    if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                    if (obj.issues[key].assigned_to &&
+                                            obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
                                        data.issues[i].watcher = false; 
                                     } else {
                                         data.issues[i].watcher = true; 

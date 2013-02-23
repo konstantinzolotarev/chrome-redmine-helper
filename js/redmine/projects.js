@@ -6,26 +6,111 @@
  */
 com.rdHelper.Projects = {
     loaded: false,
-    projects: []
+    projects: {}
+};
+
+/**
+ * Store current projects in storage
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Projects.store = function(callback) {
+    callback = callback || function() {};
+    chrome.local.set({'projects': this.projects}, callback);
+};
+
+/**
+ * Load projects from extension Memory
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Projects.load = function(callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        chrome.local.get('projects', function(item) {
+            if (!item.projects) {
+                callback({});
+            }
+            obj.projects = item.projects;
+            obj.loaded = true;
+            callback();
+        });
+    })(this);
+    return;
+
+};
+
+/**
+ * Clear stored data & update current projects
+ *
+ * @returns {void}
+ */
+com.rdHelper.Projects.clear = function() {
+    this.projects = {};
+    this.loaded = false;
 };
 
 /**
  * Get list of projects
  * 
  * @param {boolean} reload if set to true project list will be updated from server
+ * @param {function(Object)=} callback
  * @returns {Array}
  */
-com.rdHelper.Projects.all = function(reload) {
+com.rdHelper.Projects.all = function(reload, callback) {
     if (this.loaded && !reload) {
-        return this.projects;
+        callback(this.projects);
     }
-    //Try loading from memory
-    this.load();
-    //If we have no projects there loading from API
-    if (this.projects.length < 1 || reload) {
-        this.loadFromRedmine();
+    (function(obj) {
+        obj.load(function() {
+            //If we have no projects there loading from API
+            if (obj.projects.length < 1 || reload) {
+                return obj.loadFromRedmine(callback);
+            }
+            callback(obj.projects);
+        });
+        return;
+    })(this);
+};
+
+/**
+ * Load projects from Redmine API
+ *
+ * @param {number=} offset
+ * @param {function()=} callback
+ */
+com.rdHelper.Projects.loadFromRedmine = function(offset, callback) {
+    if (arguments.length < 2 && typeof offset == "function") {
+        callback = offset;
+        offset = 0;
     }
-    return this.projects;
+    callback = callback || function() {};
+    //update process
+    (function(obj) {
+        offset = offset || "0";
+        redmineApi.projects.all("offset="+offset, function(error, data) {
+            if (error) {
+                callback({});
+                return;
+            }
+            if (data.total_count && data.total_count > 0) {
+                for(var i = 0; i < data.projects.length; i++) {
+                    obj.projects[data.projects[i].id] = data.projects[i];
+                }
+                obj.loaded = true;
+                obj.store();
+                if (data.total_count > (data.limit + data.offset)) {
+                    obj.loadFromRedmine(data.limit + data.offset, callback);
+                } else {
+                    callback(obj.projects);
+                    chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
+                }
+            }
+        });
+        return;
+    })(this);
 };
 
 /**
@@ -36,6 +121,7 @@ com.rdHelper.Projects.all = function(reload) {
  * @returns {Object}
  */
 com.rdHelper.Projects.get = function(id, reload) {
+    return false;
     var p = this.getById(id);
     if (!p.project) {
         return false;
@@ -148,72 +234,6 @@ com.rdHelper.Projects.getProjectKey = function(ident) {
         }
     }
     return false;
-};
-
-/**
- * Load projects from Redmine API
- * 
- * @param {number=} offset 
- * @returns {void}
- */
-com.rdHelper.Projects.loadFromRedmine = function(offset) {
-    //update process
-    (function(obj) {
-        offset = offset || "0";
-        redmineApi.projects.all("offset="+offset, function(error, data) {
-            if (error) {
-                return;
-            }
-            if (data.total_count && data.total_count > 0) {
-                for(var i = 0; i < data.projects.length; i++) {
-                    obj.projects.push(data.projects[i]);
-                }
-                obj.loaded = true;
-                obj.store();
-                if (data.total_count > (data.limit + data.offset)) {
-                    obj.loadFromRedmine(data.limit + data.offset);
-                } else {
-                    chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
-                }
-            }
-        });
-    })(this);
-};
-
-/**
- * Store current projects 
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.store = function() {
-    if (!this.loaded) {
-        return;
-    }
-    localStorage['projects'] = JSON.stringify(this.projects);
-};
-
-/**
- * Load projects from extension Memory
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.load = function() {
-    if (this.loaded) {
-        return;
-    }
-    this.projects = JSON.parse(localStorage.projects || "[]");
-    this.loaded = true;
-};
-
-/**
- * Clear stored data & update current projects
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.clear = function() {
-    localStorage.removeItem("projects");
-    this.projects = [];
-    this.loaded = false;
 };
 
 /**

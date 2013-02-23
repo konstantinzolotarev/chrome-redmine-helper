@@ -68,8 +68,8 @@ com.rdHelper.Timeline.all = function(reload, onLoad) {
         obj.load(function() {
             onLoad(obj.timelines);
         });
+        return;
     })(this);
-    return;
 };
 
 /**
