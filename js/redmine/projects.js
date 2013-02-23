@@ -29,7 +29,7 @@ com.rdHelper.Projects.store = function(callback) {
 com.rdHelper.Projects.load = function(callback) {
     callback = callback || function() {};
     (function(obj) {
-        chrome.local.get('projects', function(item) {
+        chrome.storage.local.get('projects', function(item) {
             if (!item.projects) {
                 callback({});
             }
@@ -38,8 +38,6 @@ com.rdHelper.Projects.load = function(callback) {
             callback();
         });
     })(this);
-    return;
-
 };
 
 /**
@@ -60,6 +58,11 @@ com.rdHelper.Projects.clear = function() {
  * @returns {Array}
  */
 com.rdHelper.Projects.all = function(reload, callback) {
+    if (arguments.length < 2 && typeof reload == "function") {
+        callback = reload;
+        reload = false;
+    }
+    callback = callback || function() {};
     if (this.loaded && !reload) {
         callback(this.projects);
     }

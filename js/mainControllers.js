@@ -39,9 +39,18 @@ function openAuthorPage(userId) {
 function Main($scope, $location, $timeout) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
-    $scope.projects = BG.com.rdHelper.Projects.all();
+    $scope.projects = {};
     $scope.$location = $location;
 
+    //loading projects
+    BG.com.rdHelper.Projects.all(function(projects) {
+        for(var i in projects) {
+            $scope.projects[i] = projects[i];
+        }
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
+    });
     //Custom messages
     $scope.customError = "";
     $scope.customSuccess = "";
@@ -116,9 +125,10 @@ function Main($scope, $location, $timeout) {
 
     $scope.projectsLoadedHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "projectsLoaded" && request.projects) {
-            $scope.$apply(function(sc) {
-                sc.projects = request.projects;
-            });
+            $scope.projects = request.projects;
+            if(!$scope.$$phase) {
+                $scope.$digest();
+            }
         }
     };
 
@@ -156,6 +166,7 @@ function Main($scope, $location, $timeout) {
      * On projects updated
      */
     $scope.updateProjects = function() {
+        BG.com.rdHelper.Projects.clear();
         BG.com.rdHelper.Projects.all(true);
     };
 
