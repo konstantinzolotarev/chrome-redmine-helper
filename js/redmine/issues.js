@@ -1,21 +1,91 @@
 
 /**
+ * Issues api
  * 
  * @class
- * @returns {Issues}
+ * @returns {com.rdHelper.Issues}
  */
 com.rdHelper.Issues = {
-    lastUpdated: localStorage.lastUpdated ? new Date(localStorage.lastUpdated) : false,
-    issues: JSON.parse(localStorage.issues || "[]"),
+    lastUpdated: false,
+    // List of issues
+    issues: {},
+    // Issues list loaded from storage
+    loaded: false,
+    // Amount of unread issues
     unread: 0,
     //Global issue statuses
-    statuses: JSON.parse(localStorage.issueStatuses || "[]"),
-    statusesLoaded: localStorage.statusesLoaded || false,
+    statuses: [],
+    statusesLoaded: false,
     //Global issue Priorities
-    priorities: JSON.parse(localStorage.priorities || "[]"),
-    prioripiesLoaded: localStorage.prioripiesLoaded || false
+    priorities: [],
+    prioripiesLoaded: false
 };
 
+/**
+ * Clear issues list
+ *
+ * @returns {undefined}
+ */
+com.rdHelper.Issues.clearIssues = function() {
+    this.issues = {};
+    this.loaded = false;
+};
+
+/**
+ * Get number of issues
+ * 
+ * @returns {number}
+ */
+com.rdHelper.Issues.size = function() {
+    return Object.keys(this.issues);
+};
+
+/**
+ * Load data from chrome.storage
+ * 
+ * @param {function()=} callback
+ */
+com.rdHelper.Issues.loadFromStorage = function(callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        chrome.storage.local.get('issues', function(items) {
+            if (!items.issues) {
+                callback();
+            }
+            obj.issues = items.issues.issues;
+            obj.issueStatuses = items.issues.issueStatuses;
+            obj.lastUpdated = items.issues.lastUpdated;
+            obj.loaded = true;
+            callback();
+        });
+        return;
+    })(this);
+};
+
+/**
+ * Store data into chrome.storage
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Issues.store = function(callback) {
+    if (!this.lastUpdated) {
+        this.lastUpdated = new Date();
+    }
+    callback = callback || function() {};
+    var data = {
+        'issues': this.issues,
+        'issueStatuses': this.statuses,
+        'lastUpdated': this.lastUpdated.toISOString()
+    };
+    chrome.storage.local.set({'issues': data}, callback);
+};
+
+/**
+ * Update unread issues count
+ * 
+ * @param {boolean=} updateBadge
+ */
 com.rdHelper.Issues.updateUnread = function(updateBadge) {
     this.unread = 0;
     for(var i in this.issues) {
@@ -38,12 +108,24 @@ com.rdHelper.Issues.getUnreadCount = function() {
 };
 
 /**
- * Load issues list 
+ * Get issue by it's ID
+ *
+ * @param {number} id
+ * @returns {Boolean}
+ */
+com.rdHelper.Issues.getById = function(id) {
+    if (!this.issues[id]) {
+        return false;
+    }
+    return this.issues[id];
+};
+
+/**
+ * Load issues list from server
  * 
- * @param {int} offset load result offset
- * @param {int} limit Limit for results
- * @param {Boolean} watcher
- * @returns {void}
+ * @param {number} offset load result offset
+ * @param {number} limit Limit for results
+ * @param {boolean} watcher
  */
 com.rdHelper.Issues.load = function(offset, limit, watcher) {
     offset = offset || 0;
@@ -73,33 +155,32 @@ com.rdHelper.Issues.load = function(offset, limit, watcher) {
             if (data.total_count && data.total_count > 0) {
                 for(var i in data.issues) {
                     var found = false;
+                    var issueId = data.issues[i].id;
                     if (getConfig().getProjectsSettings().show_for == "selected"
                             && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
                         continue;
                     }
-                    for(var key in obj.issues) {
-                        //We found this issue
-                        if (obj.issues[key].id == data.issues[i].id) {
-                            found = true;
-                            if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
-                                //mark as unread
-                                data.issues[i].read = false;
-                                //mark as watcher issue
-                                if (watcher) {
-                                    if (obj.issues[key].assigned_to &&
-                                            obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
-                                       data.issues[i].watcher = false; 
-                                    } else {
-                                        data.issues[i].watcher = true; 
-                                    }
+                    //We found this issue
+                    if (obj.issues[issueId]) {
+                        found = true;
+                        if (new Date(obj.issues[issueId].updated_on) < new Date(data.issues[i].updated_on)) {
+                            //mark as unread
+                            data.issues[i].read = false;
+                            //mark as watcher issue
+                            if (watcher) {
+                                if (obj.issues[issueId].assigned_to 
+                                        && obj.issues[issueId].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                   data.issues[i].watcher = false; 
+                                } else {
+                                    data.issues[i].watcher = true; 
                                 }
-                                obj.issues[key] = data.issues[i];
-                                updated += 1;
-                                //Bind users from issue
-                                com.rdHelper.Users.grabFromIssue(data.issues[i]);
-                                if (getConfig().getNotifications().show == "updated") {
-                                    notifiedIssues.push(obj.issues[key]);
-                                }
+                            }
+                            obj.issues[issueId] = data.issues[i];
+                            updated += 1;
+                            //Bind users from issue
+                            com.rdHelper.Users.grabFromIssue(data.issues[i]);
+                            if (getConfig().getNotifications().show == "updated") {
+                                notifiedIssues.push(obj.issues[issueId]);
                             }
                         }
                     }
@@ -110,17 +191,17 @@ com.rdHelper.Issues.load = function(offset, limit, watcher) {
                         data.issues[i].read = false;
                         //mark as watcher issue
                         if (watcher) {
-                            if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                            if (data.issues[i].assigned_to
+                                    && data.issues[i].assigned_to.id == getConfig().getProfile().currentUserId) {
                                data.issues[i].watcher = false; 
                             } else {
                                 data.issues[i].watcher = true; 
                             }
                         }
-//                            data.issues[i].updated = new Date(data.issues[i].updated_on);
-                        obj.issues.push(data.issues[i]);
+                        obj.issues[issueId] = data.issues[i];
                         updated += 1;
                         if (getConfig().getNotifications().show == "new") {
-                            notifiedIssues.push(obj.issues[key]);
+                            notifiedIssues.push(obj.issues[issueId]);
                         }
                     }
                 }
@@ -163,7 +244,7 @@ com.rdHelper.Issues.load = function(offset, limit, watcher) {
 };
 
 /**
- * Show notifications 
+ * Show notifications about issues
  * 
  * @param {Array} notifications
  * @returns {undefined}
@@ -201,16 +282,16 @@ com.rdHelper.Issues.get = function(issue, reload) {
     (function(obj) {
         redmineApi.issues.get(issue.id, "attachments,journals", function(error, json) {
             if (json.issue) {
-                var is = obj.getById(json.issue.id);
-                if (is.issue) {
+                var issueId = json.issue.id;
+                if (obj.issues[issueId]) {
                     //Grab users from issue
                     com.rdHelper.Users.grabFromIssue(json.issue);
                     //update issue
                     json.issue.detailsLoaded = true;
-                    obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
+                    obj.issues[issueId] = merge(obj.issues[issueId], json.issue);
                     obj.store();
                     //notify all listeners
-                    chrome.extension.sendMessage({action: "issueDetails", id: issue.id, issue: obj.issues[is.key]});
+                    chrome.extension.sendMessage({action: "issueDetails", id: issue.id, issue: obj.issues[issueId]});
                 }
             }
         });
@@ -225,8 +306,7 @@ com.rdHelper.Issues.get = function(issue, reload) {
  * @returns {undefined}
  */
 com.rdHelper.Issues.comment = function(id, comment) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+    if (!this.issues[id]) {
         return;
     }
     return this.update(id, {'notes': comment});
@@ -244,9 +324,8 @@ com.rdHelper.Issues.update = function(id, issueData) {
     if (issueData === null || typeof issueData != "object") {
         return;
     }
-    //Check issue
-    var issue = this.getById(id);
-    if (!issue.issue) {
+    //check issue
+    if (!this.issues[id]) {
         return;
     }
     (function(obj) {
@@ -258,7 +337,7 @@ com.rdHelper.Issues.update = function(id, issueData) {
                 }
                 return;
             }
-            obj.get(issue.issue, true);
+            obj.get(obj.issues[id], true);
         });
     })(this);
 };
@@ -293,11 +372,10 @@ com.rdHelper.Issues.create = function(issue) {
  * @returns {undefined}
  */
 com.rdHelper.Issues.markAsUnRead = function(id) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+    if (!this.issues[id]) {
         return;
     }
-    this.issues[issue.key].read = false;
+    this.issues[id].read = false;
     this.unread += 1;
     setUnreadIssuesCount(this.unread);
     this.store();
@@ -310,11 +388,10 @@ com.rdHelper.Issues.markAsUnRead = function(id) {
  * @returns {undefined}
  */
 com.rdHelper.Issues.markAsRead = function(id) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+    if (!this.issues[id]) {
         return;
     }
-    this.issues[issue.key].read = true;
+    this.issues[id].read = true;
     this.unread -= 1;
     setUnreadIssuesCount(this.unread);
     this.store();
@@ -331,29 +408,6 @@ com.rdHelper.Issues.markAllAsRead = function() {
     }
     this.store();
     this.updateUnread(true);
-};
-
-/**
- * Get issue by it's ID 
- * 
- * @param {int} id
- * @returns {Boolean}
- */
-com.rdHelper.Issues.getById = function(id) {
-    var issue = {
-        'key': false,
-        'issue': false
-    };
-    if (this.issues.length < 1) {
-        return false;
-    }
-    for(var i in this.issues) {
-        if (this.issues[i].id == id) {
-            issue = {'key': i, 'issue': this.issues[i]};
-            break;
-        }
-    }
-    return issue;
 };
 
 /**
@@ -425,30 +479,4 @@ com.rdHelper.Issues.getStatusNameById = function(id) {
         }
     }
     return id;
-};
-
-/**
- * Clear issues list 
- * 
- * @returns {undefined}
- */
-com.rdHelper.Issues.clearIssues = function() {
-    this.issues = [];
-    this.store();
-    this.load();
-};
-
-/**
- * Store data into localStorage
- * 
- * @returns {void}
- */
-com.rdHelper.Issues.store = function() {
-    localStorage['issues'] = JSON.stringify(this.issues);
-    if (!this.lastUpdated) {
-        this.lastUpdated = new Date();
-    }
-    localStorage['lastUpdated'] = this.lastUpdated.toISOString();
-    localStorage['issueStatuses'] = JSON.stringify(this.statuses);
-    localStorage['statusesLoaded'] = this.statusesLoaded;
 };

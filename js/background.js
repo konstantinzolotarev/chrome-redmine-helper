@@ -22,6 +22,11 @@ config.load(function() {
 });
 
 /**
+ * Loading issues
+ */
+com.rdHelper.Issues.loadFromStorage();
+
+/**
  * 
  * @returns {@exp;redmine@call;Api}
  */
@@ -300,13 +305,7 @@ chrome.contextMenus.onClicked.addListener(handleContextMenu);
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
-    if (localStorage.profile) {
-        //sync it with chrome.storage
-        var loadedProfile = JSON.parse(localStorage.profile);
-        getConfig().store(loadedProfile);
-        //clear storage
-        localStorage.removeItem('profile');
-    }
+    localStorage.clear();
     startRequest({scheduleRequest:true});
 });
 

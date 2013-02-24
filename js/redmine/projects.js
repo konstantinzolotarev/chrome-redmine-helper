@@ -10,6 +10,15 @@ com.rdHelper.Projects = {
 };
 
 /**
+ * Get length of projects
+ * 
+ * @returns {number}
+ */
+com.rdHelper.Projects.length = function() {
+    return Object.keys(this.projects).length;
+};
+
+/**
  * Store current projects in storage
  *
  * @param {function()=} callback
@@ -17,7 +26,7 @@ com.rdHelper.Projects = {
  */
 com.rdHelper.Projects.store = function(callback) {
     callback = callback || function() {};
-    chrome.local.set({'projects': this.projects}, callback);
+    chrome.storage.local.set({'projects': this.projects}, callback);
 };
 
 /**
@@ -31,7 +40,8 @@ com.rdHelper.Projects.load = function(callback) {
     (function(obj) {
         chrome.storage.local.get('projects', function(item) {
             if (!item.projects) {
-                callback({});
+                callback();
+                return;
             }
             obj.projects = item.projects;
             obj.loaded = true;
@@ -69,7 +79,7 @@ com.rdHelper.Projects.all = function(reload, callback) {
     (function(obj) {
         obj.load(function() {
             //If we have no projects there loading from API
-            if (obj.projects.length < 1 || reload) {
+            if (obj.length() < 1 || reload) {
                 return obj.loadFromRedmine(callback);
             }
             callback(obj.projects);
