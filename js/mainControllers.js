@@ -757,7 +757,7 @@ function NewIssue($scope) {
      * @param {Object} request
      * @param {Object} sender
      * @param {Object} sendResponse
-     * @returns {undefined}
+     * @returns {*}
      */
     var onProjectUpdated = function(request, sender, sendResponse) {
         //check project
@@ -902,8 +902,8 @@ function Timelines($scope) {
                     }
                 }
                 var issue = BG.com.rdHelper.Issues.getById(i);
-                if (issue && issue.issue) {
-                    $scope.timelines.push({'issue': issue.issue, 'total': total, 'times': timelines[i]});
+                if (issue) {
+                    $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
                 } else {
                     $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
                 }
