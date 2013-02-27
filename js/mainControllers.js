@@ -844,16 +844,17 @@ function Projects($scope) {
      * @returns {undefined}
      */
     var projectsLoaded = function(request, sender, sendResponse) {
-        $scope.hideLoading();
-        $scope.projects = BG.com.rdHelper.Projects.projects;
-        if (!$scope.$$phase) {
-            $scope.$digest();
-        }
+//        if (!$scope.$$phase) {
+            $scope.$apply(function(sc) {
+                sc.hideLoading();
+                sc.projects = BG.com.rdHelper.Projects.projects;
+            });
+//        }
     };
     
     //Handle new issue creation
     var onMessage = function(request, sender, sendResponse) {
-        if (!request.action && request.action == "projectsLoaded") {
+        if (request.action && request.action == "projectsLoaded") {
             return projectsLoaded(request, sender, sendResponse);
         }
     };
