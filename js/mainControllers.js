@@ -780,9 +780,10 @@ function NewIssue($scope) {
             return;
         }
         //stop loading
-        $scope.$apply(function(sc) {
-            sc.hideLoading();
-        });
+        $scope.hideLoading();
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
     };
 
     //Handle new issue creation
@@ -816,12 +817,13 @@ function NewIssue($scope) {
 function Projects($scope) {
     //list of projects
     $scope.projects = {};
-    BG.com.rdHelper.all(function(projects) {
-        $scope.$apply(function(sc) {
-            for(var i in projects) {
-                sc.projects[i] = projects[i];
-            }
-        });
+    BG.com.rdHelper.Projects.all(function(projects) {
+        for(var i in projects) {
+            $scope.projects[i] = projects[i];
+        }
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
     });
     
     /**
@@ -842,10 +844,11 @@ function Projects($scope) {
      * @returns {undefined}
      */
     var projectsLoaded = function(request, sender, sendResponse) {
-        $scope.$apply(function(sc) {
-            sc.hideLoading();
-            sc.projects = BG.com.rdHelper.Projects.projects;
-        });
+        $scope.hideLoading();
+        $scope.projects = BG.com.rdHelper.Projects.projects;
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
     };
     
     //Handle new issue creation
