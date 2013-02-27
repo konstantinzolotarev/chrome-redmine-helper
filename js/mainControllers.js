@@ -245,6 +245,16 @@ function Options($scope, $timeout) {
     $scope.useHttpAuth = BG.getConfig().getProfile().useHttpAuth;
     
     /**
+     * Clear all stored objects in storage
+     */
+    $scope.clearStorage = function() {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        chrome.storage.local.clear();
+    };
+    
+    /**
      * Save new options
      */
     $scope.storeOptions = function() {
@@ -564,6 +574,7 @@ function Home($scope) {
             $scope.$apply(function(sc) {
                 sc.issue = request.issue;
                 sc.updateIssues();
+                sc.updateIssueTimeline();
             });
             sendResponse({});
         }

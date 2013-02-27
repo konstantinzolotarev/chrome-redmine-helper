@@ -46,7 +46,9 @@ com.rdHelper.Users.load = function(reload, callback) {
     (function(obj) {
         chrome.storage.local.get('users', function(item) {
             if (!item.users) {
-                callback({});
+                obj.users = {};
+                callback();
+                return;
             }
             obj.users = item.users;
             obj.loaded = true;

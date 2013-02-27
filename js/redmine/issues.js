@@ -51,10 +51,17 @@ com.rdHelper.Issues.loadFromStorage = function(callback) {
         chrome.storage.local.get('issues', function(items) {
             if (!items.issues) {
                 callback();
+                return;
             }
-            obj.issues = items.issues.issues;
-            obj.issueStatuses = items.issues.issueStatuses;
-            obj.lastUpdated = items.issues.lastUpdated;
+            if (items.issues.issues) {
+                obj.issues = items.issues.issues;
+            }
+            if (items.issues.issueStatuses) {
+                obj.issueStatuses = items.issues.issueStatuses;
+            }
+            if (items.issues.lastUpdated) {
+                obj.lastUpdated = items.issues.lastUpdated;
+            }
             obj.loaded = true;
             callback();
         });
