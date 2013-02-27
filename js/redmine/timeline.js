@@ -82,6 +82,7 @@ com.rdHelper.Timeline.load = function(onLoad) {
     (function(obj) {
         chrome.storage.local.get('timelines', function(items) {
             obj.loaded = true;
+            console.log(items.timelines);
             if (items.timelines) {
                 obj.timelines = items.timelines;
             }
