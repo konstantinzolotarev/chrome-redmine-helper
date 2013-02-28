@@ -947,11 +947,6 @@ function Timelines($scope) {
             var total = 0;
             if (timelines[i].length > 0) {
                 var issue = BG.com.rdHelper.Issues.getById(i);
-                if (issue) {
-                    $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
-                } else {
-                    $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
-                }
                 for(var j = 0; j < timelines[i].length; j++) {
                     if (!timelines[i][j].end || !timelines[i][j].spent) {
                         timelines[i][j].issue = issue;
@@ -959,6 +954,11 @@ function Timelines($scope) {
                     } else {
                         total += timelines[i][j].spent;
                     }
+                }
+                if (issue) {
+                    $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
+                } else {
+                    $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
                 }
             }
         }
