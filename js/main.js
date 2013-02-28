@@ -67,7 +67,7 @@ angular.module('issues', ['ngSanitize']).
 .filter('tohours', function() {
 	return function(time) { 
         var hours = time / (1000*60*60);
-        if (hours < 0.5) {
+        if (hours < 1) {
             return Math.round(time / (1000*60))+" min.";
         }
 	    return (hours).toFixed(1) + " h.";
