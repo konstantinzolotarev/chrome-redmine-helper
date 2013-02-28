@@ -125,7 +125,6 @@ angular.module('issues', ['ngSanitize']).
                 }
                 return scope.item.new_value;
             };
-
             if (!scope.item.name) {
                 return;
             }
@@ -165,6 +164,8 @@ angular.module('issues', ['ngSanitize']).
             } else if (scope.item.property == "attachment") {
                 element.html("<strong>Attachment</strong> added "
                                         + "<i>"+getAttachmentUrl()+"</i>");
+            } else {
+                element.html("<i>Unknown property.</i>");
             }
         }
     };

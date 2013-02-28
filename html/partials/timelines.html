@@ -12,8 +12,18 @@
     </div>
     <div data-ng-show="timelinesActive.length > 0">
         <div data-ng-repeat="timeline in timelinesActive" class="wall">
-            {{timeline.issueId}} {{timeline.start|date:'MM/dd/yyyy h:mma'}}&nbsp;
-            <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+            <div class="row-fluid">
+                <div class="span10">
+                    <i class="icon-chevron-right"></i>
+                    {{timeline.issue.subject}}&nbsp;
+                    <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+                    <br/>
+                    <small class="muted"><i>&nbsp;{{timeline.start|date:'yyyy-MM-dd h:mma'}}</i></small>
+                </div>
+                <div class="span2">
+                    <button class="btn btn-danger" data-ng-click="stopTrackingTime(timeline)">Stop working</button>
+                </div>
+            </div>
         </div>
         <hr/>
     </div>

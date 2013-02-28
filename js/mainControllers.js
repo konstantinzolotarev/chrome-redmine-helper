@@ -472,6 +472,26 @@ function Home($scope) {
             }
         });
     };
+
+    /**
+     * Removes timeline from issue
+     *
+     * @param {Object} timeline
+     */
+    $scope.removeTimeline = function(timeline) {
+        if (!timeline || typeof timeline != "object") {
+            return;
+        }
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.remove(timeline, timeline.issueId, function() {
+            $scope.updateIssueTimeline();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
     
     /**
      * Time tracking 
@@ -873,7 +893,10 @@ function Timelines($scope) {
     $scope.timelines = [];
     $scope.timelinesActive = [];
     $scope.limit = 10;
-    
+
+    /**
+     * Clear all timelines
+     */
     $scope.clear = function() {
         if (!confirm("Are you sure ?")) {
             return;
@@ -882,6 +905,31 @@ function Timelines($scope) {
         BG.com.rdHelper.Timeline.store();
         $scope.timelines = [];
         $scope.timelinesActive = [];
+    };
+
+    /**
+     * Update timelines
+     */
+    $scope.update = function() {
+        BG.com.rdHelper.Timeline.all(timelinesLoaded);
+    };
+
+    /**
+     * Stop tracking time for issue
+     *
+     * @param timeline
+     */
+    $scope.stopTrackingTime = function(timeline) {
+        if (!timeline || !timeline.issueId) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.stopPoccess(timeline.issueId, function() {
+            $scope.showSuccess("You stoped working on: "+timeline.issue.subject);
+            $scope.update();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
     };
     
     BG.com.rdHelper.Timeline.all(timelinesLoaded);
@@ -898,18 +946,19 @@ function Timelines($scope) {
             //issues
             var total = 0;
             if (timelines[i].length > 0) {
-                for(var j in timelines[i]) {
-                    if (!timelines[i][j].end || !timelines[i][j].spent) {
-                        $scope.timelinesActive.push(timelines[i][j]);
-                    } else {
-                        total += timelines[i][j].spent;
-                    }
-                }
                 var issue = BG.com.rdHelper.Issues.getById(i);
                 if (issue) {
                     $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
                 } else {
                     $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
+                }
+                for(var j = 0; j < timelines[i].length; j++) {
+                    if (!timelines[i][j].end || !timelines[i][j].spent) {
+                        timelines[i][j].issue = issue;
+                        $scope.timelinesActive.push(timelines[i][j]);
+                    } else {
+                        total += timelines[i][j].spent;
+                    }
                 }
             }
         }

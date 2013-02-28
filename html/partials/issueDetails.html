@@ -164,7 +164,7 @@
                                     <span class="label label-info">Total spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
                                 </div>
                                 <div class="span4">
-                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)">
+                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
                                         <i class="icon-trash"></i>&nbsp;
                                         Clear work log
                                     </a>
@@ -182,7 +182,7 @@
                                     <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                 </div>
                                 <div class="span1">
-                                    <i class="icon-trash pointer remove-hidden"></i>
+                                    <i class="icon-trash pointer remove-hidden" data-ng-click="removeTimeline(timeline)"></i>
                                 </div>
                             </div>
                         </div>
