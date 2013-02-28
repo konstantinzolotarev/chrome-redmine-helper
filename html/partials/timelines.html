@@ -28,10 +28,15 @@
         <hr/>
     </div>
     <div data-ng-repeat="timeline in timelines|limitTo:limit" class="wall">
-        <div data-ng-click="timeline.open = !timeline.open" class="pointer">
-            <i data-ng-class="timeline.open && 'icon-minus-sign' || 'icon-plus-sign'"></i>
-            {{timeline.issue.subject}}&nbsp;
-            <span style="margin-left: 15px;" class="label label-warning">total: {{timeline.total|tohours}}</span>
+        <div class="row-fluid">
+            <div class="span11 pointer" data-ng-click="timeline.open = !timeline.open">
+                <i data-ng-class="timeline.open && 'icon-minus-sign' || 'icon-plus-sign'"></i>
+                {{timeline.issue.subject}}&nbsp;
+                <span style="margin-left: 15px;" class="label label-warning">total: {{timeline.total|tohours}}</span>
+            </div>
+            <div class="span1">
+                <i class="icon-trash pointer remove-hidden" data-ng-click="removeIssueTimeline(timeline.issue)"></i>
+            </div>
         </div>
         <div data-ng-show="timeline.open" class="time-entries">
             <div data-ng-repeat="t in timeline.times" class="entry">

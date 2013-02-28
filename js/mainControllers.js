@@ -931,6 +931,27 @@ function Timelines($scope) {
             }
         });
     };
+
+    /**
+     * Clear timlines for issue
+     *
+     * @param issue
+     */
+    $scope.removeIssueTimeline = function(issue) {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        if (!issue || !issue.id) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.clearByIssueId(issue.id, function() {
+            $scope.showSuccess("You cleared working logs for: "+issue.subject);
+            $scope.update();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
     
     BG.com.rdHelper.Timeline.all(timelinesLoaded);
     
@@ -954,6 +975,10 @@ function Timelines($scope) {
                     } else {
                         total += timelines[i][j].spent;
                     }
+                }
+                //we shouldn't add timeline if total spent time = 0
+                if (total == 0) {
+                    continue;
                 }
                 if (issue) {
                     $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
