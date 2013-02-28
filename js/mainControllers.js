@@ -311,6 +311,17 @@ function Home($scope) {
     $scope.issue = {};
     $scope.project = {};
 
+    $scope.scroll = function(top) {
+        if (top) {
+            var id = "#scrollToBottom";
+        } else {
+            var id = "#scrollToTop";
+        }
+        jQuery("#issueDetails .modal-body").animate({
+            scrollTop: $(id).offset().top
+        }, 500);
+    };
+
     /**
      * On new file selected for upload
      */

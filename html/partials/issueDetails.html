@@ -104,7 +104,10 @@
                     <div class="alert center" data-ng-hide="issue.detailsLoaded">
                         Loading history...
                     </div>
-                    <div data-ng-repeat="history in issue.journals" class="issue-history">                    
+                    <div class="text-center scroll" data-ng-show="issue.detailsLoaded">
+                        <a href="" id="scrollToBottom" data-ng-click="scroll(false)">Scroll to bottom...</a>
+                    </div>
+                    <div data-ng-repeat="history in issue.journals" class="issue-history">
                         <p class="pointer minify" data-ng-click="toggleMinify(history)">
                             <small>
                                 <strong>Updated by</strong>&nbsp;
@@ -127,6 +130,9 @@
                                 </blockquote>
                             </div>
                         </div>
+                    </div>
+                    <div class="text-center scroll"  data-ng-show="issue.detailsLoaded">
+                        <a href="" id="scrollToTop" data-ng-click="scroll(true)">Scroll to top...</a>
                     </div>
                 </div>
                 <!-- List of attachments for issue -->
@@ -177,7 +183,7 @@
                                 <div class="span11 entry">
                                     <p>
                                         <span class="label label-success">{{timeline.spent|tohours}}</span>
-                                        Some comment
+                                        <i>No comment</i>
                                     </p>
                                     <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                 </div>

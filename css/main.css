@@ -126,6 +126,10 @@ table.issues .unread {
     background-color: #ececec;
 }
 
+.scroll {
+    margin: 10px;
+}
+
 .news {
     margin-top: 20px;
 }
