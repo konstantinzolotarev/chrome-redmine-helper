@@ -236,7 +236,7 @@ com.rdHelper.Timeline.remove = function(timeline, issueId, callback) {
             for(var i = 0; i < obj.timelines[issueId].length; i++) {
                 var tt = obj.timelines[issueId][i];
                 if (tt.start == timeline.start && tt.issueId == timeline.issueId) {
-                    delete obj.timelines[issueId][i];
+                    obj.timelines[issueId].splice(i, 1);
                     break;
                 }
             }
