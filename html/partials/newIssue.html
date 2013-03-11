@@ -1,0 +1,89 @@
+<div class="alert alert-success" data-ng-show="success">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Success!</strong> Your issue successfully created !
+</div>
+<div class="alert alert-error" data-ng-show="errors.length > 0">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Error!</strong>
+    <ul>
+        <li data-ng-repeat="error in errors">{{error}}</li>
+    </ul>
+</div>
+<div class="page-header">
+    <h3>New Issue</h3>
+</div>
+<div class="row-fluid">
+    <div class="span9">
+        <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="subject">Subject</label>
+                <div class="controls">
+                    <input type="text" id="subject" placeholder="Subject" data-ng-model="issue.subject" required tabindex="1"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="project_id">Project</label>
+                <div class="controls">
+                    <select id="project_id"
+                            data-ng-model="issue.project_id" 
+                            data-ng-options="project.id as project.name for project in projects" 
+                            data-ng-change="projectChanged()" 
+                            tabindex="2">
+                        <option value="">Select project</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group" data-ng-show="issue.project_id > 0">
+                <label class="control-label" for="assigned_to_id">Assign to</label>
+                <div class="controls">
+                    <span data-ng-hide="project.membersLoaded">Loading...</span>
+                    <select id="assigned_to_id"
+                            data-ng-show="project.membersLoaded"
+                            data-ng-model="issue.assigned_to_id" 
+                            data-ng-options="member.id as member.name for member in project.members"
+                            tabindex="3">
+                        <option value="">Select assignee</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group" data-ng-show="issue.project_id > 0">
+                <label class="control-label" for="tracker_id">Tracker</label>
+                <div class="controls">
+                    <span data-ng-hide="project.fullyLoaded">Loading...</span>
+                    <select id="tracker_id"
+                            data-ng-show="project.fullyLoaded"
+                            data-ng-model="issue.tracker_id" 
+                            data-ng-options="track.id as track.name for track in project.trackers"
+                            tabindex="4">
+                        <option value="" >Select tracker</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="estimated_hours">
+                    Estimated hours
+                </label>
+                <div class="controls">
+                    <input type="number" id="estimated_hours" min="0" data-ng-model="issue.estimated_hours" tabindex="5"/>  
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="description">Description</label>
+                <div class="controls">
+                    <textarea rows="7" id="description" class="input-xxlarge" data-ng-model="issue.description" tabindex="6"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success" data-ng-click="submit()" tabindex="7">Create new Issue</button>
+                <a href="#/home" class="btn" tabindex="8">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="span3" data-ng-hide="options.profile.hideHints">
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong>Notice</strong><br /><br />
+            <strong>Tracker</strong> and <strong>Assignee</strong> fields will appear after project selection.
+        </div>
+    </div>
+</div>

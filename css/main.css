@@ -4,21 +4,14 @@ body {
     /* The html and body elements cannot have any padding or margin. */
 }
 
-/* Wrapper for page content to push down footer */
-#wrap {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-    /* Negative indent footer by it's height */
-    margin: 40px auto 20px;
-}
-/* Set the fixed height of the footer here */
-#push,
 #footer {
     height: 40px;
-}
-#footer {
     background-color: #f5f5f5;
+    margin-top: 40px;
+}
+
+.main {
+
 }
 
 /* Lastly, apply responsive CSS fixes as necessary */
@@ -55,4 +48,101 @@ table.issues .unread {
     border: 1px solid #dddddd;
     border-radius: 3px;
     padding: 4px;
+}
+
+.issue-timelines .timeline {
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    padding: 5px;
+    margin: 13px 2px;
+    box-shadow: -1px 1px 7px -1px #a6acb3;
+}
+
+.issue-timelines .timeline .date {
+    margin-left: 10px;
+}
+
+.issue-timelines .timeline .remove-hidden {
+    display: none;
+}
+
+.issue-timelines .timeline:hover .remove-hidden {
+    display: block;
+    -webkit-animation-name: 'toggle';
+    -webkit-animation-duration: .3s;
+}
+
+.time-entries {
+    margin: 10px;
+}
+
+.time-entries .entry {
+    margin: 8px 0;
+    border-radius: 6px;
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.time-entries .entry:hover {
+    background-color: #fefefe;
+}
+
+.time-entries .entry p {
+    margin: 0 0 5px;
+}
+
+.entry span.label {
+    width: 70px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+@-webkit-keyframes 'toggle' {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.attach {
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 8px;
+}
+
+.add-attach {
+    margin-bottom: 5px;
+}
+
+.margin {
+    margin-bottom: 10px;
+}
+.minify {
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.minify:hover {
+    background-color: #ececec;
+}
+
+.scroll {
+    margin: 10px;
+}
+
+.news {
+    margin-top: 20px;
+}
+
+.news .read-more {
+    margin-left: 5px;
+    font-style: italic;
+}
+
+.wall {
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    padding: 10px;
+    margin: 13px 2px;
+    box-shadow: -1px 1px 7px -1px #a6acb3;
 }

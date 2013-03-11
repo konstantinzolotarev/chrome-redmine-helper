@@ -1,0 +1,85 @@
+<div class="row-fluid">
+    <div class="span12">
+        <!-- No issues message -->
+        <div class="alert" data-ng-show="issues.length < 1 && !isLoading()">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Oops!</strong> No issues are available.
+        </div>
+        <!-- Issue list -->
+        <table class="table table-hover table-condensed issues" data-ng-show="issues.length > 0">
+            <thead>
+                <tr>
+                    <!--<th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
+                    </th>-->
+                    <th style="width: 250px;" data-ng-show="options.profile.table.author">
+                        <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
+                    </th>
+                    <th style="width: 250px;" data-ng-show="options.profile.table.project">
+                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">Project</a>
+                    </th>
+                    <th>
+                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
+                    </th>
+                    <th data-ng-show="options.profile.table.tracker">
+                        <a href="" data-ng-click="order = 'tracker.name'; reverse=!reverse">Tracker</a>
+                    </th>
+                    <th style="width: 150px;" data-ng-show="options.profile.table.status">
+                        <a href="" data-ng-click="order = 'status.name'; reverse=!reverse">Status</a>
+                    </th>
+                    <th style="width: 15px; text-align: center;">
+                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">
+                            <i class="icon-star"></i>
+                        </a>
+                    </th>
+                    <th style="width: 50px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
+                    <!--
+                    <td>
+                        <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
+                    </td>
+                    -->
+                    <td data-ng-show="options.profile.table.author">{{issue.author.name}}</td>
+                    <td data-ng-show="options.profile.table.project">
+                        {{issue.project.name}}
+                    </td>
+                    <td>
+                        <a href="" data-ng-click="showDetails(issue)">
+                            <i class="icon-eye-open ng-cloak" 
+                                    data-ng-show="issue.watcher" 
+                                    data-type="tooltip" 
+                                    data-original-title="You are only watching this issue"></i>
+                            {{issue.subject}}
+                        </a>
+                    </td>
+                    <td data-ng-show="options.profile.table.tracker">
+                        {{issue.tracker.name}}
+                    </td>
+                    <td data-ng-show="options.profile.table.status">
+                        {{issue.status.name}}
+                    </td>
+                    <td>
+                        <i class="icon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
+                        <i class="icon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
+                    </td>
+                    <td>
+                        <i class="icon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div data-ng-show="issues.length > pageSize">
+            <ul class="pager">
+                <li>
+                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">&larr;&nbsp;Previous</button>
+                </li>
+                <li>
+                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">Next&nbsp;&rarr;</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

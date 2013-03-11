@@ -1,17 +1,63 @@
 var pollIntervalMin = 5;  // 5 minutes
 var notification;
+var selectedText = "";
+
 /**
  * Init global variables
  */
-var config = new Config(),
-loader = new Loader(),
-projects = new Projects(),
-issues = new Issues();
+config = new Config();
+
+/**
+ * Loading Redmine API
+ * 
+ * @type {redmine.Api}
+ */
+redmineApi = null;
+
+//Load configs on init
+config.load(function() {
+    //handle loading complete
+    //fetch config
+    updateRedmineApi(); 
+});
+
+/**
+ * Loading issues
+ */
+com.rdHelper.Issues.loadFromStorage();
+
 /**
  * 
- * @type Users
+ * @returns {@exp;redmine@call;Api}
  */
-var users;
+function updateRedmineApi() {
+    //clear errors first
+    chrome.browserAction.setBadgeText({text: ""});
+    redmineApi = new redmine.Api({
+        host: getConfig().profile.host,
+        useHttpAuth: getConfig().profile.useHttpAuth,
+        httpUser: getConfig().profile.httpUser,
+        httpPassword: getConfig().profile.httpPass,
+        chiliProject: getConfig().profile.chiliProject,
+        apiAccessKey: getConfig().profile.apiAccessKey
+    });
+}
+
+/**
+ * Get selected text from context menu event
+ *
+ * @returns {String} selected text
+ */
+function getSelectedText() {
+    return selectedText;
+}
+
+/**
+ * Clear selected in context menu text
+ */
+function clearSelectedText() {
+    selectedText = "";
+}
 
 /**
  * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
@@ -24,16 +70,6 @@ function merge(obj1,obj2){
     for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
     for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
     return obj3;
-}
-
-/**
- * 
- * @param {ProgressEvent} e
- * @returns {void}
- */
-function requestError(e) {
-    chrome.extension.sendMessage({action: "xhrError", params: {"e": e}});
-    chrome.browserAction.setBadgeText({text: "Err"});
 }
 
 /**
@@ -52,44 +88,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * Get Loader
- * 
- * @returns {Loader}
- */
-function getLoader() {
-    return loader;
-}
-
-/**
- * 
- * @returns {Projects}
- */
-function getProjects() {
-    return projects;
-}
-
-/**
- * Get Issues
- * 
- * @returns {Issues}
- */
-function getIssues() {
-    return issues;
-}
-
-/**
- * Get Users
- * 
- * @returns {Users}
- */
-function getUsers() {
-    if (!users) {
-        users = new Users();
-    }
-    return users;
 }
 
 /**
@@ -115,8 +113,7 @@ function setUnreadIssuesCount(count) {
  * 
  * @returns {void}
  */
-function clearItems() {
-    projects.clear();
+function updateItems() {
     if (!config.isEmpty()) {
         startRequest({scheduleRequest:true});
     }
@@ -156,17 +153,22 @@ function getMainUrl(absolute) {
 /**
  * Will open new Extension Main page or set selected page that already open
  * 
+ * @param {Object} page
  * @returns {void}
  */
-function openMainPage() {
+function openMainPage(page) {
+    var urlToOpen = page ? getMainUrl()+"#"+page : getMainUrl() ;
     chrome.tabs.getAllInWindow(undefined, function(tabs) {
         for (var i = 0, tab; tab = tabs[i]; i++) {
             if (tab.url && isMainUrl(tab.url)) {
-                chrome.tabs.update(tab.id, {selected: true});
+                chrome.tabs.update(tab.id, {
+                    selected: true,
+                    url: urlToOpen
+                });
                 return;
             }
         }
-        chrome.tabs.create({url: getMainUrl()});
+        chrome.tabs.create({url: urlToOpen});
     });
 }
 
@@ -174,25 +176,47 @@ function openMainPage() {
  * Shedule next request to Redmine
  */
 function scheduleRequest() {
-    chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    try {
+        chrome.alarms.get("issues", function(alarm) {
+            if (alarm) {
+                chrome.alarms.clear("issues");
+            }
+            chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});        
+        });
+    } catch(err) {
+        chrome.alarms.create("issues", {'delayInMinutes': pollIntervalMin});
+    }
 }
 
 /**
- * 
- * @param {type} onSuccess
+ * Load current user details
+
+ * @param {function()=} onSuccess function that will be called after success loading of user details
  * @returns {void}
  */
 function getCurrentUser(onSuccess) {
-    getLoader().get("users/current.json",
-        function(json) {
-            if (json.user) {
-                getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
-                getConfig().getProfile().currentUserId = json.user.id;
-                getConfig().store(getConfig().getProfile());
-                onSuccess();
-            }
+    redmineApi.users.me(function(error, json) {
+        if (error) {
+            fireError("Couldn't load user details", true);
         }
-    );
+        if (json.user) {
+            getConfig().getProfile().currentUserName = json.user.firstname + ' ' + json.user.lastname;
+            getConfig().getProfile().currentUserId = json.user.id;
+            getConfig().store(getConfig().getProfile());
+            onSuccess();
+        }
+    });
+    
+}
+
+/**
+ * Upload file to redmine
+ * 
+ * @param {?} file
+ * @param {function(?Object, ?Object)} callback Callback function
+ */
+function uploadFile(file, callback) {
+    redmineApi.upload(file, callback);
 }
 
 /**
@@ -202,6 +226,7 @@ function getCurrentUser(onSuccess) {
  * @returns {void}
  */
 function startRequest(params) {
+    chrome.browserAction.setBadgeText({text: ""});
     if (params.scheduleRequest) {
         scheduleRequest();
     }
@@ -215,54 +240,73 @@ function startRequest(params) {
             /**
              * Load list of issues
              */
-            getIssues().load();
-            /**
-             * Load list of users
-             */
-//            getUsers().load();
+            com.rdHelper.Issues.load();
         }
     } else {
-        chrome.browserAction.setBadgeText({text: "Err"});
+         fireError("Couldn't connect to server.", true);
     }
 }
 
 /**
+ * Shows new Global error message
  * 
- * @returns {undefined}
+ * @param {string=} message 
+ * @param {boolean} global
  */
-function upgradeSettings() {
-    //Check for updated settings
-    if (!getConfig().getProfile().notifications) {
-        //update profile with new settings
-        getConfig().getProfile().notifications = {
-            show: 'none'
-        };
-        //Store changes
-        getConfig().store(getConfig().getProfile());
+function fireError(message, global) {
+    if (global) {
+        chrome.browserAction.setBadgeText({text: "Err"});
     }
-    //Check for updated settings for projects
-    if (!getConfig().getProfile().projects) {
-        //update profile with new settings
-        getConfig().getProfile().projects = {
-            show_for: 'all',
-            list: []
-        };
-        //Store changes
-        getConfig().store(getConfig().getProfile());
-    }
+    //send error
+    chrome.extension.sendMessage({
+        action: "globalError", params: {
+            "error": {
+                'message': message
+            }
+        }
+    });
+};
+
+/**
+ * handler for click on context menu
+ */
+function handleContextMenu(info, tab) {
+    console.log(info);
+    //store selected text
+    selectedText = info.selectionText;
+    //open new tab to create issue 
+    openMainPage("/new_issue");
 }
+
+/**
+ * Handle settings update
+ * 
+ * @param {Object} changes
+ * @param {Object} namespace
+ */
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+    //handle only profile update
+    if (!changes.profile) {
+        return;
+    }
+    console.log("Settings updated");
+    //Update settings
+    updateRedmineApi();
+    updateItems();
+});
+
+/**
+ * Add handler to context menu click
+ */
+chrome.contextMenus.onClicked.addListener(handleContextMenu);
+
 
 /**
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
-    console.log("Installed");
-    upgradeSettings();
+    localStorage.clear();
     startRequest({scheduleRequest:true});
-});
-
-chrome.runtime.onSuspend.addListener(function() {
-    console.log("Suspended");
 });
 
 /**
@@ -285,4 +329,20 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 /**
  * Bind click action to icon
  */
-chrome.browserAction.onClicked.addListener(openMainPage);
+chrome.browserAction.onClicked.addListener(function() {
+    openMainPage(); 
+});
+
+/**
+ * Remove all context menues first
+ */
+chrome.contextMenus.removeAll(function() {
+    /**
+     * Create context menu to create new issues from selected text
+     */ 
+     chrome.contextMenus.create({
+        'id': "newIssueContextMenu",
+        'title': "Create new Redmine issue",
+        'contexts': ["selection"]
+     });
+});

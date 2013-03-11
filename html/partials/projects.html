@@ -1,0 +1,28 @@
+<div class="page-header">
+    <h3>Your Projects</h3>
+</div>
+<div>
+    <div>
+        <a href="" data-ng-click="reload()" class="btn" data-ng-class="isLoading() && 'disabled'">
+            <i class="icon-refresh"></i>&nbsp;Update
+        </a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width: 40px;">#</th>
+                <th>Name</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="project in projects">
+                <td>{{project.id}}</td>
+                <td>{{project.name}}</td>
+                <td>
+                    &nbsp;
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

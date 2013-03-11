@@ -68,12 +68,30 @@
                 </div>
             </div>
         </div>
+        <div class="well well-small">
+            <div data-ng-show="issue.tracking">
+                <a href="" class="btn btn-danger" data-ng-click="stopTrackingTime()">
+                    <i class="icon-remove-circle"></i>
+                    Finish working on this issue
+                </a>
+            </div>
+            <div data-ng-hide="issue.tracking">
+                <a href="" class="btn btn-success" data-ng-click="startTrackingTime()">
+                    <i class="icon-time"></i>
+                    Start working on this issue
+                </a>
+            </div>
+        </div>
         <hr/>
-        <div class="tabbable">
+        <div class="tabbable" id="detailsTabs">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
                 <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+                <li class="">
+                    <a href="#attachments" data-toggle="tab">Attachments</a>
+                </li>
                 <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
+                <li class=""><a href="#timelines" data-toggle="tab">Time logs</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="description">
@@ -86,22 +104,49 @@
                     <div class="alert center" data-ng-hide="issue.detailsLoaded">
                         Loading history...
                     </div>
-                    <div data-ng-repeat="history in issue.journals" class="issue-history">                    
-                        <p>
+                    <div class="text-center scroll" data-ng-show="issue.detailsLoaded">
+                        <a href="" id="scrollToBottom" data-ng-click="scroll(false)">Scroll to bottom...</a>
+                    </div>
+                    <div data-ng-repeat="history in issue.journals" class="issue-history">
+                        <p class="pointer minify" data-ng-click="toggleMinify(history)">
                             <small>
                                 <strong>Updated by</strong>&nbsp;
-                                <a href="#">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
+                                <a href="" data-ng-click="false;">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
                             </small>
+                            <i class="pull-right" data-ng-class="history.minified && 'icon-resize-full' || 'icon-resize-small'"></i>
                         </p>
-                        <ul data-ng-show="history.details.length > 0">
-                            <li data-ng-repeat="item in history.details">
-                                <div data-issue-history="item" data-project="project"></div>
-                            </li>
-                        </ul>
-                        <blockquote data-ng-show="history.notes">
-                            <p>{{history.notes}}</p>
-                            <small>New comment added</small>
-                        </blockquote>
+                        <div data-ng-hide="history.minified">
+                            <ul data-ng-show="history.details.length > 0">
+                                <li data-ng-repeat="item in history.details">
+                                    <div data-issue-history="item" data-issue="issue" data-project="project"></div>
+                                </li>
+                            </ul>
+                            <div data-ng-show="history.notes">
+                                <blockquote>
+                                    <p>{{history.notes}}</p>
+                                    <small class="pointer" data-ng-click="replyComment()">
+                                        <i class="icon-comment"></i>&nbsp;Reply
+                                    </small>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center scroll"  data-ng-show="issue.detailsLoaded">
+                        <a href="" id="scrollToTop" data-ng-click="scroll(true)">Scroll to top...</a>
+                    </div>
+                </div>
+                <!-- List of attachments for issue -->
+                <div class="tab-pane" id="attachments">
+                    <div class="issue-attachments">
+                        <upload-file></upload-file>
+                        <div data-ng-repeat="attach in issue.attachments" class="attach">
+                            <i class="icon-chevron-right"></i>&nbsp;
+                            <a data-ng-href="{{attach.content_url}}" target="_blank">{{attach.filename}}</a>
+                            &nbsp;
+                            <small>
+                                <i>{{attach.author.name}}&nbsp;{{attach.created_on | date:'dd-MM-yyyy'}}</i>
+                            </small>
+                        </div>
                     </div>
                 </div>
                 <!-- Add new Comment to issue -->
@@ -112,6 +157,42 @@
                             <button class="btn" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
                         </div>
                     </form>
+                </div>
+                <!-- Timelines -->
+                <div class="tab-pane" id="timelines">
+                    <div class="issue-timelines">
+                        <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
+                            No time logs available.
+                        </div>
+                        <div data-ng-show="issue.timelines.length > 0">
+                            <div class="row-fluid">
+                                <div class="span8">
+                                    <span class="label label-info">Total time spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
+                                </div>
+                                <div class="span4">
+                                    <a href="" class="btn" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
+                                        <i class="icon-trash"></i>&nbsp;
+                                        Clear time logs
+                                    </a>
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>                        
+                        <div class="timeline" data-ng-repeat="timeline in issue.timelines">
+                            <div class="row-fluid">
+                                <div class="span11 entry">
+                                    <p>
+                                        <span class="label label-success">{{timeline.spent|tohours}}</span>
+                                        <i>No comment available</i>
+                                    </p>
+                                    <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
+                                </div>
+                                <div class="span1">
+                                    <i class="icon-trash pointer remove-hidden" data-ng-click="removeTimeline(timeline)"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

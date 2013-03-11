@@ -1,5 +1,39 @@
 Changelog
 ---------------------------------
+1.6.5 ()
+    - Added config synchronization between devices
+
+1.6.0 (15-Feb-2013)
+    - Updated Twitter Bootstrap to version 2.3
+    - Added ChiliProject support
+    - Updated UI
+    - Latest news
+    - Code optimization and stability improvements
+
+1.0 (28-Nov-2012)
+    - Create new issue from selected text (Context menu)
+    - Hints + disable hints in options
+    - Options code optimization
+    - Minor UI optimization
+    
+0.9.9 (23-Nov-2012)
+    - Attach file to issue
+    - Attachment history parsing
+    - Stability improvements
+    - V8 code optimazation
+
+0.9.8 (20-Nov-2012)
+    - Added "Issue list options"
+
+0.9.7 (19-Nov-2012)
+    - Added assignee field into Create issue
+    - Core fixes
+
+0.9.6 (19-Nov-2012)
+    - New issue creation feature
+    - Small UI improvements
+    - Minor core fixes
+
 0.9.5 (15-Nov-2012)
     - Added notifications support & options
     - Added projects filtering options

@@ -1,88 +1,61 @@
-<div>
-    <div class="alert alert-danger" data-ng-show="options.isEmpty()">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>Warning!</strong> No options defined ! <a href="#/options">Define</a>
+<div class="modal hide fade" id="tableOptions" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>
+            Issue list options
+            <small>Select fields that should be shown</small>
+        </h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal">
+            <label class="checkbox">
+                <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> Project title
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> Author name
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> Tracker
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> Status
+            </label>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="" class="btn btn-success" data-ng-click="storeTableOptions()">
+            Store options
+        </a>
+        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
     </div>
 </div>
-<div class="row-fluid">
-    <div class="offset4 span4 alert alert-info center" data-ng-show="isLoading">
-        <img src="/img/ajax-loader.gif" alt="Loading..." />
-        <strong>Loading...</strong>
-    </div>
-</div>
+
 <div data-ng-include src="'/html/partials/issueDetails.html'"></div>
 <div class="page-header">
     <h3>Your Latest Issues</h3>
 </div>
-<div class="well well-small row-fluid">
+<div class="well well-small row-fluid" data-ng-show="issues.length > 0">
     <div class="span7">
         <input type="text" class="input-medium search-query" data-ng-model="search.subject" placeholder="Search by subject"/>
     </div>
     <div class="span5">
-        <a href="" class="btn" data-ng-click="markAllRead()">
+        <a href="#/new_issue" class="btn btn-info">
+            <i class="icon-plus-sign"></i>&nbsp;New Issue
+        </a>
+        <a href="" class="btn" data-ng-click="markAllRead()" data-ng-show="getUnreadCount() > 0">
             <i class="icon-ok"></i>&nbsp;Mark all as read
         </a>
-        <a href="" class="btn" data-ng-click="reload()" data-ng-hide="isLoading">
+        <a href="" class="btn" data-ng-click="reload()" data-ng-class="isLoading() && 'disabled'">
             <i class="icon-refresh"></i>&nbsp;Update
         </a>
+        <a href="#tableOptions" class="btn" data-toggle="modal">
+            <i class="icon-cog"></i>
+        </a>
+        <i class="help icon-info-sign"
+                data-ng-hide="options.profile.hideHints"
+                data-type="popover"
+                data-original-title="Notice"
+                data-content="With conf sign (left to this hint) you could manage fields that are shown in the table"></i>
     </div>
 </div>
-<div class="row-fluid">
-    <div class="span12">
-        <table class="table table-hover table-condensed issues">
-            <thead>
-                <tr>
-                    <th style="width: 15px; text-align: center;">
-                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
-                    </th>
-                    <th style="width: 250px;" >
-                        <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
-                    </th>
-                    <th style="width: 250px;" >
-                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">Project</a>
-                    </th>
-                    <th>
-                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
-                    </th>
-                    <th style="width: 15px; text-align: center;">
-                        <a href="" data-ng-click="order = 'read'; reverse=!reverse">
-                            <i class="icon-star"></i>
-                        </a>
-                    </th>
-                    <th style="width: 50px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
-                    <td>
-                        <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
-                    </td>
-                    <td>{{issue.author.name}}</td>
-                    <td>
-                        {{issue.project.name}}
-                    </td>
-                    <td>
-                        <a href="" data-ng-click="showDetails(issue)">{{issue.subject}}</a>
-                    </td>
-                    <td>
-                        <i class="icon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
-                        <i class="icon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
-                    </td>
-                    <td>
-                        <i class="icon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div data-ng-show="issues.length > pageSize">
-            <ul class="pager">
-                <li>
-                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">&larr;&nbsp;Previous</button>
-                </li>
-                <li>
-                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">Next&nbsp;&rarr;</button>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>
+<div data-ng-include src="'/html/partials/issueList.html'"></div>

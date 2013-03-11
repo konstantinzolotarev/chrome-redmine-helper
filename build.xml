@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<project name="Redmine Helper" default="dist" basedir=".">
+    <description>
+        Redmine helper Chrome Extension
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="."/>
+  <property name="js" location="js"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${dist}/js"/>
+  </target>
+
+  <target name="move-libs" depends="init">
+    <!-- Copy manifest file -->
+    <copy file="${src}/manifest.json" tofile="${dist}/manifest.json" />
+    <!-- Copy js libs -->
+    <copy todir="${dist}/js/lib">
+      <fileset dir="${js}/lib"/>
+    </copy>
+    <!-- Copy icons -->
+    <copy todir="${dist}/icon">
+      <fileset dir="${src}/icon"/>
+    </copy>
+    <!-- Copy images -->
+    <copy todir="${dist}/img">
+      <fileset dir="${src}/img"/>
+    </copy>
+    <!-- Copy css -->
+    <copy todir="${dist}/css">
+      <fileset dir="${src}/css"/>
+    </copy>
+    <!-- Copy html -->
+    <copy todir="${dist}/html">
+      <fileset dir="${src}/html"/>
+    </copy>
+    <!-- Copy JS scripts -->
+    <copy file="${js}/main.js" tofile="${dist}/js/main.js" />
+    <copy file="${js}/mainControllers.js" tofile="${dist}/js/mainControllers.js" />
+  </target>
+
+  <target name="compile" depends="move-libs"
+        description="compile the source " >
+    <java jar="${build}/compiler.jar" fork="true" failonerror="true">
+      <arg line="--js ${js}/bg_base.js --js ${js}/config.js --js ${js}/redmine/timeline.js --js ${js}/redmine/projects.js --js ${js}/redmine/issues.js --js ${js}/redmine/users.js --js ${js}/redmine/news.js --js ${js}/background.js --js_output_file ${dist}/js/background.js" />
+    </java>
+
+    <replace file="${dist}/manifest.json">
+      <replacefilter>
+        <replacetoken><![CDATA["js/bg_base.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/config.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/timeline.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/projects.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/issues.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/users.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+      <replacefilter>
+        <replacetoken><![CDATA["js/redmine/news.js",]]></replacetoken>
+        <replacevalue></replacevalue>
+      </replacefilter>
+    </replace>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the and ${dist} directory trees -->
+    <delete dir="${dist}"/>
+  </target>
+</project>

@@ -1,67 +1,93 @@
 <!DOCTYPE html>
 <html data-ng-app="issues" data-ng-csp>
     <head>
-        <title></title>
+        <title>Redmine Helper</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=1024, initial-scale=1.0">
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
         <link href="../css/main.css" rel="stylesheet">
+        <!-- Javascripts -->
+        <script type="text/javascript" src="../js/lib/jquery.min.js"></script>
+        <script type="text/javascript" src="../js/lib/bootstrap.min.js"></script>
+        <script type="text/javascript" src="../js/lib/angular.min.js"></script>
+        <script type="text/javascript" src="../js/lib/angular-sanitize.min.js"></script>
+        <script type="text/javascript" src="../js/main.js"></script>
+        <script type="text/javascript" src="../js/mainControllers.js"></script>
     </head>
     <body>
-        <div data-ng-controller="Main">
-            <div class="navbar navbar-fixed-top">
+        <div data-ng-controller="Main" style="padding-left: 0;">
+            <div class="navbar navbar-static-top">
                 <div class="navbar-inner">
                     <div class="container">
-                        <div class="nav-collapse collapse">
-                            <ul class="nav">
-                                <li>
-                                    <a href="#/home">Home</a>
-                                </li>
-                                <li class="divider-vertical"></li>
-                                <li>
-                                    <a href="#/options">Options</a>
-                                </li>
-                                <li>
-                                    <a href="#projectFilters" data-toggle="modal">Projects filtering</a>
-                                </li>
-                            </ul>
-                            <ul class="nav pull-right">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        My projects
-                                        <b class="caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li data-ng-show="projects.length < 1">
-                                            <a href="#/home">No projects</a>
-                                        </li>
-                                        <li data-ng-repeat="project in projects">
-                                            <a href="#/project/{{project.identifier}}">{{project.name}}</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="" data-ng-click="updateProjects()">
-                                                <i class="icon-refresh"></i>&nbsp;Update project list
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
+                        <ul class="nav">
+                            <li data-ng-class="$location.path() == '/home' && 'active'">
+                                <a href="#/home">
+                                    <i class="icon-list"></i>
+                                    Issue List&nbsp;
+                                    <span class="badge" data-ng-show="getUnreadCount() > 0">{{getUnreadCount()}}</span>
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/news' && 'active'">
+                                <a href="#/news">
+                                    <i class="icon-briefcase"></i>
+                                    News
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/projects' && 'active'">
+                                <a href="#/projects">
+                                    <i class="icon-book"></i>
+                                    Projects
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/timelines' && 'active'">
+                                <a href="#/timelines">
+                                    <i class="icon-time"></i>
+                                    Time logs
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav pull-right">
+                            <li data-ng-show="$location.path() == '/home'">
+                                <a href="#projectFilters" data-toggle="modal">
+                                    <i class="icon-filter"></i>
+                                    Projects filtering
+                                </a>
+                            </li>
+                            <li data-ng-class="$location.path() == '/options' && 'active'">
+                                <a href="#/options">
+                                    <i class="icon-wrench"></i>
+                                    Options
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="container">
-                <div class="alert alert-error" style="margin-top: 40px;" data-ng-show="xhrError">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
-                    <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
+            <div class="container main">
+                <div class="row-fluid">
+                    <!--Body content-->
+                    <div class="alert alert-error" data-ng-show="xhrError">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
+                    </div>
+                    <div class="alert alert-success ng-cloak" data-ng-show="customSuccess != ''">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <div data-ng-bind-html="customSuccess"></div>
+                    </div>
+                    <div class="alert alert-error ng-cloak" data-ng-show="customError != ''">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        <div data-ng-bind-html="customError"></div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="offset3 span6 alert alert-info center" data-ng-show="loading">
+                            <img src="/img/ajax-loader.gif" alt="Loading..." />
+                            <strong>Loading...</strong>
+                        </div>
+                    </div>
+                    <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
+                    <div data-ng-view></div>
                 </div>
-            </div>
-            <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
-        </div>
-        <div id="wrap">
-            <div class="container">
-                <div data-ng-view></div>
             </div>
         </div>
         <div id="footer">
@@ -72,11 +98,5 @@
                 </p>
             </div>
         </div>
-        <script type="text/javascript" src="../js/lib/jquery.min.js"></script>
-        <script type="text/javascript" src="../js/lib/bootstrap.min.js"></script>
-        <script type="text/javascript" src="../js/lib/angular.min.js"></script>
-        <script type="text/javascript" src="../js/lib/angular-sanitize.min.js"></script>
-        <script type="text/javascript" src="../js/main.js"></script>
-        <script type="text/javascript" src="../js/mainControllers.js"></script>
     </body>
 </html>
