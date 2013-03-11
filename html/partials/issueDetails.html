@@ -91,7 +91,7 @@
                     <a href="#attachments" data-toggle="tab">Attachments</a>
                 </li>
                 <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
-                <li class=""><a href="#timelines" data-toggle="tab">Work history</a></li>
+                <li class=""><a href="#timelines" data-toggle="tab">Time logs</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="description">
@@ -162,17 +162,17 @@
                 <div class="tab-pane" id="timelines">
                     <div class="issue-timelines">
                         <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
-                            No logs available.
+                            No time logs available.
                         </div>
                         <div data-ng-show="issue.timelines.length > 0">
                             <div class="row-fluid">
                                 <div class="span8">
-                                    <span class="label label-info">Total spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
+                                    <span class="label label-info">Total time spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
                                 </div>
                                 <div class="span4">
                                     <a href="" class="btn" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
                                         <i class="icon-trash"></i>&nbsp;
-                                        Clear work log
+                                        Clear time logs
                                     </a>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@
                                 <div class="span11 entry">
                                     <p>
                                         <span class="label label-success">{{timeline.spent|tohours}}</span>
-                                        <i>No comment</i>
+                                        <i>No comment available</i>
                                     </p>
                                     <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                 </div>

@@ -16,6 +16,9 @@ var linkFunction = function(scope, element, attrs) {
      * On mouse enter
      */
     scope.mouseEnter = function() {
+        if (scope.list && scope.list.length < 1) {
+            return;
+        }
         if (!scope.editing) {
             scope.visible = true;
         }
@@ -34,10 +37,12 @@ var linkFunction = function(scope, element, attrs) {
      * Open edit
      */
     scope.edit = function() {
+        if (scope.list && scope.list.length < 1) {
+            return;
+        }
         scope.editing = true;
         scope.visible = false;
         defaultValue = scope.value;
-        console.log(scope.value, scope.list);
     };
     
     /**

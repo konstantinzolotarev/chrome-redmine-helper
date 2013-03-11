@@ -451,7 +451,6 @@ function Home($scope) {
             return;
         }
         BG.com.rdHelper.Timeline.getByIssueId($scope.issue.id, function(list) {
-            console.log(list);
             $scope.issue.tracking = false;
             $scope.issue.timelines = [];
             var total = 0;

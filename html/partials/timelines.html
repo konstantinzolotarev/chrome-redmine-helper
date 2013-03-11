@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h3>Your Timelines</h3>
+    <h3>Your Time logs</h3>
 </div>
 <div>
     <div class="alert text-center" data-ng-hide="timelines.length > 0 || timelinesActive.length > 0">
@@ -7,21 +7,24 @@
     </div>
     <div data-ng-show="timelines.length > 0 || timelinesActive.length > 0">
         <a href="" class="btn btn-danger" data-ng-click="clear()">
-            <i class="icon-trash"></i>&nbsp;Clear all work logs
+            <i class="icon-trash"></i>&nbsp;Clear all time logs
         </a>
     </div>
     <div data-ng-show="timelinesActive.length > 0">
         <div data-ng-repeat="timeline in timelinesActive" class="wall">
             <div class="row-fluid">
                 <div class="span10">
-                    <i class="icon-chevron-right"></i>
+                    <i class="icon-time"></i>
                     {{timeline.issue.subject}}&nbsp;
-                    <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">Active</span>
+                    <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">You are working on this issue</span>
                     <br/>
                     <small class="muted"><i>&nbsp;{{timeline.start|date:'yyyy-MM-dd h:mma'}}</i></small>
                 </div>
                 <div class="span2">
-                    <button class="btn btn-danger" data-ng-click="stopTrackingTime(timeline)">Stop working</button>
+                    <button class="btn btn-danger" data-ng-click="stopTrackingTime(timeline)">
+                        <i class="icon-remove-circle"></i>&nbsp;
+                        Finish working
+                    </button>
                 </div>
             </div>
         </div>
@@ -42,7 +45,7 @@
             <div data-ng-repeat="t in timeline.times" class="entry">
                 <p>
                     <span class="label label-success">{{t.spent|tohours}}</span>
-                    <i>No comment</i>
+                    <i>No comment available</i>
                 </p>
                 <small class="muted"><i>&nbsp;{{t.start|date:'yyyy-MM-dd'}}</i></small>
             </div>
