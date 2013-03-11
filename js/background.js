@@ -5,10 +5,7 @@ var selectedText = "";
 /**
  * Init global variables
  */
-config = new Config(),
-issues = new Issues(),
-users = new Users(),
-news = new News();
+config = new Config();
 
 /**
  * Loading Redmine API
@@ -25,10 +22,17 @@ config.load(function() {
 });
 
 /**
+ * Loading issues
+ */
+com.rdHelper.Issues.loadFromStorage();
+
+/**
  * 
  * @returns {@exp;redmine@call;Api}
  */
 function updateRedmineApi() {
+    //clear errors first
+    chrome.browserAction.setBadgeText({text: ""});
     redmineApi = new redmine.Api({
         host: getConfig().profile.host,
         useHttpAuth: getConfig().profile.useHttpAuth,
@@ -84,32 +88,6 @@ function trim(string) {
 function getConfig() {
     config.load();
     return config;
-}
-
-/**
- * Get Issues
- * 
- * @returns {Issues}
- */
-function getIssues() {
-    return issues;
-}
-
-/**
- * Get Users
- * 
- * @returns {Users}
- */
-function getUsers() {
-    return users;
-}
-
-/**
- * 
- * @returns {News}
- */
-function getNews() {
-    return news;
 }
 
 /**
@@ -248,6 +226,7 @@ function uploadFile(file, callback) {
  * @returns {void}
  */
 function startRequest(params) {
+    chrome.browserAction.setBadgeText({text: ""});
     if (params.scheduleRequest) {
         scheduleRequest();
     }
@@ -261,7 +240,7 @@ function startRequest(params) {
             /**
              * Load list of issues
              */
-            getIssues().load();
+            com.rdHelper.Issues.load();
         }
     } else {
          fireError("Couldn't connect to server.", true);
@@ -306,6 +285,10 @@ function handleContextMenu(info, tab) {
  * @param {Object} namespace
  */
 chrome.storage.onChanged.addListener(function(changes, namespace) {
+    //handle only profile update
+    if (!changes.profile) {
+        return;
+    }
     console.log("Settings updated");
     //Update settings
     updateRedmineApi();
@@ -322,13 +305,7 @@ chrome.contextMenus.onClicked.addListener(handleContextMenu);
  * Bind actions on extension is installed
  */
 chrome.runtime.onInstalled.addListener(function() {
-    if (localStorage.profile) {
-        //sync it with chrome.storage
-        var loadedProfile = JSON.parse(localStorage.profile);
-        getConfig().store(loadedProfile);
-        //clear storage
-        localStorage.removeItem('profile');
-    }
+    localStorage.clear();
     startRequest({scheduleRequest:true});
 });
 

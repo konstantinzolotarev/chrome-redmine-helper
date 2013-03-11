@@ -6,111 +6,136 @@
  */
 com.rdHelper.Projects = {
     loaded: false,
-    projects: []
+    projects: {}
+};
+
+/**
+ * Get length of projects
+ * 
+ * @returns {number}
+ */
+com.rdHelper.Projects.length = function() {
+    return Object.keys(this.projects).length;
+};
+
+/**
+ * Store current projects in storage
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Projects.store = function(callback) {
+    callback = callback || function() {};
+    chrome.storage.local.set({'projects': this.projects}, callback);
+};
+
+/**
+ * Load projects from extension Memory
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Projects.load = function(callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        chrome.storage.local.get('projects', function(item) {
+            if (!item.projects) {
+                callback();
+                return;
+            }
+            obj.projects = item.projects;
+            obj.loaded = true;
+            callback();
+        });
+    })(this);
+};
+
+/**
+ * Clear stored data & update current projects
+ *
+ * @returns {void}
+ */
+com.rdHelper.Projects.clear = function() {
+    this.projects = {};
+    this.loaded = false;
 };
 
 /**
  * Get list of projects
  * 
  * @param {boolean} reload if set to true project list will be updated from server
+ * @param {function(Object)=} callback
  * @returns {Array}
  */
-com.rdHelper.Projects.all = function(reload) {
+com.rdHelper.Projects.all = function(reload, callback) {
+    if (arguments.length < 2 && typeof reload == "function") {
+        callback = reload;
+        reload = false;
+    }
+    callback = callback || function() {};
     if (this.loaded && !reload) {
-        return this.projects;
-    }
-    //Try loading from memory
-    this.load();
-    //If we have no projects there loading from API
-    if (this.projects.length < 1 || reload) {
-        this.loadFromRedmine();
-    }
-    return this.projects;
-};
-
-/**
- * Get project detailed info 
- * 
- * @param {String} id
- * @param {boolean} reload
- * @returns {Object}
- */
-com.rdHelper.Projects.get = function(id, reload) {
-    var p = this.getById(id);
-    if (!p.project) {
-        return false;
-    }
-    if (p.project.fullyLoaded && !reload) {
-        //load members if they wa not loaded
-        this.getMembers(id);
-        return p.project;
+        callback(this.projects);
     }
     (function(obj) {
-        redmineApi.projects.get(id, function(error, data) {
-            if (error) {
-                return;
+        obj.load(function() {
+            //If we have no projects there loading from API
+            if (obj.length() < 1 || reload) {
+                return obj.loadFromRedmine(callback);
             }
-            data.project.fullyLoaded = true;
-            var key = p.key || false;
-            if (key !== false) {
-                obj.projects[key] = merge(obj.projects[key], data.project);
-                obj.store();
-                obj.sendProjectUpdated(id, obj.projects[key]);
-            }
+            callback(obj.projects);
         });
+        return;
     })(this);
-    return p.project;
 };
 
 /**
- * Get list of project members
- * 
- * @param {int} projectId
- * @param {boolean} reload
- * @returns {Array}
+ * Load projects from Redmine API
+ *
+ * @param {number=} offset
+ * @param {function()=} callback
  */
-com.rdHelper.Projects.getMembers = function(projectId, reload) {
-    var proj = this.getById(projectId);
-    if (!proj || !proj.project) {
-        return [];
+com.rdHelper.Projects.loadFromRedmine = function(offset, callback) {
+    if (arguments.length < 2 && typeof offset == "function") {
+        callback = offset;
+        offset = 0;
     }
-    if (!reload && proj.project.membersLoaded) {
-        return proj.project.members;
-    }
+    callback = callback || function() {};
+    //update process
     (function(obj) {
-        redmineApi.projects.memberships(projectId, function(error, json) {
+        offset = offset || "0";
+        redmineApi.projects.all("offset="+offset, function(error, data) {
             if (error) {
-                if (error.request.status && error.request.status == 403) {
-                    obj.projects[proj.key].membersLoaded = true;
-                    obj.projects[proj.key].members = getUsers().users;
-                    obj.store();
-                    obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
-                }
+                callback({});
                 return;
             }
-            if (json.total_count && json.total_count > 0 && json.memberships) {
-                obj.projects[proj.key].members = [];
-                for (var i in json.memberships) {
-                    obj.projects[proj.key].members.push(json.memberships[i].user);
+            if (data.total_count && data.total_count > 0) {
+                for(var i = 0; i < data.projects.length; i++) {
+                    obj.projects[data.projects[i].id] = data.projects[i];
                 }
-                obj.projects[proj.key].membersLoaded = true;
+                obj.loaded = true;
                 obj.store();
-                obj.sendProjectUpdated(projectId, obj.projects[proj.key]);
+                if (data.total_count > (data.limit + data.offset)) {
+                    obj.loadFromRedmine(data.limit + data.offset, callback);
+                } else {
+                    callback(obj.projects);
+                    chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
+                }
             }
         });
+        return;
     })(this);
 };
 
 /**
  * Get project from list by identifier
- * 
- * @param {String} ident
- * @returns {Object}
+ *
+ * @param {(string|number)} ident
+ * @returns {(Object|boolean)}
  */
 com.rdHelper.Projects.getByIdentifier = function(ident) {
     for(var pid in this.projects) {
         if (this.projects[pid].identifier == ident) {
-            return {'key': pid, 'project': this.projects[pid]};
+            return this.projects[pid];
         }
     }
     return false;
@@ -118,27 +143,21 @@ com.rdHelper.Projects.getByIdentifier = function(ident) {
 
 /**
  * Get project from list by id
- * 
- * @param {String} id
- * @returns {Object}
+ *
+ * @param {(string|number)} id
+ * @returns {(Object|boolean)}
  */
 com.rdHelper.Projects.getById = function(id) {
-    var project = {
-        'key': false,
-        'project': false
-    };
-    for(var pid in this.projects) {
-        if (this.projects[pid].id == id) {
-            project = {'key': pid, 'project': this.projects[pid]};
-        }
+    if (this.projects[id]) {
+        return this.projects[id];
     }
-    return project;
+    return false;
 };
 
 /**
  * Get project id from list by identifier
- * 
- * @param {String} ident
+ *
+ * @param {string} ident
  * @returns {int}
  */
 com.rdHelper.Projects.getProjectKey = function(ident) {
@@ -151,62 +170,74 @@ com.rdHelper.Projects.getProjectKey = function(ident) {
 };
 
 /**
- * Load projects from Redmine API
+ * Get project detailed info 
  * 
- * @returns {void}
+ * @param {(string|number)} id
+ * @param {boolean} reload
+ * @returns {(Object|boolean)}
  */
-com.rdHelper.Projects.loadFromRedmine = function() {
-    //update process
-    this.projects = [];
+com.rdHelper.Projects.get = function(id, reload) {
+    if (!this.projects[id]) {
+        return false;
+    }
+    if (this.projects[id].fullyLoaded && !reload) {
+        //load members if they wa not loaded
+        this.getMembers(id);
+        return this.projects[id];
+    }
     (function(obj) {
-        redmineApi.projects.all(function(error, data) {
+        redmineApi.projects.get(id, function(error, data) {
             if (error) {
                 return;
             }
-            if (data.total_count && data.total_count > 0) {
-                obj.projects = data.projects;
-                obj.loaded = true;
+            data.project.fullyLoaded = true;
+            obj.projects[id] = merge(obj.projects[id], data.project);
+            obj.store();
+            obj.sendProjectUpdated(id, obj.projects[id]);
+        });
+        return;
+    })(this);
+    return this.projects[id];
+};
+
+/**
+ * Get list of project members
+ * 
+ * @param {(string|number)} projectId
+ * @param {boolean} reload
+ * @returns {Array}
+ */
+com.rdHelper.Projects.getMembers = function(projectId, reload) {
+    //check for project
+    if (!this.projects[projectId]) {
+        return [];
+    }
+    if (!reload && this.projects[projectId].membersLoaded) {
+        return this.projects[projectId].members;
+    }
+    (function(obj) {
+        redmineApi.projects.memberships(projectId, function(error, json) {
+            if (error) {
+                if (error.request.status && error.request.status == 403) {
+                    obj.projects[projectId].membersLoaded = true;
+                    obj.projects[projectId].members = com.rdHelper.Users.users;
+                    obj.store();
+                    obj.sendProjectUpdated(projectId, obj.projects[projectId]);
+                }
+                return;
+            }
+            if (json.total_count && json.total_count > 0 && json.memberships) {
+                obj.projects[projectId].members = [];
+                for (var i in json.memberships) {
+                    obj.projects[projectId].members.push(json.memberships[i].user);
+                }
+                obj.projects[projectId].membersLoaded = true;
                 obj.store();
-                chrome.extension.sendMessage({action: "projectsLoaded", projects: obj.projects});
+                obj.sendProjectUpdated(projectId, obj.projects[projectId]);
             }
         });
     })(this);
-};
-
-/**
- * Store current projects 
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.store = function() {
-    if (!this.loaded) {
-        return;
-    }
-    localStorage['projects'] = JSON.stringify(this.projects);
-};
-
-/**
- * Load projects from extension Memory
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.load = function() {
-    if (this.loaded) {
-        return;
-    }
-    this.projects = JSON.parse(localStorage.projects || "[]");
-    this.loaded = true;
-};
-
-/**
- * Clear stored data & update current projects
- * 
- * @returns {void}
- */
-com.rdHelper.Projects.clear = function() {
-    localStorage.removeItem("projects");
-    this.projects = [];
-    this.loaded = false;
+    return [];
 };
 
 /**
@@ -229,17 +260,15 @@ com.rdHelper.Projects.sendProjectUpdated = function(id, project) {
  * @returns {Array}
  */
 com.rdHelper.Projects.getIssues = function(id, offset, reload) {
-    var proj = this.getById(id);
-    if (!proj.key || !proj.project) {
+    if (!this.projects[id]) {
         return [];
     }
-    var key = parseInt(proj.key);
-    if (this.projects[key].issuesLoaded && !reload) {
-        return this.projects[key].issues;
+    if (this.projects[id].issuesLoaded && !reload) {
+        return this.projects[id].issues;
     }
-    if (reload || !this.projects[key].issues) {
+    if (reload || !this.projects[id].issues) {
         //clear issues
-        this.projects[key].issues = [];
+        this.projects[id].issues = [];
     }
     offset = offset || 0;
     var limit = 50;
@@ -265,6 +294,6 @@ com.rdHelper.Projects.getIssues = function(id, offset, reload) {
                 obj.getIssues(obj.projects[key].id, (offset + limit), false);
             }
         });
-    })(this, key, limit);
+    })(this, id, limit);
     return [];
 };

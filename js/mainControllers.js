@@ -39,9 +39,18 @@ function openAuthorPage(userId) {
 function Main($scope, $location, $timeout) {
     $scope.options = BG.getConfig();
     $scope.xhrError = false;
-    $scope.projects = BG.com.rdHelper.Projects.all();
+    $scope.projects = {};
     $scope.$location = $location;
 
+    //loading projects
+    BG.com.rdHelper.Projects.all(function(projects) {
+        for(var i in projects) {
+            $scope.projects[i] = projects[i];
+        }
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
+    });
     //Custom messages
     $scope.customError = "";
     $scope.customSuccess = "";
@@ -101,7 +110,7 @@ function Main($scope, $location, $timeout) {
      * @returns {Number}
      */
     $scope.getUnreadCount = function() {
-        return BG.getIssues().getUnreadCount();
+        return BG.com.rdHelper.Issues.getUnreadCount();
     }
     
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
@@ -116,9 +125,10 @@ function Main($scope, $location, $timeout) {
 
     $scope.projectsLoadedHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "projectsLoaded" && request.projects) {
-            $scope.$apply(function(sc) {
-                sc.projects = request.projects;
-            });
+            $scope.projects = request.projects;
+            if(!$scope.$$phase) {
+                $scope.$digest();
+            }
         }
     };
 
@@ -156,6 +166,7 @@ function Main($scope, $location, $timeout) {
      * On projects updated
      */
     $scope.updateProjects = function() {
+        BG.com.rdHelper.Projects.clear();
         BG.com.rdHelper.Projects.all(true);
     };
 
@@ -181,7 +192,7 @@ function Main($scope, $location, $timeout) {
         });
         BG.getConfig().store(BG.getConfig().getProfile());
         BG.com.rdHelper.Projects.store();
-        BG.getIssues().clearIssues();
+        BG.com.rdHelper.Issues.clearIssues();
         jQuery('#projectFilters').modal('toggle');
     };
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
@@ -214,7 +225,7 @@ function News($scope) {
     $scope.loadNews = function() {
         $scope.news = [];
         $scope.showLoading();
-        BG.getNews().load($scope.newsLoaded, $scope.newsError);
+        BG.com.rdHelper.News.load($scope.newsLoaded, $scope.newsError);
     };
 
     if ($scope.news.length < 1) {
@@ -232,6 +243,16 @@ function News($scope) {
 function Options($scope, $timeout) {
     $scope.options = BG.getConfig();
     $scope.useHttpAuth = BG.getConfig().getProfile().useHttpAuth;
+    
+    /**
+     * Clear all stored objects in storage
+     */
+    $scope.clearStorage = function() {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        chrome.storage.local.clear();
+    };
     
     /**
      * Save new options
@@ -278,7 +299,7 @@ function Options($scope, $timeout) {
  */
 function Home($scope) {
     $scope.options = BG.getConfig();
-    $scope.availStatuses = BG.getIssues().getStatuses();
+    $scope.availStatuses = BG.com.rdHelper.Issues.getStatuses();
     $scope.issues = [];
     $scope.order = "updated_on";
     $scope.reverse = true;
@@ -290,22 +311,15 @@ function Home($scope) {
     $scope.issue = {};
     $scope.project = {};
 
-    /**
-     * Time tracking 
-     */
-
-    /**
-     * Starts time tracking 
-     */
-    $scope.startTrackingTime = function() {
-        $scope.issue.tracking = true;
-    };
-
-    /**
-     * Stop time tracking 
-     */
-    $scope.stopTrackingTime = function() {
-        $scope.issue.tracking = false;
+    $scope.scroll = function(top) {
+        if (top) {
+            var id = "#scrollToBottom";
+        } else {
+            var id = "#scrollToTop";
+        }
+        jQuery("#issueDetails .modal-body").animate({
+            scrollTop: $(id).offset().top
+        }, 500);
     };
 
     /**
@@ -336,8 +350,8 @@ function Home($scope) {
      */
     $scope.updateIssues = function() {
         $scope.issues = [];
-        for(var key in BG.getIssues().issues) {
-            $scope.issues.push(BG.getIssues().issues[key]);
+        for(var key in BG.com.rdHelper.Issues.issues) {
+            $scope.issues.push(BG.com.rdHelper.Issues.issues[key]);
         }
     };
     //Run update issues action
@@ -353,7 +367,7 @@ function Home($scope) {
         if (issue.read) {
             return;
         }
-        BG.getIssues().markAsRead(issue.id);
+        BG.com.rdHelper.Issues.markAsRead(issue.id);
         issue.read = true;
     };
 
@@ -366,7 +380,7 @@ function Home($scope) {
         if (!issue.read) {
             return;
         }
-        BG.getIssues().markAsUnRead(issue.id);
+        BG.com.rdHelper.Issues.markAsUnRead(issue.id);
         issue.read = false;
     };
     
@@ -376,7 +390,7 @@ function Home($scope) {
      * @returns {undefined}
      */
     $scope.markAllRead = function() {
-        BG.getIssues().markAllAsRead();
+        BG.com.rdHelper.Issues.markAllAsRead();
         $scope.updateIssues();
     };
 
@@ -387,7 +401,7 @@ function Home($scope) {
      */
     $scope.reload = function() {
         $scope.showLoading();
-        BG.getIssues().load();
+        BG.com.rdHelper.Issues.load();
     };
     
     /**
@@ -421,13 +435,107 @@ function Home($scope) {
      * @param {Object} issue
      */
     $scope.showDetails = function(issue) {
-        BG.getIssues().get(issue, !issue.read);
+        BG.com.rdHelper.Issues.get(issue, !issue.read);
         $scope.markRead(issue); //mark this issue as read
         $scope.issue = issue;
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
-        console.log(issue);
-        console.log($scope.project);
+        $scope.updateIssueTimeline();
         $('#issueDetails').modal('toggle');
+    };
+    
+    /**
+     * Update timeline for issue now selected
+     */
+    $scope.updateIssueTimeline = function() {
+        if (!$scope.issue) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.getByIssueId($scope.issue.id, function(list) {
+            $scope.issue.tracking = false;
+            $scope.issue.timelines = [];
+            var total = 0;
+            for(var i in list) {
+                if (list[i].end && list[i].spent) {
+                    $scope.issue.timelines.push(list[i]);
+                    total += list[i].spent;
+                } else {
+                    $scope.issue.tracking = true;
+                }
+            }
+            $scope.issue.timelineTotal = total;
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+    
+    /**
+     * Clear timeline for selected issue
+     */
+    $scope.clearTimeline = function(issue) {
+        BG.com.rdHelper.Timeline.clearByIssueId(issue.id, function() {
+            BG.com.rdHelper.Timeline.store();
+            $scope.issue.tracking = false;
+            $scope.issue.timelines = [];
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+
+    /**
+     * Removes timeline from issue
+     *
+     * @param {Object} timeline
+     */
+    $scope.removeTimeline = function(timeline) {
+        if (!timeline || typeof timeline != "object") {
+            return;
+        }
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.remove(timeline, timeline.issueId, function() {
+            $scope.updateIssueTimeline();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+    
+    /**
+     * Time tracking 
+     */
+
+    /**
+     * Starts time tracking 
+     */
+    $scope.startTrackingTime = function() {
+        var timeline = {
+            issueId: $scope.issue.id
+        };
+        BG.com.rdHelper.Timeline.add(timeline, function() {
+            $scope.issue.tracking = true;
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+
+    /**
+     * Stop time tracking 
+     */
+    $scope.stopTrackingTime = function() {
+        if (!$scope.issue.id) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.stopPoccess($scope.issue.id, function() {
+            $scope.issue.tracking = false;
+            $scope.updateIssueTimeline();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
     };
 
     /**
@@ -435,7 +543,7 @@ function Home($scope) {
      */
     $scope.toggleMinify = function(history) {
         history.minified = !history.minified;
-        BG.getIssues().store();
+        BG.com.rdHelper.Issues.store();
     };
 
     /**
@@ -446,7 +554,7 @@ function Home($scope) {
      */
     $scope.stausOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'status_id': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'status_id': parseInt(value)});
     };
 
     /**
@@ -456,7 +564,7 @@ function Home($scope) {
      */
     $scope.trackOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'tracker_id': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'tracker_id': parseInt(value)});
     };
 
     /**
@@ -466,7 +574,7 @@ function Home($scope) {
      */
     $scope.doneOk = function(value) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'done_ratio': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'done_ratio': parseInt(value)});
     };
 
     /**
@@ -475,9 +583,8 @@ function Home($scope) {
      * @param {int} value
      */
     $scope.estimatedOk = function(value) {
-        console.log(value);
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().update($scope.issue.id, {'estimated_hours': parseInt(value)});
+        BG.com.rdHelper.Issues.update($scope.issue.id, {'estimated_hours': parseInt(value)});
     };
 
     /**
@@ -487,7 +594,7 @@ function Home($scope) {
      */
     $scope.addComment = function(comment) {
         $scope.issue.detailsLoaded = false;
-        BG.getIssues().comment($scope.issue.id, comment);
+        BG.com.rdHelper.Issues.comment($scope.issue.id, comment);
     };
     
     //Handle update issue details
@@ -497,6 +604,7 @@ function Home($scope) {
             $scope.$apply(function(sc) {
                 sc.issue = request.issue;
                 sc.updateIssues();
+                sc.updateIssueTimeline();
             });
             sendResponse({});
         }
@@ -535,7 +643,7 @@ function Home($scope) {
                 }
             ]
         };
-        BG.getIssues().update($scope.issue.id, data);
+        BG.com.rdHelper.Issues.update($scope.issue.id, data);
     };
 
     //Handle error on update issue
@@ -581,7 +689,6 @@ function Home($scope) {
  * New issue controller
  * 
  * @param {Scope} $scope
- * @param {RouteParams} $routeParams
  * @returns {undefined}
  */
 function NewIssue($scope) {
@@ -590,8 +697,9 @@ function NewIssue($scope) {
     //clear selected text
     BG.clearSelectedText();
     //list of projects
-    $scope.projects = BG.com.rdHelper.Projects.all();
+    $scope.projects = {};
     $scope.project = {};
+    BG.com.rdHelper.Projects.all();
     
     //User options
     $scope.options = BG.getConfig();
@@ -647,7 +755,7 @@ function NewIssue($scope) {
         if ($scope.errors.length > 0) {
             return false;
         }
-        BG.getIssues().create($scope.issue);
+        BG.com.rdHelper.Issues.create($scope.issue);
         $scope.showLoading();
     };
 
@@ -679,7 +787,7 @@ function NewIssue($scope) {
      * @param {Object} request
      * @param {Object} sender
      * @param {Object} sendResponse
-     * @returns {undefined}
+     * @returns {*}
      */
     var onProjectUpdated = function(request, sender, sendResponse) {
         //check project
@@ -702,9 +810,10 @@ function NewIssue($scope) {
             return;
         }
         //stop loading
-        $scope.$apply(function(sc) {
-            sc.hideLoading();
-        });
+        $scope.hideLoading();
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
     };
 
     //Handle new issue creation
@@ -729,7 +838,170 @@ function NewIssue($scope) {
     chrome.extension.onMessage.addListener(onMessage);
 }
 
+/**
+ * List of your projects
+ * 
+ * @param {Object} $scope
+ * @returns {?}
+ */
+function Projects($scope) {
+    //list of projects
+    $scope.projects = {};
+    BG.com.rdHelper.Projects.all(function(projects) {
+        for(var i in projects) {
+            $scope.projects[i] = projects[i];
+        }
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
+    });
+    
+    /**
+     * Reload projects list
+     */
+    $scope.reload = function() {
+        $scope.showLoading();
+        BG.com.rdHelper.Projects.clear();
+        BG.com.rdHelper.Projects.all(true);
+    };
+    
+    /**
+     * On projects list updated
+     * 
+     * @param {Object} request
+     * @param {Object} sender
+     * @param {Object} sendResponse
+     * @returns {undefined}
+     */
+    var projectsLoaded = function(request, sender, sendResponse) {
+//        if (!$scope.$$phase) {
+            $scope.$apply(function(sc) {
+                sc.hideLoading();
+                sc.projects = BG.com.rdHelper.Projects.projects;
+            });
+//        }
+    };
+    
+    //Handle new issue creation
+    var onMessage = function(request, sender, sendResponse) {
+        if (request.action && request.action == "projectsLoaded") {
+            return projectsLoaded(request, sender, sendResponse);
+        }
+    };
 
+    //Add one global handler for messages from background
+    chrome.extension.onMessage.addListener(onMessage);
+}
+
+/**
+ * Timelines controller 
+ * 
+ * @param {Object} $scope
+ * @returns {?}
+ */
+function Timelines($scope) {
+    $scope.timelines = [];
+    $scope.timelinesActive = [];
+    $scope.limit = 10;
+
+    /**
+     * Clear all timelines
+     */
+    $scope.clear = function() {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.clear();
+        BG.com.rdHelper.Timeline.store();
+        $scope.timelines = [];
+        $scope.timelinesActive = [];
+    };
+
+    /**
+     * Update timelines
+     */
+    $scope.update = function() {
+        BG.com.rdHelper.Timeline.all(timelinesLoaded);
+    };
+
+    /**
+     * Stop tracking time for issue
+     *
+     * @param timeline
+     */
+    $scope.stopTrackingTime = function(timeline) {
+        if (!timeline || !timeline.issueId) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.stopPoccess(timeline.issueId, function() {
+            $scope.showSuccess("You stoped working on: "+timeline.issue.subject);
+            $scope.update();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+
+    /**
+     * Clear timlines for issue
+     *
+     * @param issue
+     */
+    $scope.removeIssueTimeline = function(issue) {
+        if (!confirm("Are you sure ?")) {
+            return;
+        }
+        if (!issue || !issue.id) {
+            return;
+        }
+        BG.com.rdHelper.Timeline.clearByIssueId(issue.id, function() {
+            $scope.showSuccess("You cleared working logs for: "+issue.subject);
+            $scope.update();
+            if (!$scope.$$phase) {
+                $scope.$digest();
+            }
+        });
+    };
+    
+    BG.com.rdHelper.Timeline.all(timelinesLoaded);
+    
+    /**
+     * Handle Timelines loaded
+     * 
+     * @param {Array} timelines
+     */
+    function timelinesLoaded(timelines) {
+        $scope.timelines = [];
+        $scope.timelinesActive = [];
+        for(var i in timelines) {
+            //issues
+            var total = 0;
+            if (timelines[i].length > 0) {
+                var issue = BG.com.rdHelper.Issues.getById(i);
+                for(var j = 0; j < timelines[i].length; j++) {
+                    if (!timelines[i][j].end || !timelines[i][j].spent) {
+                        timelines[i][j].issue = issue;
+                        $scope.timelinesActive.push(timelines[i][j]);
+                    } else {
+                        total += timelines[i][j].spent;
+                    }
+                }
+                //we shouldn't add timeline if total spent time = 0
+                if (total == 0) {
+                    continue;
+                }
+                if (issue) {
+                    $scope.timelines.push({'issue': issue, 'total': total, 'times': timelines[i]});
+                } else {
+                    $scope.timelines.push({'issue': {}, 'total': total, 'times': timelines[i]});
+                }
+            }
+        }
+        if(!$scope.$$phase) {
+            $scope.$digest();
+        }
+    }
+}
 
 
 //Options.$inject = ['$scope', '$timeout'];

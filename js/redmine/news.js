@@ -1,12 +1,10 @@
 /**
- * News representation class
+ * Projects actions 
  * 
- * @class 
- * @returns {News}
+ * @class
+ * @returns {com.rdHelper.News}
  */
-function News() {
-
-}
+com.rdHelper.News = {};
 
 /**
  * Load latest news list
@@ -14,7 +12,7 @@ function News() {
  * @param {Function} success
  * @param {Function} error
  */
-News.prototype.load = function(success, error) {
+com.rdHelper.News.load = function(success, error) {
     if (!success) {
         success = function() {};
     }

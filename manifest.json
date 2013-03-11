@@ -1,6 +1,6 @@
 {
     "name": "Redmine Helper",
-    "version": "1.6.5",
+    "version": "1.6.6",
     "manifest_version": 2,
     "description": "This extension will help to work with your Redmine issues without need to open Redmine",
     "minimum_chrome_version": "22",
@@ -19,6 +19,7 @@
             "js/bg_base.js",
             "js/config.js",
             "js/redmine/projects.js",
+            "js/redmine/timeline.js",
             "js/redmine/issues.js",
             "js/redmine/users.js",
             "js/redmine/news.js",
@@ -29,6 +30,7 @@
     },
     "permissions": [
         "storage",
+        "unlimitedStorage",
         "alarms",
         "tabs",
         "notifications",

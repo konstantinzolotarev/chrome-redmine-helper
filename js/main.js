@@ -16,6 +16,9 @@ var linkFunction = function(scope, element, attrs) {
      * On mouse enter
      */
     scope.mouseEnter = function() {
+        if (scope.list && scope.list.length < 1) {
+            return;
+        }
         if (!scope.editing) {
             scope.visible = true;
         }
@@ -34,6 +37,9 @@ var linkFunction = function(scope, element, attrs) {
      * Open edit
      */
     scope.edit = function() {
+        if (scope.list && scope.list.length < 1) {
+            return;
+        }
         scope.editing = true;
         scope.visible = false;
         defaultValue = scope.value;
@@ -58,10 +64,20 @@ angular.module('issues', ['ngSanitize']).
             when('/options', {templateUrl: 'partials/options.html', controller: Options}).
             when('/home', {templateUrl: 'partials/home.html', controller: Home}).
             when('/news', {templateUrl: 'partials/news.html', controller: News}).
+            when('/projects', {templateUrl: 'partials/projects.html', controller: Projects}).
+            when('/timelines', {templateUrl: 'partials/timelines.html', controller: Timelines}).
             when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
             otherwise({redirectTo: '/home'});
 }])
-.filter('nl2br', function() {
+.filter('tohours', function() {
+	return function(time) { 
+        var hours = time / (1000*60*60);
+        if (hours < 1) {
+            return Math.round(time / (1000*60))+" min.";
+        }
+	    return (hours).toFixed(1) + " h.";
+	};
+}).filter('nl2br', function() {
 	return function(string,is_xhtml) { 
 	    var is_xhtml = is_xhtml || true;
 	    var breakTag = (is_xhtml) ? '<br />' : '<br>';    
@@ -114,7 +130,6 @@ angular.module('issues', ['ngSanitize']).
                 }
                 return scope.item.new_value;
             };
-
             if (!scope.item.name) {
                 return;
             }
@@ -122,11 +137,11 @@ angular.module('issues', ['ngSanitize']).
                 switch (scope.item.name) {
                     case "status_id":
                         element.html("<strong>Status</strong> changed from "
-                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.old_value) + "</i> to "
-                                + "<i>" + BG.getIssues().getStatusNameById(scope.item.new_value) + "</i>");
+                                + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.old_value) + "</i> to "
+                                + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.new_value) + "</i>");
                         break;
                     case "assigned_to_id":
-                        element.html("<strong>Assignee</strong> set to: "+BG.getUsers().getNameById(scope.scope.item.new_value));
+                        element.html("<strong>Assignee</strong> set to: "+BG.com.rdHelper.Users.getNameById(scope.item.new_value));
                         break;
                     case "category_id":
                         element.html("<strong>Category</strong> set to: "+scope.item.new_value);
@@ -154,6 +169,8 @@ angular.module('issues', ['ngSanitize']).
             } else if (scope.item.property == "attachment") {
                 element.html("<strong>Attachment</strong> added "
                                         + "<i>"+getAttachmentUrl()+"</i>");
+            } else {
+                element.html("<i>Unknown property.</i>");
             }
         }
     };
@@ -167,8 +184,7 @@ angular.module('issues', ['ngSanitize']).
                             +'&nbsp;<i class="icon-pencil pointer" data-ng-show="visible" data-ng-click="edit()"></i>'
                         +'</span>'
                         +'<span data-ng-show="editing">'
-                                +'<select class="input-small" data-ng-model="value">'
-                                    +'<option data-ng-repeat="item in list" value="{{item.id}}">{{item.name}}</option>'
+                                +'<select class="input-small" data-ng-model="value" data-ng-options="c.id as c.name for c in list">'
                                 +'</select>'
                                 +'&nbsp;&nbsp;<i class="icon-ok pointer" data-ng-click="editing=false; onOk(value)"></i>'
                                 +'<i class="icon-remove pointer" data-ng-click="cancel()"></i>'

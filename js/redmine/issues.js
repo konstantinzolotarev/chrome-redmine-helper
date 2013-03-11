@@ -1,27 +1,99 @@
 
 /**
+ * Issues api
  * 
  * @class
- * @returns {Issues}
+ * @returns {com.rdHelper.Issues}
  */
-function Issues() {
-    this.lastUpdated = false;
-    if (localStorage.lastUpdated) {
-        this.lastUpdated = new Date(localStorage.lastUpdated);
-    }
-    this.issues = JSON.parse(localStorage.issues || "[]");
-    this.unread = 0;
+com.rdHelper.Issues = {
+    lastUpdated: false,
+    // List of issues
+    issues: {},
+    // Issues list loaded from storage
+    loaded: false,
+    // Amount of unread issues
+    unread: 0,
     //Global issue statuses
-    this.statuses = JSON.parse(localStorage.issueStatuses || "[]");
-    this.statusesLoaded = localStorage.statusesLoaded || false;
+    statuses: [],
+    statusesLoaded: false,
     //Global issue Priorities
-    this.priorities = JSON.parse(localStorage.priorities || "[]");
-    this.prioripiesLoaded = localStorage.prioripiesLoaded || false;;
-    
-    this.updateUnread(true);
-}
+    priorities: [],
+    prioripiesLoaded: false
+};
 
-Issues.prototype.updateUnread = function(updateBadge) {
+/**
+ * Clear issues list
+ *
+ * @returns {undefined}
+ */
+com.rdHelper.Issues.clearIssues = function() {
+    this.issues = {};
+    this.loaded = false;
+};
+
+/**
+ * Get number of issues
+ * 
+ * @returns {number}
+ */
+com.rdHelper.Issues.size = function() {
+    return Object.keys(this.issues);
+};
+
+/**
+ * Load data from chrome.storage
+ * 
+ * @param {function()=} callback
+ */
+com.rdHelper.Issues.loadFromStorage = function(callback) {
+    callback = callback || function() {};
+    (function(obj) {
+        chrome.storage.local.get('issues', function(items) {
+            if (!items.issues) {
+                callback();
+                return;
+            }
+            if (items.issues.issues) {
+                obj.issues = items.issues.issues;
+            }
+            if (items.issues.issueStatuses) {
+                obj.issueStatuses = items.issues.issueStatuses;
+            }
+            if (items.issues.lastUpdated) {
+                obj.lastUpdated = items.issues.lastUpdated;
+            }
+            obj.loaded = true;
+            callback();
+        });
+        return;
+    })(this);
+};
+
+/**
+ * Store data into chrome.storage
+ *
+ * @param {function()=} callback
+ * @returns {void}
+ */
+com.rdHelper.Issues.store = function(callback) {
+    if (!this.lastUpdated) {
+        this.lastUpdated = new Date();
+    }
+    callback = callback || function() {};
+    var data = {
+        'issues': this.issues,
+        'issueStatuses': this.statuses,
+        'lastUpdated': this.lastUpdated.toISOString()
+    };
+    chrome.storage.local.set({'issues': data}, callback);
+};
+
+/**
+ * Update unread issues count
+ * 
+ * @param {boolean=} updateBadge
+ */
+com.rdHelper.Issues.updateUnread = function(updateBadge) {
     this.unread = 0;
     for(var i in this.issues) {
         if(!this.issues[i].read) {
@@ -38,19 +110,31 @@ Issues.prototype.updateUnread = function(updateBadge) {
 
  * @returns {number}
  */
-Issues.prototype.getUnreadCount = function() {
+com.rdHelper.Issues.getUnreadCount = function() {
     return this.unread;
 };
 
 /**
- * Load issues list 
- * 
- * @param {int} offset load result offset
- * @param {int} limit Limit for results
- * @param {Boolean} watcher
- * @returns {void}
+ * Get issue by it's ID
+ *
+ * @param {number} id
+ * @returns {Boolean}
  */
-Issues.prototype.load = function(offset, limit, watcher) {
+com.rdHelper.Issues.getById = function(id) {
+    if (!this.issues[id]) {
+        return false;
+    }
+    return this.issues[id];
+};
+
+/**
+ * Load issues list from server
+ * 
+ * @param {number} offset load result offset
+ * @param {number} limit Limit for results
+ * @param {boolean} watcher
+ */
+com.rdHelper.Issues.load = function(offset, limit, watcher) {
     offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
@@ -66,61 +150,65 @@ Issues.prototype.load = function(offset, limit, watcher) {
         } else {
             filter = "sort=updated_on:desc&watcher_id="+getConfig().getProfile().currentUserId
                                 +"&limit="+limit
-                                +"&offset="+offset
+                                +"&offset="+offset;
         }
         redmineApi.issues.all(filter, function(error, data) {
+            if (error) {
+                fireError("Server is unavailable.", true);
+                return;
+            }
             var updated = 0;
             var notifiedIssues = [];
             if (data.total_count && data.total_count > 0) {
                 for(var i in data.issues) {
                     var found = false;
+                    var issueId = data.issues[i].id;
                     if (getConfig().getProjectsSettings().show_for == "selected"
                             && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
                         continue;
                     }
-                    for(var key in obj.issues) {
-                        //We found this issue
-                        if (obj.issues[key].id == data.issues[i].id) {
-                            found = true;
-                            if (new Date(obj.issues[key].updated_on) < new Date(data.issues[i].updated_on)) {
-                                //mark as unread
-                                data.issues[i].read = false;
-                                //mark as watcher issue
-                                if (watcher) {
-                                    if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
-                                       data.issues[i].watcher = false; 
-                                    } else {
-                                        data.issues[i].watcher = true; 
-                                    }
+                    //We found this issue
+                    if (obj.issues[issueId]) {
+                        found = true;
+                        if (new Date(obj.issues[issueId].updated_on) < new Date(data.issues[i].updated_on)) {
+                            //mark as unread
+                            data.issues[i].read = false;
+                            //mark as watcher issue
+                            if (watcher) {
+                                if (obj.issues[issueId].assigned_to 
+                                        && obj.issues[issueId].assigned_to.id == getConfig().getProfile().currentUserId) {
+                                   data.issues[i].watcher = false; 
+                                } else {
+                                    data.issues[i].watcher = true; 
                                 }
-                                obj.issues[key] = data.issues[i];
-                                updated += 1;
-                                //Bind users from issue
-                                getUsers().grabFromIssue(data.issues[i]);
-                                if (getConfig().getNotifications().show == "updated") {
-                                    notifiedIssues.push(obj.issues[key]);
-                                }
+                            }
+                            obj.issues[issueId] = data.issues[i];
+                            updated += 1;
+                            //Bind users from issue
+                            com.rdHelper.Users.grabFromIssue(data.issues[i]);
+                            if (getConfig().getNotifications().show == "updated") {
+                                notifiedIssues.push(obj.issues[issueId]);
                             }
                         }
                     }
                     if (!found) {
                         //Bind users from issue
-                        getUsers().grabFromIssue(data.issues[i]);
+                        com.rdHelper.Users.grabFromIssue(data.issues[i]);
                         //mark as unread
                         data.issues[i].read = false;
                         //mark as watcher issue
                         if (watcher) {
-                            if (obj.issues[key].assigned_to.id == getConfig().getProfile().currentUserId) {
+                            if (data.issues[i].assigned_to
+                                    && data.issues[i].assigned_to.id == getConfig().getProfile().currentUserId) {
                                data.issues[i].watcher = false; 
                             } else {
                                 data.issues[i].watcher = true; 
                             }
                         }
-//                            data.issues[i].updated = new Date(data.issues[i].updated_on);
-                        obj.issues.push(data.issues[i]);
+                        obj.issues[issueId] = data.issues[i];
                         updated += 1;
                         if (getConfig().getNotifications().show == "new") {
-                            notifiedIssues.push(obj.issues[key]);
+                            notifiedIssues.push(obj.issues[issueId]);
                         }
                     }
                 }
@@ -163,12 +251,12 @@ Issues.prototype.load = function(offset, limit, watcher) {
 };
 
 /**
- * Show notifications 
+ * Show notifications about issues
  * 
  * @param {Array} notifications
  * @returns {undefined}
  */
-Issues.prototype.showNotifications = function(notifications) {
+com.rdHelper.Issues.showNotifications = function(notifications) {
     var text = "";
     var subject = "";
     if (notifications.length == 1) {
@@ -194,23 +282,23 @@ Issues.prototype.showNotifications = function(notifications) {
  * @param {boolean} reload
  * @returns {undefined}
  */
-Issues.prototype.get = function(issue, reload) {
+com.rdHelper.Issues.get = function(issue, reload) {
     if (issue.detailsLoaded && !reload) {
         return;
     }
     (function(obj) {
         redmineApi.issues.get(issue.id, "attachments,journals", function(error, json) {
             if (json.issue) {
-                var is = obj.getById(json.issue.id);
-                if (is.issue) {
+                var issueId = json.issue.id;
+                if (obj.issues[issueId]) {
                     //Grab users from issue
-                    getUsers().grabFromIssue(json.issue);
+                    com.rdHelper.Users.grabFromIssue(json.issue);
                     //update issue
                     json.issue.detailsLoaded = true;
-                    obj.issues[is.key] = merge(obj.issues[is.key], json.issue);
+                    obj.issues[issueId] = merge(obj.issues[issueId], json.issue);
                     obj.store();
                     //notify all listeners
-                    chrome.extension.sendMessage({action: "issueDetails", id: issue.id, issue: obj.issues[is.key]});
+                    chrome.extension.sendMessage({action: "issueDetails", id: issue.id, issue: obj.issues[issueId]});
                 }
             }
         });
@@ -224,9 +312,8 @@ Issues.prototype.get = function(issue, reload) {
  * @param {String} comment
  * @returns {undefined}
  */
-Issues.prototype.comment = function(id, comment) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+com.rdHelper.Issues.comment = function(id, comment) {
+    if (!this.issues[id]) {
         return;
     }
     return this.update(id, {'notes': comment});
@@ -239,14 +326,13 @@ Issues.prototype.comment = function(id, comment) {
  * @param {Object} issueData
  * @returns {undefined}
  */
-Issues.prototype.update = function(id, issueData) {
+com.rdHelper.Issues.update = function(id, issueData) {
     //check input data
     if (issueData === null || typeof issueData != "object") {
         return;
     }
-    //Check issue
-    var issue = this.getById(id);
-    if (!issue.issue) {
+    //check issue
+    if (!this.issues[id]) {
         return;
     }
     (function(obj) {
@@ -258,7 +344,7 @@ Issues.prototype.update = function(id, issueData) {
                 }
                 return;
             }
-            obj.get(issue.issue, true);
+            obj.get(obj.issues[id], true);
         });
     })(this);
 };
@@ -269,7 +355,7 @@ Issues.prototype.update = function(id, issueData) {
  * @param {Object} issue
  * @returns {undefined}
  */
-Issues.prototype.create = function(issue) {
+com.rdHelper.Issues.create = function(issue) {
     (function(obj) {
         redmineApi.issues.create(issue, function(error, json) {
             if (error) {
@@ -292,12 +378,11 @@ Issues.prototype.create = function(issue) {
  * @param {int} id
  * @returns {undefined}
  */
-Issues.prototype.markAsUnRead = function(id) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+com.rdHelper.Issues.markAsUnRead = function(id) {
+    if (!this.issues[id]) {
         return;
     }
-    this.issues[issue.key].read = false;
+    this.issues[id].read = false;
     this.unread += 1;
     setUnreadIssuesCount(this.unread);
     this.store();
@@ -309,12 +394,11 @@ Issues.prototype.markAsUnRead = function(id) {
  * @param {int} id
  * @returns {undefined}
  */
-Issues.prototype.markAsRead = function(id) {
-    var issue = this.getById(id);
-    if (!issue.issue) {
+com.rdHelper.Issues.markAsRead = function(id) {
+    if (!this.issues[id]) {
         return;
     }
-    this.issues[issue.key].read = true;
+    this.issues[id].read = true;
     this.unread -= 1;
     setUnreadIssuesCount(this.unread);
     this.store();
@@ -325,7 +409,7 @@ Issues.prototype.markAsRead = function(id) {
  * 
  * @returns {undefined}
  */
-Issues.prototype.markAllAsRead = function() {
+com.rdHelper.Issues.markAllAsRead = function() {
     for(var i in this.issues) {
         this.issues[i].read = true;
     }
@@ -334,34 +418,12 @@ Issues.prototype.markAllAsRead = function() {
 };
 
 /**
- * Get issue by it's ID 
- * 
- * @param {int} id
- * @returns {Boolean}
- */
-Issues.prototype.getById = function(id) {
-    var issue = {
-        'key': false,
-        'issue': false
-    };
-    if (this.issues.length < 1) {
-        return false;
-    }
-    for(var i in this.issues) {
-        if (this.issues[i].id == id) {
-            issue = {'key': i, 'issue': this.issues[i]};
-        }
-    }
-    return issue;
-};
-
-/**
  * Load list of Issue Statuses from API
  * 
  * @param {boolean} reload
  * @returns {Array}
  */
-Issues.prototype.getStatuses = function(reload) {
+com.rdHelper.Issues.getStatuses = function(reload) {
     if (this.statusesLoaded && !reload) {
         return this.statuses;
     }
@@ -388,7 +450,7 @@ Issues.prototype.getStatuses = function(reload) {
  * @param {boolean} reload
  * @returns {Array}
  */
-Issues.prototype.getPriorities = function(reload) {
+com.rdHelper.Issues.getPriorities = function(reload) {
     return; //Now not working in Redmine
     if (this.prioripiesLoaded && !reload) {
         return this.priorities;
@@ -413,7 +475,7 @@ Issues.prototype.getPriorities = function(reload) {
  * @param {int} id
  * @returns {String}
  */
-Issues.prototype.getStatusNameById = function(id) {
+com.rdHelper.Issues.getStatusNameById = function(id) {
     if (!this.statusesLoaded) {
         this.getStatuses();
         return id;
@@ -424,30 +486,4 @@ Issues.prototype.getStatusNameById = function(id) {
         }
     }
     return id;
-};
-
-/**
- * Clear issues list 
- * 
- * @returns {undefined}
- */
-Issues.prototype.clearIssues = function() {
-    this.issues = [];
-    this.store();
-    this.load();
-};
-
-/**
- * Store data into localStorage
- * 
- * @returns {void}
- */
-Issues.prototype.store = function() {
-    localStorage['issues'] = JSON.stringify(this.issues);
-    if (!this.lastUpdated) {
-        this.lastUpdated = new Date();
-    }
-    localStorage['lastUpdated'] = this.lastUpdated.toISOString();
-    localStorage['issueStatuses'] = JSON.stringify(this.statuses);
-    localStorage['statusesLoaded'] = this.statusesLoaded;
 };

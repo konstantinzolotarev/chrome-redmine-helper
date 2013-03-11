@@ -44,7 +44,7 @@ Config.prototype.isEmpty = function() {
 };
 
 /**
- * Create new exmpty config in localstorage
+ * Create new exmpty config and store this
  * 
  * @returns {void}
  */
@@ -92,7 +92,7 @@ Config.prototype.load = function(onLoad) {
 };
 
 /**
- * Store given profile into localStorage
+ * Store given profile into chrome.storage.sync
  * 
  * @param {Object} profile
  * @returns {void}
@@ -103,7 +103,6 @@ Config.prototype.store = function(profile) {
     }
     this.loaded = false;
     chrome.storage.sync.set({'profile': profile});
-//    localStorage['profile'] = JSON.stringify(profile);
 };
 
 /**
