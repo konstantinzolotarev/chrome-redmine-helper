@@ -76,7 +76,7 @@ com.rdHelper.Issues.loadFromStorage = function(callback) {
  * @returns {void}
  */
 com.rdHelper.Issues.store = function(callback) {
-    if (!this.lastUpdated) {
+    if (!this.lastUpdated || !this.lastUpdated instanceof Date) {
         this.lastUpdated = new Date();
     }
     callback = callback || function() {};
