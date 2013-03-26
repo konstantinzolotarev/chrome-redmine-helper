@@ -60,7 +60,7 @@ com.rdHelper.Issues.loadFromStorage = function(callback) {
                 obj.issueStatuses = items.issues.issueStatuses;
             }
             if (items.issues.lastUpdated) {
-                obj.lastUpdated = items.issues.lastUpdated;
+                obj.lastUpdated = new Date(items.issues.lastUpdated);
             }
             obj.loaded = true;
             callback();
@@ -76,8 +76,11 @@ com.rdHelper.Issues.loadFromStorage = function(callback) {
  * @returns {void}
  */
 com.rdHelper.Issues.store = function(callback) {
-    if (!this.lastUpdated || !this.lastUpdated instanceof Date) {
+    if (!this.lastUpdated) {
         this.lastUpdated = new Date();
+    }
+    if ("string" == typeof this.lastUpdated) {
+        this.lastUpdated = new Date(this.lastUpdated);
     }
     callback = callback || function() {};
     var data = {
