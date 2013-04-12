@@ -91,7 +91,6 @@ com.rdHelper.Timeline.load = function(onLoad) {
     (function(obj) {
         chrome.storage.local.get('timelines', function(items) {
             obj.loaded = true;
-            console.log(items.timelines);
             if (items.timelines) {
                 obj.timelines = items.timelines;
             }
@@ -147,11 +146,18 @@ com.rdHelper.Timeline.add = function(timeline, onSuccess) {
  * Stop working on issue
  * 
  * @param {(number|string)} issueId
+ * @param {?string} comment
  * @param {?function()} callback
  */
-com.rdHelper.Timeline.stopPoccess = function(issueId, callback) {
+com.rdHelper.Timeline.stopPoccess = function(issueId, comment, callback) {
     if (!issueId) {
         return;
+    }
+    if (arguments.length < 3) {
+        if (typeof comment == "function") {
+            callback = comment;
+            comment = "";
+        }
     }
     callback = callback || function() {};
     (function(obj) {
@@ -164,6 +170,7 @@ com.rdHelper.Timeline.stopPoccess = function(issueId, callback) {
             var start = new Date(obj.timelines[issueId][key].start);
             obj.timelines[issueId][key].end = date.toJSON();
             obj.timelines[issueId][key].spent = date.getTime() - start.getTime();
+            obj.timelines[issueId][key].comment = comment;
             obj.store();
             callback();
         });

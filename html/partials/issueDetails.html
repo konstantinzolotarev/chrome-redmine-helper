@@ -70,10 +70,20 @@
         </div>
         <div class="well well-small">
             <div data-ng-show="issue.tracking">
-                <a href="" class="btn btn-danger" data-ng-click="stopTrackingTime()">
-                    <i class="icon-remove-circle"></i>
-                    Finish working on this issue
-                </a>
+                <div>
+                    <a href="" class="btn btn-danger" data-ng-click="stopTrackingTime()">
+                        <i class="icon-remove-circle"></i>
+                        Finish working on this issue
+                    </a>
+                </div>
+                <div class="margin margin-top">
+                    <a href="" data-ng-click="toggleTimeComment = !toggleTimeComment">
+                        <i class="icon-comment"></i>&nbsp;Edit comment
+                    </a>
+                    <div data-ng-show="toggleTimeComment">
+                        <textarea style="width: 80%; height: 90px;" data-ng-model="issue.trackingComment"></textarea>
+                    </div>
+                </div>
             </div>
             <div data-ng-hide="issue.tracking">
                 <a href="" class="btn btn-success" data-ng-click="startTrackingTime()">
@@ -183,7 +193,8 @@
                                 <div class="span11 entry">
                                     <p>
                                         <span class="label label-success">{{timeline.spent|tohours}}</span>
-                                        <i>No comment available</i>
+                                        <i data-ng-show="timeline.comment == ''">No comment available</i>
+                                        <i data-ng-hide="timeline.comment == ''">{{timeline.comment}}</i>
                                     </p>
                                     <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                 </div>

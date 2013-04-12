@@ -118,6 +118,11 @@ table.issues .unread {
 .margin {
     margin-bottom: 10px;
 }
+
+.margin-top {
+    margin-top: 10px;
+}
+
 .minify {
   padding: 1px 5px;
   border-radius: 3px;

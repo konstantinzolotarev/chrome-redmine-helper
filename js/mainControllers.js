@@ -529,8 +529,9 @@ function Home($scope) {
         if (!$scope.issue.id) {
             return;
         }
-        BG.com.rdHelper.Timeline.stopPoccess($scope.issue.id, function() {
+        BG.com.rdHelper.Timeline.stopPoccess($scope.issue.id, $scope.issue.trackingComment, function() {
             $scope.issue.tracking = false;
+            $scope.issue.trackingComment = "";
             $scope.updateIssueTimeline();
             if (!$scope.$$phase) {
                 $scope.$digest();
