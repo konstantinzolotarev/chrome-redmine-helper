@@ -1,3 +1,5 @@
 dist
 nbproject
 .idea
+npm*
+node*

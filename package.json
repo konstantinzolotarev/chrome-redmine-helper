@@ -1,0 +1,13 @@
+{
+    "name": "redmin-helper",
+    "version": "1.7.0",
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-clean": "*",
+        "grunt-contrib-copy": "*",
+        "grunt-contrib-cssmin": "*",
+        "grunt-contrib-jshint": "~0.1.1",
+        "grunt-contrib-uglify": "*",
+        "grunt-text-replace": "*"
+    }
+}

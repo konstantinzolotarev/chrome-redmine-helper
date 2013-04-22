@@ -197,6 +197,7 @@ function Main($scope, $location, $timeout) {
     };
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
 }
+Main.$inject = ['$scope', '$location', '$timeout'];
 
 /**
  * News screen controller 
@@ -232,6 +233,7 @@ function News($scope) {
         $scope.loadNews();
     }
 }
+News.$inject = ['$scope'];
 
 /**
  * Options screen controller
@@ -290,6 +292,7 @@ function Options($scope, $timeout) {
         $scope.useHttpAuth = $(event.source).is(":checked");
     };
 }
+Options.$inject = ['$scope', '$timeout'];
 
 /**
  * Main screen controller
@@ -685,6 +688,7 @@ function Home($scope) {
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
 }
+Home.$inject = ['$scope'];
 
 /**
  * New issue controller
@@ -838,6 +842,7 @@ function NewIssue($scope) {
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
 }
+NewIssue.$inject = ['$scope'];
 
 /**
  * List of your projects
@@ -893,6 +898,7 @@ function Projects($scope) {
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
 }
+Projects.$inject = ['$scope'];
 
 /**
  * Timelines controller 
@@ -1003,9 +1009,4 @@ function Timelines($scope) {
         }
     }
 }
-
-
-//Options.$inject = ['$scope', '$timeout'];
-//Home.$inject = ['$scope'];
-//NewIssue.$inject = ['$scope'];
-//Project.$inject = ['$scope', '$routeParams'];
+Timelines.$inject = ['$scope'];
