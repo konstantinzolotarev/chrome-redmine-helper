@@ -70,6 +70,16 @@ module.exports = function(grunt) {
                         to: ''
                     }
                 ]
+            },
+            html: {
+                src: ['dist/html/main.html'],
+                overwrite: true,
+                replacements: [
+                    {
+                        from: '<script type="text/javascript" src="../js/mainControllers.js"></script>',
+                        to: ''
+                    }
+                ]
             }
         },
 
@@ -90,11 +100,12 @@ module.exports = function(grunt) {
                         'js/background.js'
                     ],
                     'dist/js/main.js': [
-                        'js/main.js'
-                    ],
-                    'dist/js/mainControllers.js': [
+                        'js/main.js',
                         'js/mainControllers.js'
-                    ]
+                    ]//,
+//                    'dist/js/mainControllers.js': [
+//                        'js/mainControllers.js'
+//                    ]
                 }
             }
         }
