@@ -937,6 +937,8 @@ function Timelines($scope) {
      * @param timeline
      */
     $scope.stopTrackingTime = function(timeline) {
+        //hide comment
+        $scope.toggleTimeComment = false;
         if (!timeline || !timeline.issueId) {
             return;
         }

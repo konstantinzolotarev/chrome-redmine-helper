@@ -172,6 +172,24 @@ com.rdHelper.Timeline.stopPoccess = function(issueId, comment, callback) {
             obj.timelines[issueId][key].spent = date.getTime() - start.getTime();
             obj.timelines[issueId][key].comment = comment;
             obj.store();
+            /**
+             * Send data to Redmiine server
+             */
+            var hours = obj.timelines[issueId][key].spent / (1000*60*60);
+            var time = (hours).toFixed(2);
+            redmineApi.time_entry.create({
+                issue_id: issueId,
+                hours: time,
+                comments: comment.length > 255 ? comment.substr(0, 254) : comment
+            }, function(err, data) {
+                console.log(err, data);
+                if (!err && data.time_entry) {
+                    //update id
+                    obj.timelines[issueId][key].redmineId = data.time_entry.id;
+                    obj.store();
+                }
+            });
+            //callback
             callback();
         });
     })(this);
@@ -243,6 +261,13 @@ com.rdHelper.Timeline.remove = function(timeline, issueId, callback) {
             for(var i = 0; i < obj.timelines[issueId].length; i++) {
                 var tt = obj.timelines[issueId][i];
                 if (tt.start == timeline.start && tt.issueId == timeline.issueId) {
+                    /**
+                     * Check if issue syncked with redmine
+                     * If so we have to remove it from redmine too
+                     */
+                    if (tt.redmineId && tt.redmineId > 0) {
+                        redmineApi.time_entry.del(tt.redmineId, function() {});
+                    }
                     obj.timelines[issueId].splice(i, 1);
                     break;
                 }
@@ -263,6 +288,19 @@ com.rdHelper.Timeline.clearByIssueId = function(issueId, callback) {
     callback = callback || function() {};
     (function(obj) {
         obj.all(function(timelines) {
+            /**
+             * Clear items in redmine
+             */
+            for(var i = 0; i < obj.timelines[issueId].length; i++) {
+                var tt = obj.timelines[issueId][i];
+                /**
+                 * Check if issue syncked with redmine
+                 * If so we have to remove it from redmine too
+                 */
+                if (tt.redmineId && tt.redmineId > 0) {
+                    redmineApi.time_entry.del(tt.redmineId, function() {});
+                }
+            }
             if (obj.timelines[issueId]) {
                 delete obj.timelines[issueId];
             }

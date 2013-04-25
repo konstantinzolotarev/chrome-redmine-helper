@@ -108,6 +108,17 @@ module.exports = function(grunt) {
 //                    ]
                 }
             }
+        },
+
+        compress: {
+            main: {
+                options: {
+                    archive: 'dist/release.zip'
+                },
+                files: [
+                    {cwd: 'dist/', src: ['**'], dest: '/'} // includes files in path and its subdirs
+                ]
+            }
         }
     });
 
@@ -116,6 +127,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-text-replace');
 
     grunt.registerTask('mkdirs', "Create Build directories", function() {
@@ -124,6 +136,6 @@ module.exports = function(grunt) {
         fs.mkdirSync(__dirname+'/dist');
     });
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'mkdirs', 'copy', 'cssmin', 'replace', 'uglify', 'clean:build']);
+    grunt.registerTask('default', ['clean', 'mkdirs', 'copy', 'cssmin', 'replace', 'uglify', 'compress', 'clean:build']);
 
 };

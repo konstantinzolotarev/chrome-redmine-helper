@@ -78,7 +78,9 @@
                 </div>
                 <div class="margin margin-top">
                     <a href="" data-ng-click="toggleTimeComment = !toggleTimeComment">
-                        <i class="icon-comment"></i>&nbsp;Edit comment
+                        <i class="icon-comment"></i>&nbsp;
+                        <span data-ng-hide="toggleTimeComment">Edit comment</span>
+                        <span data-ng-show="toggleTimeComment">Finish editing</span>
                     </a>
                     <div data-ng-show="toggleTimeComment">
                         <textarea style="width: 80%; height: 90px;" data-ng-model="issue.trackingComment"></textarea>
