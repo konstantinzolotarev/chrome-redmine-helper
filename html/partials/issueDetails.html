@@ -135,7 +135,7 @@
                             </ul>
                             <div data-ng-show="history.notes">
                                 <blockquote>
-                                    <p>{{history.notes}}</p>
+                                    <p data-ng-bind-html="history.notes|nl2br|comment"></p>
                                     <small class="pointer" data-ng-click="replyComment()">
                                         <i class="icon-comment"></i>&nbsp;Reply
                                     </small>

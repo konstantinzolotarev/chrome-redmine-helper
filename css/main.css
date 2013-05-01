@@ -14,6 +14,10 @@ body {
 
 }
 
+blockquote.comment {
+    margin: 0;
+}
+
 /* Lastly, apply responsive CSS fixes as necessary */
 @media (max-width: 767px) {
     #footer {

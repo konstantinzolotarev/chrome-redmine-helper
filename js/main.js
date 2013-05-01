@@ -84,6 +84,12 @@ angular.module('issues', ['ngSanitize']).
 	    var text = (string + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
 	    return text;
 	};
+}).filter('comment', function() {
+        //^>.*
+    return function(string) {
+        return string.replace(/\>(.*)\<br \/\>/g, '<blockquote class="comment">$1</blockquote>');
+//        return string;
+    };
 }).filter('pager', function() {
     return function(input, start) {
         start = +start; //parse to int
