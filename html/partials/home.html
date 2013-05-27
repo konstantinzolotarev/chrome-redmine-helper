@@ -31,31 +31,4 @@
 </div>
 
 <div data-ng-include src="'/html/partials/issueDetails.html'"></div>
-<div class="page-header">
-    <h3>Your Latest Issues</h3>
-</div>
-<div class="well well-small row-fluid" data-ng-show="issues.length > 0">
-    <div class="span7">
-        <input type="text" class="input-medium search-query" data-ng-model="search.subject" placeholder="Search by subject"/>
-    </div>
-    <div class="span5">
-        <a href="#/new_issue" class="btn btn-info">
-            <i class="icon-plus-sign"></i>&nbsp;New Issue
-        </a>
-        <a href="" class="btn" data-ng-click="markAllRead()">
-            <i class="icon-ok"></i>&nbsp;Mark all as read
-        </a>
-        <a href="" class="btn" data-ng-click="reload()" data-ng-class="isLoading() && 'disabled'">
-            <i class="icon-refresh"></i>&nbsp;Update
-        </a>
-        <a href="#tableOptions" class="btn" data-toggle="modal">
-            <i class="icon-cog"></i>
-        </a>
-        <i class="help icon-info-sign"
-                data-ng-hide="options.profile.hideHints"
-                data-type="popover"
-                data-original-title="Notice"
-                data-content="With conf sign (left to this hint) you could manage fields that are shown in the table"></i>
-    </div>
-</div>
 <div data-ng-include src="'/html/partials/issueList.html'"></div>
