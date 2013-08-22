@@ -8,6 +8,14 @@
  * @returns {void}
  */
 function Options($scope, BG) {
+
+    /**
+     * Disable tabs navigation
+     */
+    $('#options_tabs').click(function (e) {
+        e.preventDefault();
+    });
+
     $scope.options = BG.getConfig();
     $scope.useHttpAuth = BG.getConfig().getProfile().useHttpAuth;
 

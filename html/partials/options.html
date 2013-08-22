@@ -2,112 +2,114 @@
     <h1>Options</h1>
 </div>
 <div>
-    <div class="tabbable tabs-left">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
-            <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
-            <li><a href="#misc" data-toggle="tab">Misc</a></li>
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane active" id="connection">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label" for="chiliProject">ChiliProject</label>
-                        <div class="controls">
-                            <input type="checkbox" id="chiliProject" data-ng-model="options.profile.chiliProject" data-ng-checked="options.profile.chiliProject" />
-                        </div>
+    <ul class="nav nav-tabs" id="options_tabs">
+        <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
+        <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
+        <li><a href="#misc" data-toggle="tab">Misc</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="connection">
+            <form class="form-horizontal margin-top" role="form">
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="chiliProject">ChiliProject</label>
+                    <div class="col-md-5 checkbox">
+                        <input type="checkbox" id="chiliProject" data-ng-model="options.profile.chiliProject" data-ng-checked="options.profile.chiliProject" />
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputHost">Redmine Host</label>
-                        <div class="controls">
-                            <input type="text" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="inputHost">Redmine Host</label>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="inputHost" data-ng-model="options.profile.host" placeholder="https://some.redmine.host" required />
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="inputApiKey">
-                            Api Access Key <i class="help icon-info-sign"  
-                                data-ng-hide="options.profile.hideHints"
-                                data-type="popover"
-                                data-original-title="Notice"
-                                data-content="Redmine Api Access Key could be found into your Redmine profile. Regulary into right part of the page."></i>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="inputApiKey">
+                        Api Access Key <i class="help icon-info-sign"
+                            data-ng-hide="options.profile.hideHints"
+                            data-type="popover"
+                            data-original-title="Notice"
+                            data-content="Redmine Api Access Key could be found into your Redmine profile. Regulary into right part of the page."></i>
+                    </label>
+                    <div class="col-md-5">
+                        <input type="password" class="form-control" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="useHttpAuth">Use HTTP Auth for requests</label>
+                    <div class="col-md-5 checkbox">
+                        <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
+                    </div>
+                </div>
+                <div class="form-group" data-ng-show="options.profile.useHttpAuth">
+                    <label class="control-label col-md-2" for="httpUser">HTTP Username</label>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
+                    </div>
+                </div>
+                <div class="form-group" data-ng-show="options.profile.useHttpAuth">
+                    <label class="control-label col-md-2" for="httpPass">HTTP Password</label>
+                    <div class="col-md-5">
+                        <input type="password" class="form-control" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
+                    </div>
+                </div>
+                <hr/>
+                <div class="">
+                    <button type="button" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane" id="notifications">
+            <form class="form-horizontal margin-top" role="form">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Show notifications</label>
+                    <div class="col-md-5">
+                        <label class="radio">
+                            <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios0" value="none"
+                                   data-ng-checked="options.profile.notifications.show == 'none'" />
+                            Never
                         </label>
-                        <div class="controls">
-                            <input type="password" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
-                        </div>
+                        <label class="radio">
+                            <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios1" value="new"
+                                   data-ng-checked="options.profile.notifications.show == 'new'" />
+                            On new issues
+                        </label>
+                        <label class="radio">
+                            <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios2" value="updated"
+                                   data-ng-checked="options.profile.notifications.show == 'updated'" />
+                            On new and updated issues
+                        </label>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="useHttpAuth">Use HTTP Auth for requests</label>
-                        <div class="controls">
-                            <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
-                        </div>
+                </div>
+                <hr/>
+                <div class="">
+                    <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane" id="misc">
+            <form class="form-horizontal margin-top" role="form">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-5 checkbox">
+                        <label>
+                            <input type="checkbox" id="showhints"
+                                   data-ng-model="options.profile.hideHints" />
+                            Hide help messages and hints
+                        </label>
                     </div>
-                    <div class="control-group" data-ng-show="options.profile.useHttpAuth">
-                        <label class="control-label" for="httpUser">HTTP Username</label>
-                        <div class="controls">
-                            <input type="text" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
-                        </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-5">
+                        <button class="btn btn-danger" data-ng-click="clearStorage()">
+                            <i class="icon-trash"></i>&nbsp;
+                            Clear all stored information
+                        </button>
                     </div>
-                    <div class="control-group" data-ng-show="options.profile.useHttpAuth">
-                        <label class="control-label" for="httpPass">HTTP Password</label>
-                        <div class="controls">
-                            <input type="password" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
-                    </div>
-                </form>
-            </div>
-            <div class="tab-pane" id="notifications">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label">Show notifications</label>
-                        <div class="controls">
-                            <label class="radio">
-                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios0" value="none" 
-                                       data-ng-checked="options.profile.notifications.show == 'none'" />
-                                Never
-                            </label>
-                            <label class="radio">
-                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios1" value="new" 
-                                       data-ng-checked="options.profile.notifications.show == 'new'" />
-                                On new issues
-                            </label>
-                            <label class="radio">
-                                <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios2" value="updated"
-                                       data-ng-checked="options.profile.notifications.show == 'updated'" />
-                                On new and updated issues
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
-                    </div>
-                </form>
-            </div>
-            <div class="tab-pane" id="misc">
-                    <form class="form-horizontal">
-                    <div class="control-group">
-                        <div class="controls">
-                            <label class="checkbox">
-                                <input type="checkbox" id="showhints" 
-                                       data-ng-model="options.profile.hideHints" />
-                                Hide help messages and hints
-                            </label>
-                        </div>
-                        <hr/>
-                        <div class="controls">
-                            <button class="btn btn-danger" data-ng-click="clearStorage()">
-                                <i class="icon-trash"></i>&nbsp;
-                                Clear all stored information
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-success" data-ng-click="storeMisc()">Store settings</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <hr/>
+                <div class="">
+                    <button type="submit" class="btn btn-success" data-ng-click="storeMisc()">Store settings</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
