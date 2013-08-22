@@ -61,7 +61,7 @@ angular.module('Issues.Service', ['ngSanitize'])
     .factory('BG', function () {
         return chrome.extension.getBackgroundPage();
     })
-    .directive('issueHistory',function () {
+    .directive('issueHistory', function () {
         return {
             replace: true,
             transclude: false,
