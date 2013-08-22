@@ -10,6 +10,7 @@
  * @returns {undefined}
  */
 function Home($scope, BG) {
+
     $scope.options = BG.getConfig();
     $scope.availStatuses = BG.com.rdHelper.Issues.getStatuses();
     $scope.issues = [];
@@ -153,6 +154,9 @@ function Home($scope, BG) {
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
         $scope.updateIssueTimeline();
         $('#issueDetails').modal('toggle');
+        $('#issue-details-tabs').click(function (e) {
+            e.preventDefault()
+        });
     };
 
     /**

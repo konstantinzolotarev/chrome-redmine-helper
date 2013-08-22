@@ -7,14 +7,14 @@
     </div>
     <div data-ng-show="timelines.length > 0 || timelinesActive.length > 0">
         <a href="" class="btn btn-danger" data-ng-click="clear()">
-            <i class="icon-trash"></i>&nbsp;Clear all time logs
+            <i class="glyphicon glyphicon-trash"></i>&nbsp;Clear all time logs
         </a>
     </div>
     <div data-ng-show="timelinesActive.length > 0">
         <div data-ng-repeat="timeline in timelinesActive" class="wall">
             <div class="row-fluid">
                 <div class="span10">
-                    <i class="icon-time"></i>
+                    <i class="glyphicon glyphicon-time"></i>
                     {{timeline.issue.subject}}&nbsp;
                     <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">You are working on this issue</span>
                     <br/>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="span2">
                     <button class="btn btn-danger" data-ng-click="stopTrackingTime(timeline)">
-                        <i class="icon-remove-circle"></i>&nbsp;
+                        <i class="glyphicon glyphicon-remove-circle"></i>&nbsp;
                         Finish working
                     </button>
                 </div>
@@ -33,12 +33,12 @@
     <div data-ng-repeat="timeline in timelines|limitTo:limit" class="wall">
         <div class="row-fluid">
             <div class="span11 pointer" data-ng-click="timeline.open = !timeline.open">
-                <i data-ng-class="timeline.open && 'icon-minus-sign' || 'icon-plus-sign'"></i>
+                <i data-ng-class="timeline.open && 'glyphicon glyphicon-minus-sign' || 'glyphicon glyphicon-plus-sign'"></i>
                 {{timeline.issue.subject}}&nbsp;
                 <span style="margin-left: 15px;" class="label label-warning">total: {{timeline.total|tohours}}</span>
             </div>
             <div class="span1">
-                <i class="icon-trash pointer remove-hidden" data-ng-click="removeIssueTimeline(timeline.issue)"></i>
+                <i class="glyphicon glyphicon-trash pointer remove-hidden" data-ng-click="removeIssueTimeline(timeline.issue)"></i>
             </div>
         </div>
         <div data-ng-show="timeline.open" class="time-entries">

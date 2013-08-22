@@ -8,10 +8,10 @@
                 </h3>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <label class="control-label">Show issues for:</label>
-                        <div class="controls">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Show issues for:</label>
+                        <div class="col-md-7">
                             <label class="radio">
                                 <input type="radio" class="projects_show" name="projects_show" id="projRadios0" value="all"
                                        data-ng-model="options.profile.projects.show_for" />
@@ -24,9 +24,9 @@
                             </label>
                         </div>
                     </div>
-                    <div class="control-group" data-ng-show="options.profile.projects.show_for == 'selected'">
-                        <label class="control-label">Projects:</label>
-                        <div class="controls">
+                    <div class="form-group" data-ng-show="options.profile.projects.show_for == 'selected'">
+                        <label class="control-label col-md-5">Projects:</label>
+                        <div class="col-md-7">
                             <label class="checkbox" data-ng-repeat="project in projects">
                                 <input type="checkbox"
                                        data-ng-model="project.used" /> {{project.name}}

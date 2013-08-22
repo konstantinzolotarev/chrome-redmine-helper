@@ -1,32 +1,36 @@
-<div class="modal hide fade" id="tableOptions" tabindex="-1" role="dialog">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>
-            Issue list options
-            <small>Select fields that should be shown</small>
-        </h3>
-    </div>
-    <div class="modal-body">
-        <form class="form-horizontal">
-            <label class="checkbox">
-                <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> Project title
-            </label>
-            <label class="checkbox">
-                <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> Author name
-            </label>
-            <label class="checkbox">
-                <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> Tracker
-            </label>
-            <label class="checkbox">
-                <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> Status
-            </label>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <a href="" class="btn btn-success" data-ng-click="storeTableOptions()">
-            Store options
-        </a>
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+<div class="modal fade" id="tableOptions" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>
+                    Issue list options
+                    <small>Select fields that should be shown</small>
+                </h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <label class="checkbox">
+                        <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> Project title
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> Author name
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> Tracker
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> Status
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-success" data-ng-click="storeTableOptions()">
+                    Store options
+                </a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+            </div>
+        </div>
     </div>
 </div>
 

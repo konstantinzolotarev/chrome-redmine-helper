@@ -1,35 +1,41 @@
 <div class="page-header">
     <h3>Your Latest Issues</h3>
 </div>
-<div class="well well-small row-fluid">
-    <div class="span7">
-        <input type="text" class="input-medium search-query"
-               data-ng-model="search.subject"
-               placeholder="Search by subject"
-               data-ng-show="issues.length > 0"/>
-    </div>
-    <div class="span5">
-        <a href="#/new_issue" class="btn btn-info">
-            <i class="icon-plus-sign"></i>&nbsp;New Issue
-        </a>
-        <a href="" class="btn" data-ng-click="markAllRead()" data-ng-show="issues.length > 0">
-            <i class="icon-ok"></i>&nbsp;Mark all as read
-        </a>
-        <a href="" class="btn" data-ng-click="reload()" data-ng-class="isLoading() && 'disabled'">
-            <i class="icon-refresh"></i>&nbsp;Update
-        </a>
-        <a href="#tableOptions" class="btn" data-toggle="modal">
-            <i class="icon-cog"></i>
-        </a>
-        <i class="help icon-info-sign"
-           data-ng-hide="options.profile.hideHints"
-           data-type="popover"
-           data-original-title="Notice"
-           data-content="With conf sign (left to this hint) you could manage fields that are shown in the table"></i>
+<div class="well well-sm">
+    <div class="row">
+        <div class="col-md-7">
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <input type="text" class="form-control" class="search-query"
+                           data-ng-model="search.subject"
+                           placeholder="Search by subject"
+                           data-ng-show="issues.length > 0"/>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-5">
+            <a href="#/new_issue" class="btn btn-info">
+                <i class="glyphicon glyphicon-plus-sign"></i>&nbsp;New Issue
+            </a>
+            <a href="" class="btn" data-ng-click="markAllRead()" data-ng-show="issues.length > 0">
+                <i class="glyphicon glyphicon-ok"></i>&nbsp;Mark all as read
+            </a>
+            <a href="" class="btn" data-ng-click="reload()" data-ng-class="isLoading() && 'disabled'">
+                <i class="glyphicon glyphicon-refresh"></i>&nbsp;Update
+            </a>
+            <a href="#tableOptions" class="btn" data-toggle="modal">
+                <i class="glyphicon glyphicon-cog"></i>
+            </a>
+            <i class="help glyphicon glyphicon-info-sign"
+               data-ng-hide="options.profile.hideHints"
+               data-type="popover"
+               data-original-title="Notice"
+               data-content="With conf sign (left to this hint) you could manage fields that are shown in the table"></i>
+        </div>
     </div>
 </div>
-<div class="row-fluid">
-    <div class="span12">
+<div class="row">
+    <div class="col-md-12">
         <!-- No issues message -->
         <div class="alert" data-ng-show="issues.length < 1 && !isLoading()">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -59,7 +65,7 @@
                     </th>
                     <th style="width: 15px; text-align: center;">
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">
-                            <i class="icon-star"></i>
+                            <i class="glyphicon glyphicon-star"></i>
                         </a>
                     </th>
                     <th style="width: 50px;">Actions</th>
@@ -78,7 +84,7 @@
                     </td>
                     <td>
                         <a href="" data-ng-click="showDetails(issue)">
-                            <i class="icon-eye-open ng-cloak" 
+                            <i class="glyphicon glyphicon-eye-open ng-cloak"
                                     data-ng-show="issue.watcher" 
                                     data-type="tooltip" 
                                     data-original-title="You are only watching this issue"></i>
@@ -92,11 +98,11 @@
                         {{issue.status.name}}
                     </td>
                     <td>
-                        <i class="icon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
-                        <i class="icon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
+                        <i class="glyphicon glyphicon-star pointer" data-ng-click="markRead(issue)" data-ng-hide="issue.read"></i>
+                        <i class="glyphicon glyphicon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
                     </td>
                     <td>
-                        <i class="icon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
+                        <i class="glyphicon glyphicon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
                     </td>
                 </tr>
             </tbody>
