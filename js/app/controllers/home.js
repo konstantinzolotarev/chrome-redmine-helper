@@ -154,7 +154,7 @@ function Home($scope, BG) {
         $scope.project = BG.com.rdHelper.Projects.get($scope.issue.project.id);
         $scope.updateIssueTimeline();
         $('#issueDetails').modal('toggle');
-        $('#issue-details-tabs').click(function (e) {
+        $('#issue-details-tabs').unbind().click(function (e) {
             e.preventDefault()
         });
     };
