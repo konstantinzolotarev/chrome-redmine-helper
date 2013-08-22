@@ -76,7 +76,35 @@ module.exports = function(grunt) {
                 overwrite: true,
                 replacements: [
                     {
-                        from: '<script type="text/javascript" src="../js/mainControllers.js"></script>',
+                        from: '<script type="text/javascript" src="../js/app/services.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/main.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/news.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/options.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/home.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/new_issue.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/projects.js"></script>',
+                        to: ''
+                    },
+                    {
+                        from: '<script type="text/javascript" src="../js/app/controllers/timelines.js"></script>',
                         to: ''
                     }
                 ]
@@ -99,13 +127,17 @@ module.exports = function(grunt) {
                         'js/redmine/news.js',
                         'js/background.js'
                     ],
-                    'dist/js/main.js': [
-                        'js/main.js',
-                        'js/mainControllers.js'
-                    ]//,
-//                    'dist/js/mainControllers.js': [
-//                        'js/mainControllers.js'
-//                    ]
+                    'dist/js/app.js': [
+                        'js/app/services.js',
+                        'js/app/app.js',
+                        'js/app/controllers/main.js',
+                        'js/app/controllers/home.js',
+                        'js/app/controllers/new_issue.js',
+                        'js/app/controllers/news.js',
+                        'js/app/controllers/options.js',
+                        'js/app/controllers/projects.js',
+                        'js/app/controllers/timelines.js'
+                    ]
                 }
             }
         },
