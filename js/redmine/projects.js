@@ -63,7 +63,7 @@ com.rdHelper.Projects.clear = function() {
 /**
  * Get list of projects
  * 
- * @param {boolean} reload if set to true project list will be updated from server
+ * @param {boolean=} [reload] if set to true project list will be updated from server
  * @param {function(Object)=} callback
  * @returns {Array}
  */

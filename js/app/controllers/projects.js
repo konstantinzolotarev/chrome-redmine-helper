@@ -4,11 +4,13 @@
  * List of your projects
  *
  * @param {Object} $scope
+ * @param {Object} BG
  * @returns {?}
  */
 function Projects($scope, BG) {
     //list of projects
     $scope.projects = {};
+
     BG.com.rdHelper.Projects.all(function(projects) {
         for(var i in projects) {
             $scope.projects[i] = projects[i];

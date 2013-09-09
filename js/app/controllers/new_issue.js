@@ -3,7 +3,7 @@
 /**
  * New issue controller
  *
- * @param {Scope} $scope
+ * @param {Object} $scope
  * @param {Object} BG
  * @returns {undefined}
  */
@@ -15,7 +15,15 @@ function NewIssue($scope, BG) {
     //list of projects
     $scope.projects = {};
     $scope.project = {};
-    BG.com.rdHelper.Projects.all();
+    //loading list of projects
+    BG.com.rdHelper.Projects.all(function(projects) {
+        for(var i in projects) {
+            $scope.projects[i] = projects[i];
+        }
+        if (!$scope.$$phase) {
+            $scope.$digest();
+        }
+    });
 
     //User options
     $scope.options = BG.getConfig();

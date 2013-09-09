@@ -90,7 +90,9 @@
                                 <span data-ng-show="toggleTimeComment">Finish editing</span>
                             </a>
                             <div data-ng-show="toggleTimeComment">
-                                <textarea style="width: 80%; height: 90px;" data-ng-model="issue.trackingComment"></textarea>
+                                <form class="margin-top" role="form">
+                                    <textarea class="form-control" style="width: 80%; height: 90px;" data-ng-model="issue.trackingComment"></textarea>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -114,7 +116,7 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="description">
-                            <div class="issue-description">
+                            <div class="issue-description margin-top">
                                 <p data-ng-bind-html="issue.description | nl2br"></p>
                             </div>
                         </div>
@@ -156,7 +158,7 @@
                         </div>
                         <!-- List of attachments for issue -->
                         <div class="tab-pane" id="attachments">
-                            <div class="issue-attachments">
+                            <div class="issue-attachments margin-top">
                                 <upload-file></upload-file>
                                 <div data-ng-repeat="attach in issue.attachments" class="attach">
                                     <i class="glyphicon glyphicon-chevron-right"></i>&nbsp;
@@ -170,26 +172,26 @@
                         </div>
                         <!-- Add new Comment to issue -->
                         <div class="tab-pane" id="addComment">
-                            <form>
-                                <textarea rows="5" class="input-block-level" data-ng-disabled="!issue.detailsLoaded" data-ng-model="comment"></textarea>
-                                <div>
-                                    <button class="btn" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
+                            <form class="form-horizontal margin-top" role="form">
+                                <textarea rows="5" class="form-control" data-ng-disabled="!issue.detailsLoaded" data-ng-model="comment"></textarea>
+                                <div class="margin-top">
+                                    <button class="btn btn-info" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
                                 </div>
                             </form>
                         </div>
                         <!-- Timelines -->
                         <div class="tab-pane" id="timelines">
-                            <div class="issue-timelines">
-                                <div class="alert text-center" data-ng-hide="issue.timelines.length > 0">
+                            <div class="issue-timelines margin-top">
+                                <div class="alert alert-info text-center" data-ng-hide="issue.timelines.length > 0">
                                     No time logs available.
                                 </div>
                                 <div data-ng-show="issue.timelines.length > 0">
-                                    <div class="row-fluid">
-                                        <div class="span8">
+                                    <div class="row">
+                                        <div class="col-md-8">
                                             <span class="label label-info">Total time spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
                                         </div>
-                                        <div class="span4">
-                                            <a href="" class="btn" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
+                                        <div class="col-md-4">
+                                            <a href="" class="btn btn-danger" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
                                                 <i class="glyphicon glyphicon-trash"></i>&nbsp;
                                                 Clear time logs
                                             </a>
@@ -198,8 +200,8 @@
                                     <hr/>
                                 </div>
                                 <div class="timeline" data-ng-repeat="timeline in issue.timelines">
-                                    <div class="row-fluid">
-                                        <div class="span11 entry">
+                                    <div class="row">
+                                        <div class="col-md-11 entry">
                                             <p>
                                                 <span class="label label-success">{{timeline.spent|tohours}}</span>
                                                 <i data-ng-show="timeline.comment == ''">No comment available</i>
@@ -207,7 +209,7 @@
                                             </p>
                                             <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
                                         </div>
-                                        <div class="span1">
+                                        <div class="col-md-1">
                                             <i class="glyphicon glyphicon-trash pointer remove-hidden" data-ng-click="removeTimeline(timeline)"></i>
                                         </div>
                                     </div>

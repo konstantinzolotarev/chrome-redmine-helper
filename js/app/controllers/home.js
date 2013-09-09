@@ -30,6 +30,7 @@ function Home($scope, BG) {
         } else {
             var id = "#scrollToTop";
         }
+        console.log($(id).offset().top);
         jQuery("#issueDetails .modal-body").animate({
             scrollTop: $(id).offset().top
         }, 500);

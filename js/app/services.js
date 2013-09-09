@@ -218,7 +218,7 @@ angular.module('Issues.Service', ['ngSanitize'])
             replace: true,
             transclude: true,
             restrict: "EA",
-            template: '<div class="add-attach">'
+            template: '<div class="add-attach margin-top">'
                 + '<div class="center">'
                 + '<i>'
                 + '<a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">'
@@ -226,7 +226,7 @@ angular.module('Issues.Service', ['ngSanitize'])
                 + '</a>'
                 + '</i>'
                 + '</div>'
-                + '<div class="well well-small" data-ng-show="attachOpen">'
+                + '<div class="well well-sm" data-ng-show="attachOpen">'
                 + '<div class="alert alert-info" data-ng-show="loading">'
                 + '<strong>Uploading!</strong> Your file is uploading to server...'
                 + '</div>'
