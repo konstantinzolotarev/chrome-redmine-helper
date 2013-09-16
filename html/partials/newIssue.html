@@ -27,7 +27,7 @@
                     <select id="project_id"
                             class="form-control"
                             data-ng-model="issue.project_id"
-                            data-ng-options="project.id as project.name for project in projects"
+                            data-ng-options="proj.id as proj.name for (kkey, proj) in projects"
                             data-ng-change="projectChanged()"
                             tabindex="2">
                         <option value="">Select project</option>

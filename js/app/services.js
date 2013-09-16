@@ -61,6 +61,14 @@ angular.module('Issues.Service', ['ngSanitize'])
     .factory('BG', function () {
         return chrome.extension.getBackgroundPage();
     })
+    .factory('Projects', ['BG', '$q', function(BG, $q) {
+        var defer = $q.defer();
+        BG.com.rdHelper.Projects.all(function(projects) {
+            defer.resolve(projects);
+            console.log(projects);
+        });
+        return defer.promise;
+    }])
     .directive('issueHistory', function () {
         return {
             replace: true,

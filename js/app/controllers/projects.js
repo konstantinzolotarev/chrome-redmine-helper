@@ -5,20 +5,12 @@
  *
  * @param {Object} $scope
  * @param {Object} BG
+ * @param {*} Projects
  * @returns {?}
  */
-function Projects($scope, BG) {
+function Projects($scope, BG, Projects) {
     //list of projects
-    $scope.projects = {};
-
-    BG.com.rdHelper.Projects.all(function(projects) {
-        for(var i in projects) {
-            $scope.projects[i] = projects[i];
-        }
-        if (!$scope.$$phase) {
-            $scope.$digest();
-        }
-    });
+    $scope.projects = Projects;
 
     /**
      * Reload projects list
@@ -56,4 +48,4 @@ function Projects($scope, BG) {
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
 }
-Projects.$inject = ['$scope', 'BG'];
+Projects.$inject = ['$scope', 'BG', 'Projects'];

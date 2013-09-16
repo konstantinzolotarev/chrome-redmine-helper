@@ -5,25 +5,18 @@
  *
  * @param {Object} $scope
  * @param {Object} BG
+ * @param {*} Projects
  * @returns {undefined}
  */
-function NewIssue($scope, BG) {
+function NewIssue($scope, BG, Projects) {
     //Store selected in context menu text
     var subject = BG.getSelectedText();
     //clear selected text
     BG.clearSelectedText();
+
     //list of projects
-    $scope.projects = {};
+    $scope.projects = Projects;
     $scope.project = {};
-    //loading list of projects
-    BG.com.rdHelper.Projects.all(function(projects) {
-        for(var i in projects) {
-            $scope.projects[i] = projects[i];
-        }
-        if (!$scope.$$phase) {
-            $scope.$digest();
-        }
-    });
 
     //User options
     $scope.options = BG.getConfig();
@@ -59,7 +52,6 @@ function NewIssue($scope, BG) {
         if ($scope.issue.assigned_to_id) {
             delete $scope.issue.assigned_to_id;
         }
-        console.log($scope.project);
     };
 
     /**
@@ -161,4 +153,4 @@ function NewIssue($scope, BG) {
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
 }
-NewIssue.$inject = ['$scope', 'BG'];
+NewIssue.$inject = ['$scope', 'BG', 'Projects'];
