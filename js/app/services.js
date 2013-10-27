@@ -62,12 +62,18 @@ angular.module('Issues.Service', ['ngSanitize'])
         return chrome.extension.getBackgroundPage();
     })
     .factory('Projects', ['BG', '$q', function(BG, $q) {
-        var defer = $q.defer();
-        BG.com.rdHelper.Projects.all(function(projects) {
-            defer.resolve(projects);
-            console.log(projects);
-        });
-        return defer.promise;
+        return {
+            /**
+             * Get all projects list
+             */
+            all: function() {
+                var defer = $q.defer();
+                BG.com.rdHelper.Projects.all(function(projects) {
+                    defer.resolve(projects);
+                });
+                return defer.promise;
+            }
+        };
     }])
     .directive('issueHistory', function () {
         return {

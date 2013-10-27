@@ -57,6 +57,9 @@
                     <th>
                         <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
                     </th>
+                    <th data-ng-show="options.profile.table.priority">
+                        <a href="" data-ng-click="order = 'priority.id'; reverse=!reverse">Priority</a>
+                    </th>
                     <th data-ng-show="options.profile.table.tracker">
                         <a href="" data-ng-click="order = 'tracker.name'; reverse=!reverse">Tracker</a>
                     </th>
@@ -90,6 +93,9 @@
                                     data-original-title="You are only watching this issue"></i>
                             {{issue.subject}}
                         </a>
+                    </td>
+                    <td data-ng-show="options.profile.table.priority">
+                        <span data-ng-if="issue.priority && issue.priority.name">{{issue.priority.name}}</span>
                     </td>
                     <td data-ng-show="options.profile.table.tracker">
                         {{issue.tracker.name}}

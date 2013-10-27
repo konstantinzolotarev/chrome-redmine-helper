@@ -10,7 +10,14 @@
  */
 function Projects($scope, BG, Projects) {
     //list of projects
-    $scope.projects = Projects;
+    $scope.projects = [];
+
+    // Load list of projects from backend
+    $scope.getProjects = function() {
+        Projects.all().then(function(data) {
+            $scope.projects = data;
+        });
+    };
 
     /**
      * Reload projects list
@@ -30,12 +37,10 @@ function Projects($scope, BG, Projects) {
      * @returns {undefined}
      */
     var projectsLoaded = function(request, sender, sendResponse) {
-//        if (!$scope.$$phase) {
         $scope.$apply(function(sc) {
             sc.hideLoading();
-            sc.projects = BG.com.rdHelper.Projects.projects;
+            $scope.getProjects();
         });
-//        }
     };
 
     //Handle new issue creation
@@ -47,5 +52,10 @@ function Projects($scope, BG, Projects) {
 
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
+    
+    /**
+     * Load project list
+     */
+    $scope.getProjects();
 }
 Projects.$inject = ['$scope', 'BG', 'Projects'];
