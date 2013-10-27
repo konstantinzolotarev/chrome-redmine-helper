@@ -32,7 +32,7 @@ function NewIssue($scope, BG, Projects) {
             $scope.projects = data;
         });
     };
-    
+
     /**
      * Load project list
      */
