@@ -37,7 +37,7 @@ com.rdHelper.Issues.clearIssues = function() {
  * @returns {number}
  */
 com.rdHelper.Issues.size = function() {
-    return Object.keys(this.issues);
+    return Object.keys(this.issues).length;
 };
 
 /**
