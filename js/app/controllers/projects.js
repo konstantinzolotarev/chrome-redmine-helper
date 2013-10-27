@@ -52,7 +52,7 @@ function Projects($scope, BG, Projects) {
 
     //Add one global handler for messages from background
     chrome.extension.onMessage.addListener(onMessage);
-    
+
     /**
      * Load project list
      */

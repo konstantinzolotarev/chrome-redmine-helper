@@ -15,7 +15,7 @@ function NewIssue($scope, BG, Projects) {
     BG.clearSelectedText();
 
     //list of projects
-    $scope.projects = Projects;
+    $scope.projects = [];
     $scope.project = {};
 
     //User options
@@ -25,6 +25,18 @@ function NewIssue($scope, BG, Projects) {
     $scope.errors = [];
 
     $scope.membersLoading = false;
+
+    // Load list of projects from backend
+    $scope.getProjects = function() {
+        Projects.all().then(function(data) {
+            $scope.projects = data;
+        });
+    };
+    
+    /**
+     * Load project list
+     */
+    $scope.getProjects();
 
     // Issue model
     $scope.issue = {
