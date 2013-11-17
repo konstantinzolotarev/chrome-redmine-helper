@@ -328,6 +328,13 @@ function Home($scope, BG) {
         }
     };
 
+    //Handle creation of new issue
+    var onIssueCreated = function(request, sender, sendResponse) {
+        $scope.$apply(function(sc) {
+            sc.reload();
+        });
+    };
+
     //Handle update issues list
     var onIssuesUpdated = function(request, sender, sendResponse) {
         $scope.$apply(function(sc) {
@@ -383,6 +390,9 @@ function Home($scope, BG) {
         switch(request.action) {
             case "issueDetails":
                 return onIssueDetails(request, sender, sendResponse);
+                break;
+            case "issueCreated":
+                return onIssueCreated(request, sender, sendResponse);
                 break;
             case "issuesUpdated":
                 return onIssuesUpdated(request, sender, sendResponse);
