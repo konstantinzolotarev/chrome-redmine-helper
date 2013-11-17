@@ -9,7 +9,7 @@
                 </h3>
             </div>
             <div class="modal-body">
-                <div class="alert center" data-ng-hide="issue.detailsLoaded">
+                <div class="alert alert-info center" data-ng-hide="issue.detailsLoaded">
                     Loading...
                 </div>
                 <p>
@@ -159,7 +159,6 @@
                         <!-- List of attachments for issue -->
                         <div class="tab-pane" id="attachments">
                             <div class="issue-attachments margin-top">
-                                <upload-file></upload-file>
                                 <div data-ng-repeat="attach in issue.attachments" class="attach">
                                     <i class="glyphicon glyphicon-chevron-right"></i>&nbsp;
                                     <a data-ng-href="{{attach.content_url}}" target="_blank">{{attach.filename}}</a>
@@ -173,6 +172,7 @@
                         <!-- Add new Comment to issue -->
                         <div class="tab-pane" id="addComment">
                             <form class="form-horizontal margin-top" role="form">
+                                <upload-file></upload-file>
                                 <textarea rows="5" class="form-control" data-ng-disabled="!issue.detailsLoaded" data-ng-model="comment"></textarea>
                                 <div class="margin-top">
                                     <button class="btn btn-info" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
