@@ -80,15 +80,15 @@
             <div class="container main">
                 <div class="row">
                     <!--Body content-->
-                    <div class="alert alert-danger" data-ng-show="xhrError">
+                    <div class="alert alert-danger" data-ng-if="xhrError">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
                     </div>
-                    <div class="alert alert-success ng-cloak" data-ng-show="customSuccess != ''">
+                    <div class="alert alert-success ng-cloak" data-ng-if="customSuccess">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <div data-ng-bind-html="customSuccess"></div>
                     </div>
-                    <div class="alert alert-danger ng-cloak" data-ng-show="customError != ''">
+                    <div class="alert alert-danger ng-cloak" data-ng-if="customError">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                         <div data-ng-bind-html="customError"></div>
                     </div>
