@@ -271,7 +271,6 @@ function fireError(message, global) {
  * handler for click on context menu
  */
 function handleContextMenu(info, tab) {
-    console.log(info);
     //store selected text
     selectedText = info.selectionText;
     //open new tab to create issue 
@@ -289,7 +288,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     if (!changes.profile) {
         return;
     }
-    console.log("Settings updated");
     //Update settings
     updateRedmineApi();
     updateItems();

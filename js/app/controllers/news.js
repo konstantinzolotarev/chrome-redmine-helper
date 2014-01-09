@@ -9,7 +9,6 @@ function News($scope) {
     $scope.news = [];
 
     $scope.newsLoaded = function(json) {
-        console.log(json);
         $scope.$apply(function(sc) {
             if (json.total_count > 0) {
                 sc.news = json.news;

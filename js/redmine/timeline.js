@@ -182,7 +182,6 @@ com.rdHelper.Timeline.stopPoccess = function(issueId, comment, callback) {
                 hours: time,
                 comments: comment.length > 255 ? comment.substr(0, 254) : comment
             }, function(err, data) {
-                console.log(err, data);
                 if (!err && data.time_entry) {
                     //update id
                     obj.timelines[issueId][key].redmineId = data.time_entry.id;

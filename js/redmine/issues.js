@@ -460,7 +460,7 @@ com.rdHelper.Issues.getPriorities = function(reload) {
     }
     (function(obj) {
         redmineApi.issues.statuses(function(error, json) {
-            console.log(json);return;
+            return;
             if (json.issue_statuses && json.issue_statuses.length > 0) {
                 obj.priorities = json.issue_statuses;
                 obj.prioripiesLoaded = true;

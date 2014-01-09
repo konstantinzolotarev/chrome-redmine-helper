@@ -30,7 +30,6 @@ function Home($scope, BG) {
         } else {
             var id = "#scrollToTop";
         }
-        console.log($(id).offset().top);
         jQuery("#issueDetails .modal-body").animate({
             scrollTop: $(id).offset().top
         }, 500);
@@ -40,7 +39,7 @@ function Home($scope, BG) {
      * On new file selected for upload
      */
     $scope.fileSubmitted = function(file) {
-        console.log(file);
+
     };
 
     /**

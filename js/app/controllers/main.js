@@ -88,7 +88,6 @@ function Main($scope, $location, $timeout, BG) {
 
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "globalError" && request.params) {
-            console.log(request.params);
             $scope.$apply(function(sc) {
                 sc.xhrError = true;
                 sc.hideLoading();
@@ -149,7 +148,6 @@ function Main($scope, $location, $timeout, BG) {
      * @param {Event} event
      */
     $scope.projectChecked = function(event) {
-        console.log(event);
     };
 
     /**

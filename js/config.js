@@ -76,7 +76,6 @@ Config.prototype.load = function(onLoad) {
         //loading profile data
         chrome.storage.sync.get('profile', function(items) {
             var profile = items.profile || false;
-            console.log(profile);
             if (!profile) {
                 conf.initNew();
                 conf.loaded = true;

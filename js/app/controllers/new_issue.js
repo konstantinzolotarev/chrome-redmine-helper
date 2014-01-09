@@ -128,7 +128,6 @@ function NewIssue($scope, BG, Projects) {
         }
         $scope.$apply(function(sc) {
             sc.project = request.project;
-            console.log("Updated", sc.project);
         });
     };
 
