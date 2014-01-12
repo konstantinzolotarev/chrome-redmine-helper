@@ -4,7 +4,10 @@
  * Create angular application
  */
 angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service']).
-    config(['$routeProvider', function($routeProvider) {
+    config([
+    '$routeProvider',
+    '$httpProvider',
+    function($routeProvider, $httpProvider) {
         $routeProvider.
             when('/options', {templateUrl: 'partials/options.html', controller: Options}).
             when('/home', {templateUrl: 'partials/home.html', controller: Home}).
@@ -13,6 +16,36 @@ angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service']).
             when('/timelines', {templateUrl: 'partials/timelines.html', controller: Timelines}).
             when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
             otherwise({redirectTo: '/home'});
+
+        /**
+         * Add interceptors for all http requests.
+         */
+        $httpProvider.interceptors.push([
+            '$q',
+            '$rootScope',
+            function($q, $rootScope) {
+                return {
+                    'request': function(config) {
+                        $rootScope.showLoading();
+                        return config;
+                    },
+
+                    'requestError': function(rejection) {
+                        $rootScope.hideLoading();
+                        return rejection;
+                    },
+
+                    'response': function(response) {
+                        $rootScope.hideLoading();
+                        return response;
+                    },
+
+                    'responseError': function(rejection) {
+                        $rootScope.hideLoading();
+                        return rejection;
+                    }
+                };
+        }]);
     }])
     .filter('tohours', function() {
         return function(time) {
@@ -40,11 +73,93 @@ angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service']).
             start = +start; //parse to int
             return input.slice(start);
         };
-        // Register the 'myCurrentTime' directive factory method.
-        // We inject no service since the factory method is DI.
-    }).run(['$rootScope', function($scope) {
+    }).run([
+        '$rootScope',
+        '$timeout',
 
-    }]);
+        function($scope, $timeout) {
+
+            /**
+             * List of loading processes
+             * @type {Array}
+             */
+            $scope.loading = [];
+
+            /**
+             * Custom error message
+             */
+            $scope.customError = "";
+
+            /**
+             * Custom success message
+             *
+             * @type {string}
+             */
+            $scope.customSuccess = "";
+
+            /**
+             * Represent global error existance. Server unavailable or same
+             *
+             * @type {boolean}
+             */
+            $scope.xhrError = false;
+
+            /**
+             * Add new loading process to queue
+             */
+            $scope.showLoading = function(process) {
+                $scope.loading.push(process || 'new loading process');
+            };
+
+            /**
+             * Remove one loading process from queue
+             */
+            $scope.hideLoading = function() {
+                if ($scope.loading.length == 0) {
+                    return;
+                }
+                $scope.loading.pop();
+            };
+
+            /**
+             * Remove all loading processes from queue
+             */
+            $scope.clearLoading = function() {
+                //we couldn't make $scope.loading = [] because: angular will lost this variable in other scopes
+                while($scope.loading.length > 0) {
+                    $scope.hideLoading();
+                }
+            };
+
+            /**
+             * Check if loading dialog is shown
+             *
+             * @returns {boolean}
+             */
+            $scope.isLoading = function() {
+                return $scope.loading.length > 0;
+            };
+
+            /**
+             * Shows custom success message
+             *
+             * @param {String} message HTML message to show
+             * @param {Boolean} persist do not hide success message
+             */
+            $scope.showSuccess = function(message, persist) {
+                $scope.customSuccess = message;
+                if (!persist) {
+                    $timeout($scope.hideSuccess, 5000);
+                }
+            };
+
+            /**
+             * Hide success message
+             */
+            $scope.hideSuccess = function() {
+                $scope.customSuccess = "";
+            };
+        }]);
 
 /**
  * Bind tooltips

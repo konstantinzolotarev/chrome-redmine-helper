@@ -1,7 +1,5 @@
 'use strict';
 
-var BG = chrome.extension.getBackgroundPage();
-
 /**
  * Link handler for editable field
  *
@@ -75,7 +73,7 @@ angular.module('Issues.Service', ['ngSanitize'])
             }
         };
     }])
-    .directive('issueHistory', function () {
+    .directive('issueHistory', ['BG', function (BG) {
         return {
             replace: true,
             transclude: false,
@@ -158,7 +156,7 @@ angular.module('Issues.Service', ['ngSanitize'])
                 }
             }
         };
-    }).directive('editableList',function factory() {
+    }]).directive('editableList',function factory() {
         return {
             replace: true,
             transclude: true,
@@ -227,35 +225,33 @@ angular.module('Issues.Service', ['ngSanitize'])
             // The linking function will add behavior to the template
             link: linkFunction
         };
-    }).directive('uploadFile', function () {
+    }).directive('uploadFile', ['BG', function (BG) {
         return {
             replace: true,
             transclude: true,
             restrict: "EA",
             template: '<div class="add-attach margin-top">'
-                + '<div class="center">'
-                + '<i>'
-                + '<a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">'
-                + '<i class="glyphicon glyphicon-file"></i>&nbsp;Attach new file'
-                + '</a>'
-                + '</i>'
-                + '</div>'
-                + '<div class="well well-sm" data-ng-show="attachOpen">'
-                + '<div class="alert alert-info" data-ng-show="loading">'
-                + '<strong>Uploading!</strong> Your file is uploading to server...'
-                + '</div>'
-                + '<div class="alert alert-error" data-ng-show="error">'
-                + '<button type="button" class="close" data-dismiss="alert">×</button>'
-                + '<strong>Warning!</strong> File couldn\'t be uploaded !'
-                + '</div>'
-                + '<input type="file" id="addAttach" data-ng-hide="loading"/>'
-                + '<p>'
-                + '<small>'
-                + 'File will be uploaded automaticaly after selection'
-                + '</small>'
-                + '</p>'
-                + '</div>'
-                + '</div>',
+                        + '<div class="center">'
+                            + '<i>'
+                                + '<a href="" data-ng-model="attachOpen" data-ng-click="attachOpen = !attachOpen">'
+                                    + '<i class="glyphicon glyphicon-file"></i>&nbsp;Attach new file'
+                                + '</a>'
+                            + '</i>'
+                        + '</div>'
+                        + '<div class="well well-sm" data-ng-show="attachOpen">'
+                            + '<div class="alert alert-info" data-ng-show="loading">'
+                                + '<strong>Uploading!</strong> Your file is uploading to server...'
+                            + '</div>'
+                            + '<div class="alert alert-error" data-ng-show="error">'
+                                + '<button type="button" class="close" data-dismiss="alert">×</button>'
+                                + '<strong>Warning!</strong> File couldn\'t be uploaded !'
+                            + '</div>'
+                            + '<input type="file" id="addAttach" data-ng-hide="loading"/>'
+                            + '<p>'
+                                + '<small>File will be uploaded automaticaly after selection</small>'
+                            + '</p>'
+                        + '</div>'
+                    + '</div>',
             scope: {
                 // uploadFile: "=onOk"
             },
@@ -306,4 +302,4 @@ angular.module('Issues.Service', ['ngSanitize'])
                 document.getElementById('addAttach').addEventListener('change', onFileChange);
             }
         };
-    });
+    }]);

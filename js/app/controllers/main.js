@@ -1,17 +1,16 @@
 'use strict';
 
+Main.$inject = ['$scope', '$location', 'BG'];
 /**
  * Main controller
  *
  * @param {Object} $scope
  * @param {Object} $location
- * @param {Object} $timeout
  * @param {*} BG
  * @returns {void}
  */
-function Main($scope, $location, $timeout, BG) {
+function Main($scope, $location, BG) {
     $scope.options = BG.getConfig();
-    $scope.xhrError = false;
     $scope.projects = {};
     $scope.$location = $location;
 
@@ -24,58 +23,11 @@ function Main($scope, $location, $timeout, BG) {
             $scope.$digest();
         }
     });
-    //Custom messages
-    $scope.customError = "";
-    $scope.customSuccess = "";
-    /**
-     * Loading dialog flag
-     */
-    $scope.loading = false;
 
     /**
      * Sidebar showing flag
      */
     $scope.showSidebar = false;
-
-    /**
-     * Show loading dialog
-     */
-    $scope.showLoading = function() {
-        $scope.loading = true;
-    };
-
-    /**
-     * Hide loading dialog
-     */
-    $scope.hideLoading = function() {
-        $scope.loading = false;
-    };
-
-    /**
-     * Check if loading dialog is shown
-     *
-     * @returns {boolean}
-     */
-    $scope.isLoading = function() {
-        return $scope.loading;
-    }
-
-    /**
-     * Shows custom success message
-     *
-     * @param {String} message HTML message to show
-     * @param {Boolean} persist do not hide success message
-     */
-    $scope.showSuccess = function(message, persist) {
-        $scope.customSuccess = message;
-        if (!persist) {
-            $timeout($scope.hideSuccess, 5000);
-        }
-    };
-
-    $scope.hideSuccess = function() {
-        $scope.customSuccess = "";
-    };
 
     /**
      * Get unread issues count
@@ -84,7 +36,7 @@ function Main($scope, $location, $timeout, BG) {
      */
     $scope.getUnreadCount = function() {
         return BG.com.rdHelper.Issues.getUnreadCount();
-    }
+    };
 
     $scope.xhrErrorHandler = function(request, sender, sendResponse) {
         if (request.action && request.action == "globalError" && request.params) {
@@ -168,4 +120,3 @@ function Main($scope, $location, $timeout, BG) {
     };
     chrome.extension.onMessage.addListener($scope.onMessageHandler);
 }
-Main.$inject = ['$scope', '$location', '$timeout', 'BG'];
