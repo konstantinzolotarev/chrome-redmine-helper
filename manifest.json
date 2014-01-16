@@ -2,7 +2,8 @@
     "name": "Redmine Helper",
     "version": "2.1.2",
     "manifest_version": 2,
-    "description": "This extension will help to work with your Redmine issues without need to open Redmine",
+    "description": "__MSG_lang_chrome_extension_description__",
+    "default_locale": "en",
     "minimum_chrome_version": "22",
     
     "icons": {

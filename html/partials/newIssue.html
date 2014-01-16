@@ -1,28 +1,28 @@
 <div class="alert alert-success" data-ng-show="success">
     <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>Success!</strong> Your issue successfully created !
+    {{ 'lang_SuccesIssueCreated' | translate }}
 </div>
 <div class="alert alert-error" data-ng-show="errors.length > 0">
     <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>Error!</strong>
+    <strong>{{ 'lang_Error' | translate }}!</strong>
     <ul>
         <li data-ng-repeat="error in errors">{{error}}</li>
     </ul>
 </div>
 <div class="page-header">
-    <h3>New Issue</h3>
+    <h3>{{ 'lang_NewIssue' | translate }}</h3>
 </div>
 <div class="row">
     <div class="col-md-9">
         <form class="form-horizontal" role="form">
             <div class="form-group">
-                <label class="col-md-2 control-label" for="subject">Subject</label>
+                <label class="col-md-2 control-label" for="subject">{{ 'lang_Subject' | translate }}</label>
                 <div class="col-lg-7">
-                    <input type="text" class="form-control" id="subject" placeholder="Subject" data-ng-model="issue.subject" required tabindex="1"/>
+                    <input type="text" class="form-control" id="subject" placeholder="{{ 'lang_Subject' | translate }}" data-ng-model="issue.subject" required tabindex="1"/>
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label" for="project_id">Project</label>
+                <label class="col-md-2 control-label" for="project_id">{{ 'lang_Project' | translate }}</label>
                 <div class="col-lg-7">
                     <select id="project_id"
                             class="form-control"
@@ -30,64 +30,64 @@
                             data-ng-options="proj.id as proj.name for (kkey, proj) in projects"
                             data-ng-change="projectChanged()"
                             tabindex="2">
-                        <option value="">Select project</option>
+                        <option value="">{{ 'lang_SelectProject' | translate }}</option>
                     </select>
                 </div>
             </div>
             <div class="form-group" data-ng-show="issue.project_id > 0">
-                <label class="col-md-2 control-label" for="assigned_to_id">Assign to</label>
+                <label class="col-md-2 control-label" for="assigned_to_id">{{ 'lang_AssignTo' | translate }}</label>
                 <div class="col-lg-7">
-                    <span data-ng-hide="project.membersLoaded">Loading...</span>
+                    <span data-ng-hide="project.membersLoaded">{{ 'lang_Loading' | translate }}...</span>
                     <select id="assigned_to_id"
                             class="form-control"
                             data-ng-show="project.membersLoaded"
                             data-ng-model="issue.assigned_to_id"
                             data-ng-options="member.id as member.name for member in project.members"
                             tabindex="3">
-                        <option value="">Select assignee</option>
+                        <option value="">{{ 'lang_SelectAssignee' | translate }}</option>
                     </select>
                 </div>
             </div>
             <div class="form-group" data-ng-show="issue.project_id > 0">
-                <label class="col-md-2 control-label" for="tracker_id">Tracker</label>
+                <label class="col-md-2 control-label" for="tracker_id">{{ 'lang_Tracker' | translate }}</label>
                 <div class="col-lg-7">
-                    <span data-ng-hide="project.fullyLoaded">Loading...</span>
+                    <span data-ng-hide="project.fullyLoaded">{{ 'lang_Loading' | translate }}...</span>
                     <select id="tracker_id"
                             class="form-control"
                             data-ng-show="project.fullyLoaded"
                             data-ng-model="issue.tracker_id"
                             data-ng-options="track.id as track.name for track in project.trackers"
                             tabindex="4">
-                        <option value="" >Select tracker</option>
+                        <option value="" >{{ 'lang_SelectTracker' | translate }}</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-md-2 control-label" for="estimated_hours">
-                    Estimated hours
+                    {{ 'lang_EstimatedHours' | translate }}
                 </label>
                 <div class="col-lg-7">
                     <input type="number" class="form-control" id="estimated_hours" min="0" data-ng-model="issue.estimated_hours" tabindex="5"/>
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label" for="description">Description</label>
+                <label class="col-md-2 control-label" for="description">{{ 'lang_Description' | translate }}</label>
                 <div class="col-lg-7">
                     <textarea rows="7" id="description" class="col-md-5 form-control" data-ng-model="issue.description" tabindex="6"></textarea>
                 </div>
             </div>
             <hr/>
             <div class="margin-top">
-                <button type="submit" class="btn btn-success" data-ng-click="submit()" tabindex="7">Create new Issue</button>
-                <a href="#/home" class="btn" tabindex="8">Cancel</a>
+                <button type="submit" class="btn btn-success" data-ng-click="submit()" tabindex="7">{{ 'lang_CreateNewIssue' | translate }}</button>
+                <a href="#/home" class="btn" tabindex="8">{{ 'lang_Cancel' | translate }}</a>
             </div>
         </form>
     </div>
     <div class="col-md-3" data-ng-hide="options.profile.hideHints">
         <div class="alert alert-info">
             <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong>Notice</strong><br /><br />
-            <strong>Tracker</strong> and <strong>Assignee</strong> fields will appear after project selection.
+            <strong>{{ 'lang_Notice' | translate }}</strong><br /><br />
+            {{ 'lang_NewIssueHint' | translate }}
         </div>
     </div>
 </div>

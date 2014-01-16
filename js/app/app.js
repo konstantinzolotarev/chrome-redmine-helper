@@ -3,7 +3,7 @@
 /**
  * Create angular application
  */
-angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service']).
+angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service','pascalprecht.translate']).
     config([
     '$routeProvider',
     '$httpProvider',
@@ -47,6 +47,35 @@ angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service']).
                 };
         }]);
     }])
+     .config(['$translateProvider', function($translateProvider) {
+		
+        var translationExist=function(lang_key){
+		var result = null;
+		angular.forEach(app_langs, function(lang, k){
+		  if(window.navigator.language==lang.key || lang_key==lang.key){
+			result={
+			    key: lang.key,
+			    locales: lang.locales
+			};
+			
+		  }
+		});		
+		return result;	
+	};
+	var current_lang=translationExist();
+	var en_lang=translationExist('en');
+
+	if(current_lang){
+		$translateProvider.translations(current_lang.key, current_lang.locales);
+		$translateProvider.preferredLanguage(current_lang.key);
+
+	}else{
+		$translateProvider.translations(en_lang.key, en_lang.locales);
+		$translateProvider.preferredLanguage(en_lang.key);
+	}
+	
+	
+     }])
     .filter('tohours', function() {
         return function(time) {
             var hours = time / (1000*60*60);

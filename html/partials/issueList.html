@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h3>Your Latest Issues</h3>
+    <h3>{{ 'lang_YourLatestIssues' | translate }}</h3>
 </div>
 <div class="well well-sm">
     <div class="row">
@@ -8,20 +8,20 @@
                 <div class="form-group">
                     <input type="text" class="form-control" class="search-query"
                            data-ng-model="search.subject"
-                           placeholder="Search by subject"
+                           placeholder="{{ 'lang_SearchBySubject' | translate }}"
                            data-ng-show="issues.length > 0"/>
                 </div>
             </form>
         </div>
         <div class="col-md-5">
             <a href="#/new_issue" class="btn btn-info">
-                <i class="glyphicon glyphicon-plus-sign"></i>&nbsp;New Issue
+                <i class="glyphicon glyphicon-plus-sign"></i>&nbsp;{{ 'lang_NewIssue' | translate }}
             </a>
             <a href="" class="btn" data-ng-click="markAllRead()" data-ng-show="issues.length > 0">
-                <i class="glyphicon glyphicon-ok"></i>&nbsp;Mark all as read
+                <i class="glyphicon glyphicon-ok"></i>&nbsp;{{ 'lang_MarkAllAsRead' | translate }}
             </a>
             <a href="" class="btn" data-ng-click="reload()" data-ng-class="isLoading() && 'disabled'">
-                <i class="glyphicon glyphicon-refresh"></i>&nbsp;Update
+                <i class="glyphicon glyphicon-refresh"></i>&nbsp;{{ 'lang_Update' | translate }}
             </a>
             <a href="#tableOptions" class="btn" data-toggle="modal">
                 <i class="glyphicon glyphicon-cog"></i>
@@ -29,8 +29,8 @@
             <i class="help glyphicon glyphicon-info-sign"
                data-ng-hide="options.profile.hideHints"
                data-type="popover"
-               data-original-title="Notice"
-               data-content="With conf sign (left to this hint) you could manage fields that are shown in the table"></i>
+               data-original-title="{{ 'lang_Notice' | translate }}"
+               data-content="{{ 'lang_IssueListHint' | translate }}"></i>
         </div>
     </div>
 </div>
@@ -39,7 +39,7 @@
         <!-- No issues message -->
         <div class="alert" data-ng-show="issues.length < 1 && !isLoading()">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <strong>Oops!</strong> No issues are available.
+            {{ 'lang_OopsNoIssuesAvailable' | translate }}
         </div>
         <!-- Issue list -->
         <table class="table table-hover table-condensed issues" data-ng-show="issues.length > 0">
@@ -49,29 +49,29 @@
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
                     </th>-->
                     <th style="width: 250px;" data-ng-show="options.profile.table.author">
-                        <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
+                        <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">{{ 'lang_Author' | translate }}</a>
                     </th>
                     <th style="width: 250px;" data-ng-show="options.profile.table.project">
-                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">Project</a>
+                        <a href="" data-ng-click="order = 'project.name'; reverse=!reverse">{{ 'lang_Project' | translate }}</a>
                     </th>
                     <th>
-                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">Subject</a>
+                        <a href="" data-ng-click="order = 'subject'; reverse=!reverse">{{ 'lang_Subject' | translate }}</a>
                     </th>
                     <th data-ng-show="options.profile.table.priority">
-                        <a href="" data-ng-click="order = 'priority.id'; reverse=!reverse">Priority</a>
+                        <a href="" data-ng-click="order = 'priority.id'; reverse=!reverse">{{ 'lang_Priority' | translate }}</a>
                     </th>
                     <th data-ng-show="options.profile.table.tracker">
-                        <a href="" data-ng-click="order = 'tracker.name'; reverse=!reverse">Tracker</a>
+                        <a href="" data-ng-click="order = 'tracker.name'; reverse=!reverse">{{ 'lang_Tracker' | translate }}</a>
                     </th>
                     <th style="width: 150px;" data-ng-show="options.profile.table.status">
-                        <a href="" data-ng-click="order = 'status.name'; reverse=!reverse">Status</a>
+                        <a href="" data-ng-click="order = 'status.name'; reverse=!reverse">{{ 'lang_Status' | translate }}</a>
                     </th>
                     <th style="width: 15px; text-align: center;">
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">
                             <i class="glyphicon glyphicon-star"></i>
                         </a>
                     </th>
-                    <th style="width: 50px;">Actions</th>
+                    <th style="width: 50px;">{{ 'lang_Actions' | translate }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -90,7 +90,7 @@
                             <i class="glyphicon glyphicon-eye-open ng-cloak"
                                     data-ng-show="issue.watcher" 
                                     data-type="tooltip" 
-                                    data-original-title="You are only watching this issue"></i>
+                                    data-original-title="{{ 'lang_YouAreOnlyWatching' | translate }}"></i>
                             {{issue.subject}}
                         </a>
                     </td>
@@ -108,7 +108,7 @@
                         <i class="glyphicon glyphicon-star-empty pointer" data-ng-click="markUnRead(issue)" data-ng-show="issue.read"></i>
                     </td>
                     <td>
-                        <i class="glyphicon glyphicon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="Open issue in Redmine"></i>
+                        <i class="glyphicon glyphicon-share pointer" data-ng-click="openWebPage(issue)" data-type="tooltip" data-original-title="{{ 'lang_OpenIssueInRedmine' | translate }}"></i>
                     </td>
                 </tr>
             </tbody>
@@ -116,10 +116,10 @@
         <div data-ng-show="issues.length > pageSize">
             <ul class="pager">
                 <li>
-                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">&larr;&nbsp;Previous</button>
+                    <button class="btn" data-ng-disabled="page == 0" data-ng-click="page=page-1">{{ 'lang_Previus' | translate }}</button>
                 </li>
                 <li>
-                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">Next&nbsp;&rarr;</button>
+                    <button class="btn" data-ng-disabled="page >= issues.length/pageSize - 1" data-ng-click="page=page+1">{{ 'lang_Next' | translate }}</button>
                 </li>
             </ul>
         </div>

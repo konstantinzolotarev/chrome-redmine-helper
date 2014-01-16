@@ -4,28 +4,28 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>
-                    Project filtering settings
+                    {{ 'lang_ProjectFilteringSettings' | translate }}
                 </h3>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
-                        <label class="control-label col-md-5">Show issues for:</label>
+                        <label class="control-label col-md-5">{{ 'lang_ShowIssuesFor' | translate }}</label>
                         <div class="col-md-7">
                             <label class="radio">
                                 <input type="radio" class="projects_show" name="projects_show" id="projRadios0" value="all"
                                        data-ng-model="options.profile.projects.show_for" />
-                                All projects
+                                {{ 'lang_AllProjects' | translate }}
                             </label>
                             <label class="radio">
                                 <input type="radio" class="projects_show" name="projects_show" id="projRadios1" value="selected"
                                        data-ng-model="options.profile.projects.show_for" />
-                                Selected projects
+                                {{ 'lang_SelectedProjects' | translate }}
                             </label>
                         </div>
                     </div>
                     <div class="form-group" data-ng-show="options.profile.projects.show_for == 'selected'">
-                        <label class="control-label col-md-5">Projects:</label>
+                        <label class="control-label col-md-5">{{ 'lang_Projects' | translate }}:</label>
                         <div class="col-md-7">
                             <label class="checkbox" data-ng-repeat="project in projects">
                                 <input type="checkbox"
@@ -36,8 +36,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success" data-ng-click="storeProjects()">Store settings</button>
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</a>
+                <button type="submit" class="btn btn-success" data-ng-click="storeProjects()">{{ 'lang_StoreSettings' | translate }}</button>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ 'lang_Cancel' | translate }}</a>
             </div>
         </div>
     </div>
