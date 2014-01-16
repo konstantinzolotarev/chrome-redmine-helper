@@ -1,38 +1,38 @@
 <div class="page-header">
-    <h3>Latest News</h3>
+    <h3>{{ 'lang_LastestNews' | translate }}</h3>
 </div>
 <div class="row-fluid">
 	<div class="span2">
 		<button class="btn" data-ng-class="isLoading() && 'disabled'" data-ng-click="loadNews()">
 			<i class="glyphicon glyphicon-refresh"></i>&nbsp;
-			Update
+			{{ 'lang_Update' | translate }}
 		</button>
 	</div>
 </div>
 <div class="news">
 	<div class="alert" data-ng-show="news.length < 1 && !isLoading()">
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
-		<strong>Oops!</strong> No news are available.
+		{{ 'lang_OopsNoNewsAvailble' | translate }}
 	</div>
 	<div class="list" data-ng-show="news.length > 0">
 		<div class="news-item" data-ng-repeat="item in news">
 			<h3>
 				{{item.title}}
 				<small>
-					&nbsp;by&nbsp;
+					{{ 'lang_By' | translate }}
 					<a href="">{{item.author.name}}</a>
-					&nbsp;on&nbsp;{{item.created_on|date:'yyyy-MM-dd'}}
+					{{ 'lang_On' | translate }}{{item.created_on|date:'yyyy-MM-dd'}}
 				</small>
 			</h3>
 			<div>
 				<p>
 					{{item.summary}}
 				</p>
-				<a href="" class="read-more" data-ng-click="item.show = true" data-ng-hide="item.show">Read more</a>
+				<a href="" class="read-more" data-ng-click="item.show = true" data-ng-hide="item.show">{{ 'lang_ReadMore' | translate }}</a>
 				<p data-ng-show="item.show">
 					{{item.description}}
 				</p>
-				<a href="" class="read-more" data-ng-click="item.show = false" data-ng-show="item.show">Show less</a>
+				<a href="" class="read-more" data-ng-click="item.show = false" data-ng-show="item.show">{{ 'lang_ShowLess' | translate }}</a>
 			</div>
 			<hr/>
 		</div>

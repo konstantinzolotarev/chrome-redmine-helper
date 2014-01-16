@@ -1,13 +1,13 @@
 <div class="page-header">
-    <h3>Your Time logs</h3>
+    <h3>  {{ 'lang_YourTimelogs' | translate }}</h3>
 </div>
 <div>
     <div class="alert text-center" data-ng-hide="timelines.length > 0 || timelinesActive.length > 0">
-        You are no working on issues.
+        {{ 'lang_NoWorkingIssues' | translate }}
     </div>
     <div data-ng-show="timelines.length > 0 || timelinesActive.length > 0">
         <a href="" class="btn btn-danger" data-ng-click="clear()">
-            <i class="glyphicon glyphicon-trash"></i>&nbsp;Clear all time logs
+            <i class="glyphicon glyphicon-trash"></i>&nbsp;{{ 'lang_ClearAllTimeLogs' | translate }}
         </a>
     </div>
     <div data-ng-show="timelinesActive.length > 0">
@@ -16,14 +16,14 @@
                 <div class="span10">
                     <i class="glyphicon glyphicon-time"></i>
                     {{timeline.issue.subject}}&nbsp;
-                    <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">You are working on this issue</span>
+                    <span class="label label-success" data-ng-show="!timeline.spent && !timeline.end">{{ 'lang_YouAreWorkingOnThisIssue' | translate }}</span>
                     <br/>
                     <small class="muted"><i>&nbsp;{{timeline.start|date:'yyyy-MM-dd h:mma'}}</i></small>
                 </div>
                 <div class="span2">
                     <button class="btn btn-danger" data-ng-click="stopTrackingTime(timeline)">
                         <i class="glyphicon glyphicon-remove-circle"></i>&nbsp;
-                        Finish working
+                        {{ 'lang_FinishWorking' | translate }}
                     </button>
                 </div>
             </div>
@@ -45,13 +45,13 @@
             <div data-ng-repeat="t in timeline.times" class="entry">
                 <p>
                     <span class="label label-success">{{t.spent|tohours}}</span>
-                    <i>No comment available</i>
+                    <i>{{ 'lang_NoCommentAvailable' | translate }}</i>
                 </p>
                 <small class="muted"><i>&nbsp;{{t.start|date:'yyyy-MM-dd'}}</i></small>
             </div>
         </div>
     </div>
     <div data-ng-show="timelines.length > limit">
-        <a href="" data-ng-click="limit = limit+10">Show more...</a>
+        <a href="" data-ng-click="limit = limit+10">{{ 'lang_ShowMore' | translate }}</a>
     </div>
 </div>

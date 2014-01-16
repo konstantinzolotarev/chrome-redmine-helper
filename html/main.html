@@ -20,7 +20,9 @@
         <script type="text/javascript" src="../js/lib/angular-route.js"></script>
         <script type="text/javascript" src="../js/lib/angular-sanitize.js"></script>
         <script type="text/javascript" src="../js/lib/angular-animate.js"></script>
+	<script type="text/javascript" src="../js/lib/angular-translate.min.js"></script>
 
+	<script type="text/javascript" src="../js/app/translation.js"></script>
         <script type="text/javascript" src="../js/app/services.js"></script>
         <script type="text/javascript" src="../js/app/app.js"></script>
         <script type="text/javascript" src="../js/app/controllers/home.js"></script>
@@ -40,26 +42,26 @@
                             <li data-ng-class="$location.path() == '/home' && 'active'">
                                 <a href="#/home">
                                     <i class="glyphicon glyphicon-list"></i>
-                                    Issue List&nbsp;
+                                    {{ 'lang_IssueList' | translate }}&nbsp;
                                     <span class="badge" data-ng-show="getUnreadCount() > 0">{{getUnreadCount()}}</span>
                                 </a>
                             </li>
                             <li data-ng-class="$location.path() == '/news' && 'active'">
                                 <a href="#/news">
                                     <i class="glyphicon glyphicon-briefcase"></i>
-                                    News
+                                    {{ 'lang_News' | translate }}
                                 </a>
                             </li>
                             <li data-ng-class="$location.path() == '/projects' && 'active'">
                                 <a href="#/projects">
                                     <i class="glyphicon glyphicon-book"></i>
-                                    Projects
+                                     {{ 'lang_Projects' | translate }}
                                 </a>
                             </li>
                             <li data-ng-class="$location.path() == '/timelines' && 'active'">
                                 <a href="#/timelines">
                                     <i class="glyphicon glyphicon-time"></i>
-                                    Time logs
+                                    {{ 'lang_TimeLogs' | translate }}
                                 </a>
                             </li>
                         </ul>
@@ -69,13 +71,13 @@
                             <li data-ng-show="$location.path() == '/home'">
                                 <a href="#projectFilters" data-toggle="modal">
                                     <i class="glyphicon glyphicon-filter"></i>
-                                    Projects filtering
+                                    {{ 'lang_ProjectsFiltering' | translate }}
                                 </a>
                             </li>
                             <li data-ng-class="$location.path() == '/options' && 'active'">
                                 <a href="#/options">
                                     <i class="glyphicon glyphicon-wrench"></i>
-                                    Options
+                                    {{ 'lang_Options' | translate }}
                                 </a>
                             </li>
                         </ul>
@@ -87,7 +89,7 @@
                     <!--Body content-->
                     <div class="alert alert-danger" data-ng-if="xhrError">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>
+                        {{ 'lang_ServerWarning' | translate }}
                     </div>
                     <div class="alert alert-success ng-cloak" data-ng-if="customSuccess && customSuccess != ''">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -100,7 +102,7 @@
                     <div class="row">
                         <div class="col-md-offset-3 col-md-6 alert alert-info center" data-ng-show="loading.length > 0">
                             <img src="/img/ajax-loader.gif" alt="Loading..." />
-                            <strong>Loading...</strong>
+                            <strong>{{ 'lang_Loading' | translate }}...</strong>
                         </div>
                     </div>
                     <div data-ng-include src="'/html/partials/projectFilter.html'"></div>
@@ -111,8 +113,8 @@
         <div id="footer">
             <div class="container">
                 <p class="muted credit">
-                    All enchantment you could send to my email: <a href="mailto:konstantin.zolotarev.work@gmail.com" target="_blank">Konstantin Zolotarev</a>
-                    <a href="#/options" class="pull-right">Extension Options</a>
+                    {{ 'lang_AuthorLink' | translate }}
+                    <a href="#/options" class="pull-right">{{ 'lang_ExtensionOptions' | translate }}</a>
                 </p>
             </div>
         </div>

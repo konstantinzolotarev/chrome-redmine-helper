@@ -4,34 +4,34 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3>
-                    Issue list options
-                    <small>Select fields that should be shown</small>
+                    {{ 'lang_IssueListOptions' | translate }}
+                    <small> {{ 'lang_IssueListHint' | translate }}</small>
                 </h3>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> Project title
+                        <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> {{ 'lang_ProjectTitle' | translate }}
                     </label>
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> Author name
+                        <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> {{ 'lang_AuthorName' | translate }}
                     </label>
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> Tracker
+                        <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> {{ 'lang_Tracker' | translate }}
                     </label>
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> Status
+                        <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> {{ 'lang_Status' | translate }}
                     </label>
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.priority" value="option5"> Priority
+                        <input type="checkbox" data-ng-model="options.profile.table.priority" value="option5"> {{ 'lang_Priority' | translate }}
                     </label>
                 </form>
             </div>
             <div class="modal-footer">
                 <a href="" class="btn btn-success" data-ng-click="storeTableOptions()">
-                    Store options
+                    {{ 'lang_StoreOptions' | translate }}
                 </a>
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ 'lang_Close' | translate }}</a>
             </div>
         </div>
     </div>

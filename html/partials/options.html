@@ -1,11 +1,11 @@
 <div class="page-header">
-    <h1>Options</h1>
+    <h1>{{ 'lang_Options' | translate }}</h1>
 </div>
 <div>
     <ul class="nav nav-tabs" id="options_tabs">
-        <li class="active"><a href="#connection" data-toggle="tab">Connection</a></li>
-        <li><a href="#notifications" data-toggle="tab">Notifications</a></li>
-        <li><a href="#misc" data-toggle="tab">Misc</a></li>
+        <li class="active"><a href="#connection" data-toggle="tab">{{ 'lang_Connection' | translate }}</a></li>
+        <li><a href="#notifications" data-toggle="tab">{{ 'lang_Notifications' | translate }}</a></li>
+        <li><a href="#misc" data-toggle="tab">{{ 'lang_Misc' | translate }}</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="connection">
@@ -24,65 +24,65 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-md-2" for="inputApiKey">
-                        Api Access Key <i class="help glyphicon glyphicon-info-sign"
+                        {{ 'lang_ApiKey' | translate }} <i class="help glyphicon glyphicon-info-sign"
                             data-ng-hide="options.profile.hideHints"
                             data-type="popover"
-                            data-original-title="Notice"
-                            data-content="Redmine Api Access Key could be found into your Redmine profile. Regulary into right part of the page."></i>
+                            data-original-title="{{ 'lang_Notice' | translate }}"
+                            data-content="{{ 'lang_ApiKeyNotice' | translate }}"></i>
                     </label>
                     <div class="col-md-5">
-                        <input type="password" class="form-control" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="Your Api Access Key" />
+                        <input type="password" class="form-control" id="inputApiKey" data-ng-model="options.profile.apiAccessKey" placeholder="{{ 'lang_YourApiAccessKey' | translate }}" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-md-2" for="useHttpAuth">Use HTTP Auth for requests</label>
+                    <label class="control-label col-md-2" for="useHttpAuth">{{ 'lang_UseHTTPAuth' | translate }}</label>
                     <div class="col-md-5 checkbox">
                         <input type="checkbox" id="useHttpAuth" data-ng-model="options.profile.useHttpAuth" data-ng-checked="options.profile.useHttpAuth" />
                     </div>
                 </div>
                 <div class="form-group" data-ng-show="options.profile.useHttpAuth">
-                    <label class="control-label col-md-2" for="httpUser">HTTP Username</label>
+                    <label class="control-label col-md-2" for="httpUser">{{ 'lang_HTTPUsername' | translate }}</label>
                     <div class="col-md-5">
                         <input type="text" class="form-control" id="httpUser" placeholder="username" data-ng-model="options.profile.httpUser" />
                     </div>
                 </div>
                 <div class="form-group" data-ng-show="options.profile.useHttpAuth">
-                    <label class="control-label col-md-2" for="httpPass">HTTP Password</label>
+                    <label class="control-label col-md-2" for="httpPass">{{ 'lang_HTTPPassword' | translate }}</label>
                     <div class="col-md-5">
                         <input type="password" class="form-control" id="httpPass" placeholder="password" data-ng-model="options.profile.httpPass" />
                     </div>
                 </div>
                 <hr/>
                 <div class="">
-                    <button type="button" class="btn btn-success" data-ng-click="storeOptions()">Store settings</button>
+                    <button type="button" class="btn btn-success" data-ng-click="storeOptions()">{{ 'lang_StoreSettings' | translate }}</button>
                 </div>
             </form>
         </div>
         <div class="tab-pane" id="notifications">
             <form class="form-horizontal margin-top" role="form">
                 <div class="form-group">
-                    <label class="control-label col-md-2">Show notifications</label>
+                    <label class="control-label col-md-2">{{ 'lang_ShowNotifications' | translate }}</label>
                     <div class="col-md-5">
                         <label class="radio">
                             <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios0" value="none"
                                    data-ng-checked="options.profile.notifications.show == 'none'" />
-                            Never
+                            {{ 'lang_Never' | translate }}
                         </label>
                         <label class="radio">
                             <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios1" value="new"
                                    data-ng-checked="options.profile.notifications.show == 'new'" />
-                            On new issues
+                            {{ 'lang_OnNewIssues' | translate }}
                         </label>
                         <label class="radio">
                             <input type="radio" class="notification_show" name="notifications_show" id="optionsRadios2" value="updated"
                                    data-ng-checked="options.profile.notifications.show == 'updated'" />
-                            On new and updated issues
+                            {{ 'lang_OnNewAndUpdatedIssues' | translate }}
                         </label>
                     </div>
                 </div>
                 <hr/>
                 <div class="">
-                    <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">Store settings</button>
+                    <button type="submit" class="btn btn-success" data-ng-click="storeNotifications()">{{ 'lang_StoreSettings' | translate }}</button>
                 </div>
             </form>
         </div>
@@ -93,7 +93,7 @@
                         <label>
                             <input type="checkbox" id="showhints"
                                    data-ng-model="options.profile.hideHints" />
-                            Hide help messages and hints
+                            {{ 'lang_HideHelpMessagesAndHints' | translate }}
                         </label>
                     </div>
                 </div>
@@ -101,13 +101,13 @@
                     <div class="col-md-offset-2 col-md-5">
                         <button class="btn btn-danger" data-ng-click="clearStorage()">
                             <i class="glyphicon glyphicon-trash"></i>&nbsp;
-                            Clear all stored information
+                            {{ 'lang_ClearAllStoredInformation' | translate }}
                         </button>
                     </div>
                 </div>
                 <hr/>
                 <div class="">
-                    <button type="submit" class="btn btn-success" data-ng-click="storeMisc()">Store settings</button>
+                    <button type="submit" class="btn btn-success" data-ng-click="storeMisc()">{{ 'lang_StoreSettings' | translate }}</button>
                 </div>
             </form>
         </div>

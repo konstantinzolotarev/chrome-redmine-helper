@@ -118,7 +118,7 @@ angular.module('Issues.Service', ['ngSanitize'])
                 if (scope.item.property == "attr") {
                     switch (scope.item.name) {
                         case "status_id":
-                            element.html("<strong>Status</strong> changed from "
+                            element.html("<strong>{{ 'lang_Status' | translate }}</strong> changed from "
                                 + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.old_value) + "</i> to "
                                 + "<i>" + BG.com.rdHelper.Issues.getStatusNameById(scope.item.new_value) + "</i>");
                             break;

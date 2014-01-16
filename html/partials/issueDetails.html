@@ -10,33 +10,33 @@
             </div>
             <div class="modal-body">
                 <div class="alert alert-info center" data-ng-hide="issue.detailsLoaded">
-                    Loading...
+                    {{ 'lang_Loading' | translate }}...
                 </div>
                 <p>
                     <small>
-                        Added by
+                        {{ 'lang_AddedBy' | translate }}
                         <a href="" data-ng-click="openAuthorPage(issue.author.id)">{{issue.author.name}}</a>
-                        on {{issue.created_on | date:'MMM d, y'}}
+                        {{ 'lang_On' | translate }}{{issue.created_on | date:'MMM d, y'}}
                     </small>
                 </p>
                 <div class="row">
                     <div class="col-md-6">
                         <p>
                             <small>
-                                <strong>Status</strong>:&nbsp;
+                                <strong> {{ 'lang_Status' | translate }}</strong>:&nbsp;
                                 <span data-editable-list
                                       data-editable-value="issue.status.id"
                                       data-editable-select="availStatuses"
                                       data-on-ok="stausOk">
                                     {{issue.status.name}}
                                 </span><br/>
-                                <strong>Priority</strong>:&nbsp;{{issue.priority.name}}<br/>
+                                <strong>{{ 'lang_Priority' | translate }}</strong>:&nbsp;{{issue.priority.name}}<br/>
                                 <span data-ng-show="issue.assigned_to">
-                                    <strong>Assignee</strong>:&nbsp;
+                                    <strong>{{ 'lang_Assignee' | translate }}</strong>:&nbsp;
                                     <a href="" data-ng-click="openAuthorPage(issue.assigned_to.id)">{{issue.assigned_to.name}}</a>
                                 </span><br/>
                                 <span>
-                                    <strong>Estimated hours</strong>:&nbsp;<span data-editable-input
+                                    <strong>{{ 'lang_EstimatedHours' | translate }}</strong>:&nbsp;<span data-editable-input
                                           data-editable-value="issue.estimated_hours"
                                           data-on-ok="estimatedOk">
                                         {{issue.estimated_hours || 0}}
@@ -48,7 +48,7 @@
                     <div class="col-md-6">
                         <div data-ng-show="issue.done_ratio >= 0">
                             <small data-ng-show="issue.tracker">
-                                <strong>Type</strong>:&nbsp;
+                                <strong>{{ 'lang_Type' | translate }}</strong>:&nbsp;
                                 <span data-editable-list
                                       data-editable-value="issue.tracker.id"
                                       data-editable-select="project.trackers"
@@ -58,7 +58,7 @@
                                 <br/>
                             </small>
                             <small>
-                                <strong>Done</strong>:&nbsp;<span data-progress
+                                <strong>{{ 'lang_Done' | translate }}</strong>:&nbsp;<span data-progress
                                       data-editable-value="issue.done_ratio"
                                       data-on-ok="doneOk">
                                     {{issue.done_ratio}}%
@@ -70,7 +70,7 @@
                                      aria-valuemin="0"
                                      aria-valuemax="100"
                                      style="width: {{issue.done_ratio || 0}}%;">
-                                <span class="sr-only">20% Complete</span></div>
+                                <span class="sr-only">{{ 'lang_Complete20Perc' | translate }}</span></div>
                             </div>
                         </div>
                     </div>
@@ -80,14 +80,14 @@
                         <div>
                             <a href="" class="btn btn-danger" data-ng-click="stopTrackingTime()">
                                 <i class="glyphicon glyphicon-remove-circle"></i>
-                                Finish working on this issue
+                                {{ 'lang_FinishWorkingOnIssue' | translate }}
                             </a>
                         </div>
                         <div class="margin margin-top">
                             <a href="" data-ng-click="toggleTimeComment = !toggleTimeComment">
                                 <i class="glyphicon glyphicon-comment"></i>&nbsp;
-                                <span data-ng-hide="toggleTimeComment">Edit comment</span>
-                                <span data-ng-show="toggleTimeComment">Finish editing</span>
+                                <span data-ng-hide="toggleTimeComment">{{ 'lang_EditComment' | translate }}</span>
+                                <span data-ng-show="toggleTimeComment">{{ 'lang_FinishEditing' | translate }}</span>
                             </a>
                             <div data-ng-show="toggleTimeComment">
                                 <form class="margin-top" role="form">
@@ -99,20 +99,20 @@
                     <div data-ng-hide="issue.tracking">
                         <a href="" class="btn btn-success" data-ng-click="startTrackingTime()">
                             <i class="glyphicon glyphicon-time"></i>
-                            Start working on this issue
+                            {{ 'lang_StartWorkingOnIssue' | translate }}
                         </a>
                     </div>
                 </div>
                 <hr/>
                 <div id="detailsTabs">
                     <ul class="nav nav-tabs" id="issue-details-tabs">
-                        <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
-                        <li class=""><a href="#journals" data-toggle="tab">History</a></li>
+                        <li class="active"><a href="#description" data-toggle="tab">{{ 'lang_Description' | translate }}</a></li>
+                        <li class=""><a href="#journals" data-toggle="tab">{{ 'lang_History' | translate }}</a></li>
                         <li class="">
-                            <a href="#attachments" data-toggle="tab">Attachments</a>
+                            <a href="#attachments" data-toggle="tab">{{ 'lang_Attachments' | translate }}</a>
                         </li>
-                        <li class=""><a href="#addComment" data-toggle="tab">Add Comment</a></li>
-                        <li class=""><a href="#timelines" data-toggle="tab">Time logs</a></li>
+                        <li class=""><a href="#addComment" data-toggle="tab">{{ 'lang_AddComment' | translate }}</a></li>
+                        <li class=""><a href="#timelines" data-toggle="tab"> {{ 'lang_TimeLogs' | translate }}</a></li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="description">
@@ -123,16 +123,16 @@
                         <!-- Show Issue actions history -->
                         <div class="tab-pane" id="journals">
                             <div class="alert center" data-ng-hide="issue.detailsLoaded">
-                                Loading history...
+                                {{ 'lang_LoadingHistory' | translate }}
                             </div>
                             <div class="text-center scroll" data-ng-show="issue.detailsLoaded">
-                                <a href="" id="scrollToBottom" data-ng-click="scroll(false)">Scroll to bottom...</a>
+                                <a href="" id="scrollToBottom" data-ng-click="scroll(false)">{{ 'lang_ScrollToBottom' | translate }}</a>
                             </div>
                             <div data-ng-repeat="history in issue.journals" class="issue-history">
                                 <p class="pointer minify" data-ng-click="toggleMinify(history)">
                                     <small>
-                                        <strong>Updated by</strong>&nbsp;
-                                        <a href="" data-ng-click="false;">{{history.user.name}}</a> on {{history.created_on | date:'MMM d, y'}}
+                                        <strong>{{ 'lang_UpdatedBy' | translate }}</strong>&nbsp;
+                                        <a href="" data-ng-click="false;">{{history.user.name}}</a>{{ 'lang_On' | translate }}{{history.created_on | date:'MMM d, y'}}
                                     </small>
                                     <i class="pull-right" data-ng-class="history.minified && 'glyphicon glyphicon-resize-full' || 'glyphicon glyphicon-resize-small'"></i>
                                 </p>
@@ -146,14 +146,14 @@
                                         <blockquote>
                                             <p data-ng-bind-html="history.notes|nl2br|comment"></p>
                                             <small class="pointer" data-ng-click="replyComment()">
-                                                <i class="glyphicon glyphicon-comment"></i>&nbsp;Reply
+                                                <i class="glyphicon glyphicon-comment"></i>&nbsp;{{ 'lang_Reply' | translate }}
                                             </small>
                                         </blockquote>
                                     </div>
                                 </div>
                             </div>
                             <div class="text-center scroll"  data-ng-show="issue.detailsLoaded">
-                                <a href="" id="scrollToTop" data-ng-click="scroll(true)">Scroll to top...</a>
+                                <a href="" id="scrollToTop" data-ng-click="scroll(true)">{{ 'lang_ScrollToTop' | translate }}</a>
                             </div>
                         </div>
                         <!-- List of attachments for issue -->
@@ -175,7 +175,7 @@
                                 <upload-file></upload-file>
                                 <textarea rows="5" class="form-control" data-ng-disabled="!issue.detailsLoaded" data-ng-model="comment"></textarea>
                                 <div class="margin-top">
-                                    <button class="btn btn-info" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">Add Comment</button>
+                                    <button class="btn btn-info" data-ng-disabled="!issue.detailsLoaded" data-ng-click="addComment(comment); comment = ''">{{ 'lang_AddComment' | translate }}</button>
                                 </div>
                             </form>
                         </div>
@@ -183,17 +183,17 @@
                         <div class="tab-pane" id="timelines">
                             <div class="issue-timelines margin-top">
                                 <div class="alert alert-info text-center" data-ng-hide="issue.timelines.length > 0">
-                                    No time logs available.
+                                    {{ 'lang_NoTimeLogsAvailable' | translate }}
                                 </div>
                                 <div data-ng-show="issue.timelines.length > 0">
                                     <div class="row">
                                         <div class="col-md-8">
-                                            <span class="label label-info">Total time spent:&nbsp;{{issue.timelineTotal|tohours}}</span>
+                                            <span class="label label-info">{{ 'lang_TotalTimeSpent' | translate }}:&nbsp;{{issue.timelineTotal|tohours}}</span>
                                         </div>
                                         <div class="col-md-4">
                                             <a href="" class="btn btn-danger" data-ng-click="clearTimeline(issue)" data-ng-hide="issue.tracking">
                                                 <i class="glyphicon glyphicon-trash"></i>&nbsp;
-                                                Clear time logs
+                                                {{ 'lang_ClearTimeLogs' | translate }}
                                             </a>
                                         </div>
                                     </div>
@@ -204,7 +204,7 @@
                                         <div class="col-md-11 entry">
                                             <p>
                                                 <span class="label label-success">{{timeline.spent|tohours}}</span>
-                                                <i data-ng-show="timeline.comment == ''">No comment available</i>
+                                                <i data-ng-show="timeline.comment == ''">{{ 'lang_NoCommentAvailable' | translate }}</i>
                                                 <i data-ng-hide="timeline.comment == ''">{{timeline.comment}}</i>
                                             </p>
                                             <small class="muted">&nbsp;<i>{{timeline.start|date:'yyyy-MM-dd'}}</i></small>
@@ -222,9 +222,9 @@
             <div class="modal-footer">
                 <a href="" class="btn" data-ng-click="openWebPage(issue)">
                     <i class="glyphicon glyphicon-share"></i>&nbsp;
-                    Open in Redmine
+                    {{ 'lang_OpenInRedmine' | translate }}
                 </a>
-                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+                <a href="#" class="btn" data-dismiss="modal" aria-hidden="true"> {{ 'lang_Close' | translate }}</a>
             </div>
         </div>
     </div>
