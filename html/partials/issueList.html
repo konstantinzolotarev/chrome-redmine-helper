@@ -75,7 +75,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize" data-ng-class="issue.read || 'unread'">
+                <tr data-ng-repeat="issue in issues | filter:search | orderBy:order:reverse | pager:page*pageSize | limitTo:pageSize track by issue.id" data-ng-class="issue.read || 'unread'">
                     <!--
                     <td>
                         <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 

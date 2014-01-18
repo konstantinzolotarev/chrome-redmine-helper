@@ -64,6 +64,7 @@ function Home($scope, BG) {
         for(var key in BG.com.rdHelper.Issues.issues) {
             $scope.issues.push(BG.com.rdHelper.Issues.issues[key]);
         }
+        console.log($scope.issues);
     };
     //Run update issues action
     $scope.updateIssues();
