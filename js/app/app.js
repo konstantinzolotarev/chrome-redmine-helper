@@ -188,7 +188,12 @@ angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service','pascalprech
             $scope.hideSuccess = function() {
                 $scope.customSuccess = "";
             };
-        }]);
+
+            $scope.$watch('loading', function() {
+                console.log($scope.loading);
+            });
+        }
+    ]);
 
 /**
  * Bind tooltips
