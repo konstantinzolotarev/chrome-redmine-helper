@@ -1,5 +1,12 @@
 Changelog
 ---------------------------------
+3.0.0
+    - Major core improvements and refactoring
+    - Upgrade to new Angular.js version 1.3+
+    - Added bower support
+    - Added Russian translation for extension
+    - Upgrade to Twitter bootstrap 3.1
+
 1.6.5 ()
     - Added config synchronization between devices
 
