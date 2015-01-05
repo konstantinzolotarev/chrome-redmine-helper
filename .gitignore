@@ -3,3 +3,5 @@ nbproject
 .idea
 npm*
 node*
+
+vendor

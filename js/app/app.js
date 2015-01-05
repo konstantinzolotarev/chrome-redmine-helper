@@ -3,7 +3,7 @@
 /**
  * Create angular application
  */
-angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service','pascalprecht.translate']).
+angular.module('Chrome.Redmine', ['ngRoute', 'ngSanitize', 'Chrome.Redmine.Service','pascalprecht.translate']).
     config([
     '$routeProvider',
     '$httpProvider',
@@ -188,10 +188,6 @@ angular.module('issues', ['ngRoute', 'ngSanitize', 'Issues.Service','pascalprech
             $scope.hideSuccess = function() {
                 $scope.customSuccess = "";
             };
-
-            $scope.$watch('loading', function() {
-                console.log($scope.loading);
-            });
         }
     ]);
 

@@ -55,7 +55,7 @@ var linkFunction = function (scope, element, attrs) {
     };
 };
 
-angular.module('Issues.Service', ['ngSanitize'])
+angular.module('Chrome.Redmine.Service', ['ngSanitize'])
     .factory('BG', function () {
         return chrome.extension.getBackgroundPage();
     })
