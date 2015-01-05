@@ -3,18 +3,18 @@
 /**
  * Create angular application
  */
-angular.module('Chrome.Redmine', ['ngRoute', 'ngSanitize', 'Chrome.Redmine.Service','pascalprecht.translate']).
+angular.module('Chrome.Redmine', ['ngRoute', 'ngSanitize', 'pascalprecht.translate', 'Chrome.Redmine.Service']).
     config([
     '$routeProvider',
     '$httpProvider',
     function($routeProvider, $httpProvider) {
         $routeProvider.
-            when('/options', {templateUrl: 'partials/options.html', controller: Options}).
-            when('/home', {templateUrl: 'partials/home.html', controller: Home}).
-            when('/news', {templateUrl: 'partials/news.html', controller: News}).
-            when('/projects', {templateUrl: 'partials/projects.html', controller: Projects}).
-            when('/timelines', {templateUrl: 'partials/timelines.html', controller: Timelines}).
-            when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: NewIssue}).
+            when('/options', {templateUrl: 'partials/options.html', controller: 'Options'}).
+            when('/home', {templateUrl: 'partials/home.html', controller: 'Home'}).
+            when('/news', {templateUrl: 'partials/news.html', controller: 'News'}).
+            when('/projects', {templateUrl: 'partials/projects.html', controller: 'Projects'}).
+            when('/timelines', {templateUrl: 'partials/timelines.html', controller: 'Timelines'}).
+            when('/new_issue', {templateUrl: 'partials/newIssue.html', controller: 'NewIssue'}).
             otherwise({redirectTo: '/home'});
 
         /**
