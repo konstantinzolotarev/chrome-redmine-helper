@@ -84,7 +84,9 @@
                     <!--Body content-->
                     <div class="alert alert-danger" data-ng-if="xhrError">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <strong>{{ 'lang_Warning' | translate }}</strong>
                         {{ 'lang_ServerWarning' | translate }}
+                        <a href="#/options">{{ 'lang_CheckOptions' | translate }}</a>
                     </div>
                     <div class="alert alert-success ng-cloak" data-ng-if="customSuccess && customSuccess != ''">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -108,7 +110,7 @@
         <div id="footer">
             <div class="container">
                 <p class="muted credit">
-                    {{ 'lang_AuthorLink' | translate }} <a href="mailto:konstantin.zolotarev.work@gmail.com" target="_blank">Konstantin Zolotarev</a>
+                    {{ 'lang_AuthorLink' | translate }} <a href="https://github.com/konstantinzolotarev/chrome-redmine-helper" target="_blank">Chrome Redmine Helper</a>
                     <a href="#/options" class="pull-right">{{ 'lang_ExtensionOptions' | translate }}</a>
                 </p>
             </div>

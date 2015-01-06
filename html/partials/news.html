@@ -12,6 +12,7 @@
 <div class="news">
 	<div class="alert" data-ng-show="news.length < 1 && !isLoading()">
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		<strong>{{ 'lang_Oops' | translate }}</strong>
 		{{ 'lang_OopsNoNewsAvailble' | translate }}
 	</div>
 	<div class="list" data-ng-show="news.length > 0">
