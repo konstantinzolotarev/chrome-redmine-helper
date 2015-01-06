@@ -30,7 +30,7 @@
 	lang_ServerWarning : '<strong> Предупреждение</strong>Сервер не доступен. <a href="#/options">Может быть проверить настройки?</a>',
 	lang_Loading : 'Загрузка',
 	lang_ExtensionOptions :'Настройки расширения',
-	lang_AuthorLink :'Отправляйте все пожелания на мою электронную почту: <a href="mailto:konstantin.zolotarev.work@gmail.com" target="_blank">Константин Золотарев</a>',
+	lang_AuthorLink :'Отправляйте все пожелания на мою электронную почту:',
 	
 	//Home
 	lang_IssueListOptions :'Параметры списка задач',
@@ -161,7 +161,7 @@
 	lang_ServerWarning: '<strong>Warning!</strong> Server is not accessible. <a href="#/options">May be update options ?</a>',
 	lang_Loading: 'Loading',
 	lang_ExtensionOptions: 'Extention Options',
-	lang_AuthorLink: 'All enchantment you could send to my email: <a href="mailto:konstantin.zolotarev.work@gmail.com" target="_blank">Konstantin Zolotarev</a>',
+	lang_AuthorLink: 'All enchantment you could send to my email:',
 
 	//Home
 	lang_IssueListOptions: 'Issue list options',
