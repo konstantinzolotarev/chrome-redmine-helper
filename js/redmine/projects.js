@@ -39,12 +39,11 @@ com.rdHelper.Projects.load = function(callback) {
     callback = callback || function() {};
     chrome.storage.local.get('projects', function(item) {
         if (!item.projects) {
-            callback();
-            return;
+            return callback();
         }
         this.projects = item.projects;
         this.loaded = true;
-        callback();
+        return callback();
     }.bind(this));
 };
 
@@ -72,8 +71,7 @@ com.rdHelper.Projects.all = function(reload, callback) {
     }
     callback = callback || function() {};
     if (this.loaded && !reload) {
-        callback(this.projects);
-        return;
+        return callback(null, this.projects);
     }
     this.load(function() {
         //If we have no projects there loading from API
@@ -81,7 +79,7 @@ com.rdHelper.Projects.all = function(reload, callback) {
             this.loadFromRedmine(callback);
             return;
         }
-        callback(this.projects);
+        return callback(null, this.projects);
     }.bind(this));
 };
 
@@ -101,8 +99,7 @@ com.rdHelper.Projects.loadFromRedmine = function(offset, callback) {
     offset = offset || "0";
     redmineApi.projects.all("offset="+offset, function(error, data) {
         if (error) {
-            callback({});
-            return;
+            return callback(error);
         }
         if (data.total_count && data.total_count > 0) {
             for(var i = 0; i < data.projects.length; i++) {
@@ -113,7 +110,7 @@ com.rdHelper.Projects.loadFromRedmine = function(offset, callback) {
             if (data.total_count > (data.limit + data.offset)) {
                 this.loadFromRedmine(data.limit + data.offset, callback);
             } else {
-                callback(this.projects);
+                callback(null, this.projects);
                 chrome.extension.sendMessage({action: "projectsLoaded", projects: this.projects});
             }
         }
@@ -136,6 +133,15 @@ com.rdHelper.Projects.getByIdentifier = function(ident) {
 };
 
 /**
+ * Get project id from list by identifier
+ *
+ * @see com.rdHelper.Projects.getByIdentifier
+ * @param {string} ident
+ * @returns {int}
+ */
+com.rdHelper.Projects.getProjectKey = com.rdHelper.Projects.getByIdentifier;
+
+/**
  * Get project from list by id
  *
  * @param {(string|number)} id
@@ -144,21 +150,6 @@ com.rdHelper.Projects.getByIdentifier = function(ident) {
 com.rdHelper.Projects.getById = function(id) {
     if (this.projects[id]) {
         return this.projects[id];
-    }
-    return false;
-};
-
-/**
- * Get project id from list by identifier
- *
- * @param {string} ident
- * @returns {int}
- */
-com.rdHelper.Projects.getProjectKey = function(ident) {
-    for(var pid in this.projects) {
-        if (this.projects[pid].identifier == ident) {
-            return pid;
-        }
     }
     return false;
 };

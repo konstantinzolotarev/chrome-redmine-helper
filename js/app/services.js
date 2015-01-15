@@ -59,20 +59,6 @@ angular.module('Chrome.Redmine.Service', ['ngSanitize'])
     .factory('BG', function () {
         return chrome.extension.getBackgroundPage();
     })
-    .factory('Projects', ['BG', '$q', function(BG, $q) {
-        return {
-            /**
-             * Get all projects list
-             */
-            all: function() {
-                var defer = $q.defer();
-                BG.com.rdHelper.Projects.all(function(projects) {
-                    defer.resolve(projects);
-                });
-                return defer.promise;
-            }
-        };
-    }])
     .directive('issueHistory', ['BG', function (BG) {
         return {
             replace: true,

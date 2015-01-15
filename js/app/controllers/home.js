@@ -68,10 +68,7 @@
             for(var key in BG.com.rdHelper.Issues.issues) {
                 $scope.issues.push(BG.com.rdHelper.Issues.issues[key]);
             }
-            console.log($scope.issues);
         };
-        //Run update issues action
-        $scope.updateIssues();
 
         /**
          * Mark issue as read
@@ -413,5 +410,8 @@
 
         //Add one global handler for messages from background
         chrome.extension.onMessage.addListener(onMessage);
+
+        //Run update issues action
+        $scope.updateIssues();
     };
 })();

@@ -17,6 +17,8 @@
     },
     "background": {
         "scripts": [
+            "vendor/async/lib/async.js",
+            "vendor/lodash/dist/lodash.min.js",
             "js/bg_base.js",
             "js/config.js",
             "js/redmine/projects.js",

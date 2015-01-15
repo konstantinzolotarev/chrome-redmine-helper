@@ -47,26 +47,24 @@ com.rdHelper.Issues.size = function() {
  */
 com.rdHelper.Issues.loadFromStorage = function(callback) {
     callback = callback || function() {};
-    (function(obj) {
-        chrome.storage.local.get('issues', function(items) {
-            if (!items.issues) {
-                callback();
-                return;
-            }
-            if (items.issues.issues) {
-                obj.issues = items.issues.issues;
-            }
-            if (items.issues.issueStatuses) {
-                obj.issueStatuses = items.issues.issueStatuses;
-            }
-            if (items.issues.lastUpdated) {
-                obj.lastUpdated = new Date(items.issues.lastUpdated);
-            }
-            obj.loaded = true;
+    var self = this;
+    chrome.storage.local.get('issues', function(items) {
+        if (!items.issues) {
             callback();
-        });
-        return;
-    })(this);
+            return;
+        }
+        if (items.issues.issues) {
+            self.issues = items.issues.issues;
+        }
+        if (items.issues.issueStatuses) {
+            self.issueStatuses = items.issues.issueStatuses;
+        }
+        if (items.issues.lastUpdated) {
+            self.lastUpdated = new Date(items.issues.lastUpdated);
+        }
+        self.loaded = true;
+        callback();
+    });
 };
 
 /**
@@ -133,124 +131,131 @@ com.rdHelper.Issues.getById = function(id) {
 /**
  * Load issues list from server
  * 
- * @param {number} offset load result offset
- * @param {number} limit Limit for results
- * @param {boolean} watcher
+ * @param {number} offset - Load result offset
+ * @param {number} limit - Limit for results
+ * @param {boolean} watcher - Wil load
  */
-com.rdHelper.Issues.load = function(offset, limit, watcher) {
+com.rdHelper.Issues.load = function(offset, limit, watcher, cb) {
     offset = offset || 0;
     offset = parseInt(offset);
     limit = limit || 25;
-    if  (typeof watcher == "undefined") {
+
+    if (_.isFunction(watcher)) {
+        cb = watcher;
         watcher = false;
     }
-    (function(obj) {
-        var filter = "";
-        if (!watcher) {
-            filter = "sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId
-                                +"&limit="+limit
-                                +"&offset="+offset;
-        } else {
-            filter = "sort=updated_on:desc&watcher_id="+getConfig().getProfile().currentUserId
-                                +"&limit="+limit
-                                +"&offset="+offset;
+
+    if  (!_.isBoolean(watcher)) {
+        watcher = false;
+    }
+    //callback
+    cb = cb || function() {};
+    var obj = this;
+    var filter = "";
+    if (!watcher) {
+        filter = "sort=updated_on:desc&assigned_to_id="+getConfig().getProfile().currentUserId
+                            +"&limit="+limit
+                            +"&offset="+offset;
+    } else {
+        filter = "sort=updated_on:desc&watcher_id="+getConfig().getProfile().currentUserId
+                            +"&limit="+limit
+                            +"&offset="+offset;
+    }
+    redmineApi.issues.all(filter, function(error, data) {
+        if (error) {
+            return cb(new Error("Server is unavailable."));
         }
-        redmineApi.issues.all(filter, function(error, data) {
-            if (error) {
-                fireError("Server is unavailable.", true);
-                return;
-            }
-            var updated = 0;
-            var notifiedIssues = [];
-            if (data.total_count && data.total_count > 0) {
-                for(var i in data.issues) {
-                    var found = false;
-                    var issueId = data.issues[i].id;
-                    if (getConfig().getProjectsSettings().show_for == "selected"
-                            && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
-                        continue;
-                    }
-                    //We found this issue
-                    if (obj.issues[issueId]) {
-                        found = true;
-                        if (new Date(obj.issues[issueId].updated_on) < new Date(data.issues[i].updated_on)) {
-                            //mark as unread
-                            data.issues[i].read = false;
-                            //mark as watcher issue
-                            if (watcher) {
-                                if (obj.issues[issueId].assigned_to 
-                                        && obj.issues[issueId].assigned_to.id == getConfig().getProfile().currentUserId) {
-                                   data.issues[i].watcher = false; 
-                                } else {
-                                    data.issues[i].watcher = true; 
-                                }
-                            }
-                            obj.issues[issueId] = data.issues[i];
-                            updated += 1;
-                            //Bind users from issue
-                            com.rdHelper.Users.grabFromIssue(data.issues[i]);
-                            if (getConfig().getNotifications().show == "updated") {
-                                notifiedIssues.push(obj.issues[issueId]);
-                            }
-                        }
-                    }
-                    if (!found) {
-                        //Bind users from issue
-                        com.rdHelper.Users.grabFromIssue(data.issues[i]);
+        var updated = 0;
+        var notifiedIssues = [];
+        if (data.total_count && data.total_count > 0) {
+            for(var i in data.issues) {
+                var found = false;
+                var issueId = data.issues[i].id;
+                if (getConfig().getProjectsSettings().show_for == "selected"
+                        && getConfig().getProjectsSettings().list.indexOf(data.issues[i].project.id) == -1) {
+                    continue;
+                }
+                //We found this issue
+                if (obj.issues[issueId]) {
+                    found = true;
+                    if (new Date(obj.issues[issueId].updated_on) < new Date(data.issues[i].updated_on)) {
                         //mark as unread
                         data.issues[i].read = false;
                         //mark as watcher issue
                         if (watcher) {
-                            if (data.issues[i].assigned_to
-                                    && data.issues[i].assigned_to.id == getConfig().getProfile().currentUserId) {
-                               data.issues[i].watcher = false; 
+                            if (obj.issues[issueId].assigned_to
+                                    && obj.issues[issueId].assigned_to.id == getConfig().getProfile().currentUserId) {
+                               data.issues[i].watcher = false;
                             } else {
-                                data.issues[i].watcher = true; 
+                                data.issues[i].watcher = true;
                             }
                         }
                         obj.issues[issueId] = data.issues[i];
                         updated += 1;
-                        if (getConfig().getNotifications().show == "new") {
+                        //Bind users from issue
+                        com.rdHelper.Users.grabFromIssue(data.issues[i]);
+                        if (getConfig().getNotifications().show == "updated") {
                             notifiedIssues.push(obj.issues[issueId]);
                         }
                     }
                 }
-                obj.lastUpdated = new Date();
-                obj.updateUnread(true);
-                obj.store();
-                /**
-                 * Update issue statuses
-                 */
-                obj.getStatuses();
-                /**
-                 * Notify
-                 */
-                chrome.extension.sendMessage({"action": "issuesUpdated"});
-                /**
-                 * Load rest of issues
-                 */
-                if (!watcher && data.total_count > (offset + limit) && updated >= limit) {
-                    obj.load((offset + limit), limit);
-                } else {
-                    //load my watcher issues
-                    if(!watcher) {
-                        obj.load(0, limit, true);
+                if (!found) {
+                    //Bind users from issue
+                    com.rdHelper.Users.grabFromIssue(data.issues[i]);
+                    //mark as unread
+                    data.issues[i].read = false;
+                    //mark as watcher issue
+                    if (watcher) {
+                        if (data.issues[i].assigned_to
+                                && data.issues[i].assigned_to.id == getConfig().getProfile().currentUserId) {
+                           data.issues[i].watcher = false;
+                        } else {
+                            data.issues[i].watcher = true;
+                        }
                     }
-                }
-                if (watcher) {
-                    if (data.total_count > (offset + limit) && updated >= limit) {
-                        obj.load((offset + limit), limit, true);
+                    obj.issues[issueId] = data.issues[i];
+                    updated += 1;
+                    if (getConfig().getNotifications().show == "new") {
+                        notifiedIssues.push(obj.issues[issueId]);
                     }
-                }
-                /**
-                 * Show notifications for issues
-                 */
-                if (notifiedIssues.length > 0) {
-                    obj.showNotifications(notifiedIssues);
                 }
             }
-        });
-    })(this);
+            obj.lastUpdated = new Date();
+            obj.updateUnread(true);
+            obj.store();
+            /**
+             * Update issue statuses
+             */
+            obj.getStatuses();
+            /**
+             * Notify
+             */
+            chrome.extension.sendMessage({"action": "issuesUpdated"});
+            /**
+             * Load rest of issues
+             */
+            if (!watcher && data.total_count > (offset + limit) && updated >= limit) {
+                obj.load((offset + limit), limit);
+            } else {
+                //load my watcher issues
+                if(!watcher) {
+                    obj.load(0, limit, true);
+                }
+            }
+            if (watcher) {
+                if (data.total_count > (offset + limit) && updated >= limit) {
+                    obj.load((offset + limit), limit, true);
+                }
+            }
+            /**
+             * Show notifications for issues
+             */
+            if (notifiedIssues.length > 0) {
+                obj.showNotifications(notifiedIssues);
+            }
+        }
+        return cb();
+    });
 };
 
 /**

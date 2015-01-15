@@ -13,53 +13,20 @@
      * @returns {?}
      */
     function Projects($scope, BG, Projects) {
-        //list of projects
-        $scope.projects = [];
 
-        // Load list of projects from backend
-        $scope.getProjects = function () {
-            Projects.all().then(function (data) {
-                $scope.projects = data;
-            });
-        };
+        $scope.projectsService = Projects;
+
+        //Run loading of projects
+        Projects.all(false);
 
         /**
-         * Reload projects list
+         * Will reload list of projects
          */
-        $scope.reload = function () {
+        $scope.reload = function() {
             $scope.showLoading();
-            BG.com.rdHelper.Projects.clear();
-            BG.com.rdHelper.Projects.all(true);
-        };
-
-        /**
-         * On projects list updated
-         *
-         * @param {Object} request
-         * @param {Object} sender
-         * @param {Object} sendResponse
-         * @returns {undefined}
-         */
-        var projectsLoaded = function (request, sender, sendResponse) {
-            $scope.$apply(function (sc) {
-                sc.hideLoading();
-                $scope.getProjects();
+            Projects.reload(true).then(function() {
+                $scope.hideLoading();
             });
         };
-
-        //Handle new issue creation
-        var onMessage = function (request, sender, sendResponse) {
-            if (request.action && request.action == "projectsLoaded") {
-                return projectsLoaded(request, sender, sendResponse);
-            }
-        };
-
-        //Add one global handler for messages from background
-        chrome.extension.onMessage.addListener(onMessage);
-
-        /**
-         * Load project list
-         */
-        $scope.getProjects();
     }
 })();
