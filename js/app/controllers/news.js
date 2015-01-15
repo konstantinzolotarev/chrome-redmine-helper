@@ -3,36 +3,24 @@
 
     angular.module('Chrome.Redmine').controller('News', News);
     
-    News.$inject = ['$scope', 'BG'];
+    News.$inject = ['$scope', 'News'];
 
     /**
      * News screen controller
      *
      * @param {Object} $scope
-     * @param {BG} BG
+     * @param {NewsService} News
      */
-    function News($scope, BG) {
+    function News($scope, News) {
         $scope.news = [];
-
-        $scope.newsLoaded = function (json) {
-            $scope.$apply(function (sc) {
-                if (json.total_count > 0) {
-                    sc.news = json.news;
-                }
-                sc.hideLoading();
-            });
-        };
-
-        $scope.newsError = function (e, resp) {
-            $scope.$apply(function (sc) {
-                sc.hideLoading();
-            });
-        };
 
         $scope.loadNews = function () {
             $scope.news = [];
             $scope.showLoading();
-            BG.com.rdHelper.News.load($scope.newsLoaded, $scope.newsError);
+            News.load().then(function(news) {
+                $scope.news = news;
+                $scope.hideLoading();
+            });
         };
 
         if ($scope.news.length < 1) {

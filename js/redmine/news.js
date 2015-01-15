@@ -9,21 +9,14 @@ com.rdHelper.News = {};
 /**
  * Load latest news list
  *
- * @param {Function} success
- * @param {Function} error
+ * @param {Function} cb
  */
-com.rdHelper.News.load = function(success, error) {
-    if (!success) {
-        success = function() {};
-    }
-    if (!error) {
-        error = function() {};
-    }
+com.rdHelper.News.load = function(cb) {
+    cb = cb || function() {};
     redmineApi.news.all(function(gerror, json) {
     	if (gerror) {
-    		error(error);
-    		return;
+    		return cb(gerror);
     	}
-    	success(json);
+    	return cb(null, json);
     });
 };
