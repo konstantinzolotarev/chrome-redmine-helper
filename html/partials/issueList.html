@@ -9,9 +9,9 @@
         <table class="table table-hover table-condensed issues" data-ng-show="issues.length > 0">
             <thead>
                 <tr>
-                    <!--<th style="width: 15px; text-align: center;">
+                    <th style="width: 15px; text-align: center;" data-ng-show="options.profile.table.id">
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
-                    </th>-->
+                    </th>
                     <th style="width: 250px;" data-ng-show="options.profile.table.author">
                         <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">Author</a>
                     </th>
@@ -42,6 +42,7 @@
                         <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
                     </td>
                     -->
+	                <td data-ng-show="options.profile.table.id">#{{issue.id}}</td>
                     <td data-ng-show="options.profile.table.author">{{issue.author.name}}</td>
                     <td data-ng-show="options.profile.table.project">
                         {{issue.project.name}}
