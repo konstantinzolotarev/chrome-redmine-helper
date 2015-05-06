@@ -40,7 +40,7 @@
             //Home
             lang_IssueListOptions: 'Параметры списка задач',
             lang_IssueListHint: 'Выберите поля, которые должны быть показаны',
-            lang_ProjectId: 'Id проекта',
+            lang_IssueId: 'Id задачи',
             lang_ProjectTitle: 'Название проекта',
             lang_AuthorName: 'Имя автора',
             lang_Priority: 'Приоритет',

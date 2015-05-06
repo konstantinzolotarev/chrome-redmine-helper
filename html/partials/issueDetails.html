@@ -23,6 +23,10 @@
                     <div class="col-md-6">
                         <p>
                             <small>
+	                            <strong> {{ 'lang_IssueId' | translate }}</strong>:&nbsp;
+                                <span>
+                                    {{issue.id}}
+                                </span><br/>
                                 <strong> {{ 'lang_Status' | translate }}</strong>:&nbsp;
                                 <span data-editable-list
                                       data-editable-value="issue.status.id"
