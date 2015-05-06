@@ -10,20 +10,23 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
-                    <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.project" value="option1"> {{ 'lang_ProjectTitle' | translate }}
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> {{ 'lang_AuthorName' | translate }}
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option3"> {{ 'lang_Tracker' | translate }}
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.status" value="option4"> {{ 'lang_Status' | translate }}
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" data-ng-model="options.profile.table.priority" value="option5"> {{ 'lang_Priority' | translate }}
+                    <label>
+                        <input type="checkbox" data-ng-model="options.profile.table.id" value="option1"> {{ 'lang_IssueId' | translate }}
+                    </label><br />
+	                <label>
+		                <input type="checkbox" data-ng-model="options.profile.table.author" value="option2"> {{ 'lang_AuthorName' | translate }}
+	                </label><br />
+                    <label>
+                        <input type="checkbox" data-ng-model="options.profile.table.project" value="option3"> {{ 'lang_ProjectTitle' | translate }}
+                    </label><br />
+                    <label>
+                        <input type="checkbox" data-ng-model="options.profile.table.tracker" value="option4"> {{ 'lang_Tracker' | translate }}
+                    </label><br />
+                    <label>
+                        <input type="checkbox" data-ng-model="options.profile.table.status" value="option5"> {{ 'lang_Status' | translate }}
+                    </label><br />
+                    <label>
+                        <input type="checkbox" data-ng-model="options.profile.table.priority" value="option6"> {{ 'lang_Priority' | translate }}
                     </label>
                 </form>
             </div>
