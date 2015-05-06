@@ -3,7 +3,7 @@
 </div>
 <div class="well well-sm">
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-5">
             <form class="form-inline" role="form">
                 <div class="form-group">
                     <input type="text" class="form-control" class="search-query"
@@ -13,7 +13,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-7 text-right">
             <a href="#/new_issue" class="btn btn-info">
                 <i class="glyphicon glyphicon-plus-sign"></i>&nbsp;{{ 'lang_NewIssue' | translate }}
             </a>
@@ -48,6 +48,9 @@
                     <!--<th style="width: 15px; text-align: center;">
                         <a href="" data-ng-click="order = 'read'; reverse=!reverse">#</a>
                     </th>-->
+	                <th style="width: 250px;" data-ng-show="options.profile.table.id">
+		                <a href="" data-ng-click="order = 'id'; reverse=!reverse">#</a>
+	                </th>
                     <th style="width: 250px;" data-ng-show="options.profile.table.author">
                         <a href="" data-ng-click="order = 'author.name'; reverse=!reverse">{{ 'lang_Author' | translate }}</a>
                     </th>
@@ -81,6 +84,7 @@
                         <input type="checkbox" name="issue[]" value="{{issue.id}}" /> 
                     </td>
                     -->
+                    <td data-ng-show="options.profile.table.id">{{issue.id}}</td>
                     <td data-ng-show="options.profile.table.author">{{issue.author.name}}</td>
                     <td data-ng-show="options.profile.table.project">
                         {{issue.project.name}}
