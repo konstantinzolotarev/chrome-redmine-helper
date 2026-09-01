@@ -1,0 +1,49 @@
+name: redmine-helper-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: redmine
+      POSTGRES_USER: redmine
+      POSTGRES_PASSWORD: redmine
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redmine -d redmine"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redmine:
+    image: redmine:7.0
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${REDMINE_PORT:-3001}:3000"
+    environment:
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: redmine
+      # Set SECRET_KEY_BASE rather than REDMINE_SECRET_KEY_BASE: the image's
+      # entrypoint only exports the derived value into the server's own process
+      # tree, so `docker compose exec ... rails runner` would fail to boot.
+      SECRET_KEY_BASE: dev-only-secret-key-base-do-not-use-in-production
+      RAILS_ENV: production
+      # So seed.rb can print the URL you actually reach it on.
+      REDMINE_PUBLIC_URL: http://localhost:${REDMINE_PORT:-3001}
+    volumes:
+      - files:/usr/src/redmine/files
+      # Mounted read-write so seed.rb can drop the generated API key at dev/.api-key
+      - ./:/dev-scripts
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/login || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+volumes:
+  db:
+  files:

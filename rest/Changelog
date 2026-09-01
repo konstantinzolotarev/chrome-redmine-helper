@@ -1,5 +1,28 @@
 Changelog
 ---------------------------------
+2.0.0 (in development)
+    - Complete rewrite: Svelte 5 + TypeScript on Manifest V3
+    - New side panel: the issue list now sits alongside whatever you are working on
+    - Time tracking finally reaches Redmine: stopping a timer logs a real time
+      entry, and sessions that fail to send are queued rather than lost
+    - Time tracked in 1.x is migrated into that queue on upgrade
+    - Editable priority and assignee, alongside status, tracker, % done and estimate
+    - Issue history now renders every field, including target version, dates,
+      parent, relations and custom fields
+    - Fixed: issue text was rendered as HTML, so markup in a subject or comment
+      could run inside the extension
+    - Fixed: unread state was lost whenever an issue was refetched, and the
+      unread counter drifted from the real count
+    - Fixed: the cached issue list grew without limit
+    - Polling now asks only for issues changed since the last check, instead of
+      re-reading every assigned issue every five minutes
+    - Connection problems are now reported specifically: a rejected key, a
+      disabled REST API and an unreachable host no longer all read as "Err"
+    - Host access is requested for your Redmine only, not for every site
+    - The API key is stored locally instead of being synced to your Google account
+    - Dark mode
+    - Dropped ChiliProject support (archived upstream since 2015)
+
 1.6.5 ()
     - Added config synchronization between devices
 

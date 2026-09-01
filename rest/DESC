@@ -1,7 +1,23 @@
-This plugin will notify you of the change of your Redmine issues. And give ability to work with them. Change Status, Type, Done percentage. 
-Adding comments to issues. Creating new issues.
-It requires Redmine 1.3.0 or later.
+Work with your Redmine issues without leaving the browser.
 
-To start working with this extension (after installation) go to the options page and enter your Redmine URL and Api Access Key (Could be found into your Redmine profile).
+Redmine Helper puts the issues assigned to you — and the ones you watch — in
+Chrome's side panel, right next to whatever you are working on. It tells you when
+something changes, and lets you act on it without opening Redmine.
 
-For now this extension is under development and lot of new features will be added very soon. 
+- Search your issues, and see at a glance which have changed since you last looked
+- Edit status, tracker, priority, assignee, % done and estimated hours in place
+- Read the full issue history, add comments, and attach files
+- Track time on an issue and log it straight to Redmine, with unsent sessions
+  queued locally so nothing is lost
+- Create an issue from text selected on any page, via the right-click menu
+- Optional desktop notifications for new or updated issues
+- Browse projects and news, and work in a wide full-page view when you want one
+- Dark mode
+
+Requires Redmine 5.0 or later with the REST API enabled (Administration →
+Settings → API). After installing, open the options page and enter your Redmine
+URL and API access key, which you will find on your Redmine account page.
+
+Everything stays in your browser. The extension talks only to the Redmine host
+you configure and sends nothing anywhere else. Access is requested for that one
+host rather than for every site you visit.
