@@ -224,3 +224,9 @@ has been archived since 2015.
 Everything stays in your browser. The extension talks only to the Redmine host
 you configure and sends nothing anywhere else. No analytics, no telemetry, no
 third-party requests.
+
+---
+
+## License
+
+[MIT](LICENSE) — Copyright (c) 2012-2026 Konstantin Zolotarev

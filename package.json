@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Work with your Redmine issues without opening Redmine",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "wxt",
