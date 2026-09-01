@@ -1,3 +1,15 @@
+node_modules
+.wxt
+.output
+stats.html
 dist
+*.zip
+
+# Legacy build tooling
+antdist
 nbproject
 .idea
+
+# Local dev secrets
+dev/.api-key
+dev/.env

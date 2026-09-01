@@ -1,0 +1,10 @@
+{
+  // WXT's generated base already sets strict, noUncheckedIndexedAccess,
+  // noImplicitOverride, verbatimModuleSyntax, the `@/` + `~/` aliases and the
+  // include globs (which must NOT be overridden here, or the generated
+  // `.wxt/types/*.d.ts` augmentations drop out of the program).
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  }
+}
