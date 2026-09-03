@@ -62,18 +62,38 @@ function session(over: Partial<UnsentSession> = {}): UnsentSession {
   };
 }
 
+/** happy-dom ships no clipboard, and the direct user-event API installs none. */
+function stubClipboard(): { writeText: ReturnType<typeof vi.fn> } {
+  const clipboard = { writeText: vi.fn(async () => {}) };
+  Object.defineProperty(navigator, 'clipboard', { value: clipboard, configurable: true });
+  return clipboard;
+}
+
+/** happy-dom updates location.hash but does not fire the event for it. */
+function hashChanged(): void {
+  globalThis.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+
 describe('Tab page', () => {
   beforeEach(async () => {
     vi.unstubAllGlobals();
     vi.stubGlobal(
       'fetch',
-      vi.fn(
-        async () =>
-          new Response(JSON.stringify({ news: [], total_count: 0, offset: 0, limit: 100 }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-          }),
-      ),
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        const detail = /\/issues\/(\d+)\.json/.exec(url);
+
+        const body = detail
+          ? { issue: { ...issue(Number(detail[1])), journals: [] } }
+          : url.includes('/memberships.json')
+            ? { memberships: [], total_count: 0, offset: 0, limit: 100 }
+            : { news: [], total_count: 0, offset: 0, limit: 100 };
+
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }),
     );
 
     globalThis.location.hash = '';
@@ -190,13 +210,94 @@ describe('Tab page', () => {
     expect(await screen.findByText('Not connected yet')).toBeInTheDocument();
   });
 
-  it('links issue subjects out to Redmine', async () => {
+  it('routes subjects into the detail pane, with Redmine on its own icon', async () => {
     await issuesItem.setValue({ '1': issue(1) });
     render(App);
 
+    // The subject used to carry the absolute URL and leave the extension.
     expect(await screen.findByRole('link', { name: 'Issue 1' })).toHaveAttribute(
+      'href',
+      '#/issues/1',
+    );
+    expect(screen.getByRole('link', { name: 'Open issue 1 in Redmine' })).toHaveAttribute(
       'href',
       'https://redmine.test/issues/1',
     );
+  });
+
+  it('opens the detail pane from a subject click and marks the issue read', async () => {
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('link', { name: 'Issue 1' }));
+    hashChanged();
+
+    expect(await screen.findByRole('heading', { name: 'Issue 1' })).toBeInTheDocument();
+    await waitFor(async () => expect(await readStateItem.getValue()).toHaveProperty('1'));
+  });
+
+  it('renders the detail pane for a deep-linked issue, keeping Issues selected', async () => {
+    await issuesItem.setValue({ '1': issue(1) });
+    globalThis.location.hash = '#/issues/1';
+    render(App);
+
+    expect(await screen.findByRole('heading', { name: 'Issue 1' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /Issues/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('closes the pane on back, returning to the plain list', async () => {
+    await issuesItem.setValue({ '1': issue(1) });
+    globalThis.location.hash = '#/issues/1';
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Back to the list' }));
+    hashChanged();
+
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: 'Issue 1' })).not.toBeInTheDocument(),
+    );
+    expect(screen.getByRole('link', { name: 'Issue 1' })).toBeInTheDocument();
+  });
+
+  it('explains a deep link to an issue that is no longer cached', async () => {
+    globalThis.location.hash = '#/issues/999';
+    render(App);
+
+    expect(await screen.findByText(/isn't in your list/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Open #999 in Redmine/ })).toHaveAttribute(
+      'href',
+      'https://redmine.test/issues/999',
+    );
+  });
+
+  it('copies an issue link from a row', async () => {
+    const clipboard = stubClipboard();
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Copy link to issue 1' }));
+
+    expect(clipboard.writeText).toHaveBeenCalledWith('https://redmine.test/issues/1');
+    expect(await screen.findByTitle('Copied')).toBeInTheDocument();
+  });
+
+  it('starts and stops a timer from a row', async () => {
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Start tracking time on issue 1' }),
+    );
+
+    await waitFor(async () => expect(await timerItem.getValue()).toMatchObject({ issueId: 1 }));
+    expect(await screen.findByText(/Tracking/)).toBeInTheDocument();
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Stop tracking time on issue 1' }),
+    );
+    await waitFor(async () => expect(await timerItem.getValue()).toBeNull());
   });
 });

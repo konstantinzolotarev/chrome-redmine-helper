@@ -36,6 +36,13 @@ function issue(id: number, over: Partial<Issue> = {}): Issue {
   } as Issue;
 }
 
+/** happy-dom ships no clipboard, and the direct user-event API installs none. */
+function stubClipboard(): { writeText: ReturnType<typeof vi.fn> } {
+  const clipboard = { writeText: vi.fn(async () => {}) };
+  Object.defineProperty(navigator, 'clipboard', { value: clipboard, configurable: true });
+  return clipboard;
+}
+
 describe('Side panel', () => {
   beforeEach(async () => {
     vi.unstubAllGlobals();
@@ -196,6 +203,17 @@ describe('Side panel', () => {
 
     await userEvent.click(await screen.findByLabelText('Refresh now'));
     expect(send).toHaveBeenCalledWith({ type: 'poll' });
+  });
+
+  it('copies an issue link from a card', async () => {
+    const clipboard = stubClipboard();
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Copy link to issue 1' }));
+
+    expect(clipboard.writeText).toHaveBeenCalledWith('https://redmine.test/issues/1');
+    expect(await screen.findByTitle('Copied')).toBeInTheDocument();
   });
 
   it('marks a watched issue, being one not assigned to me', async () => {

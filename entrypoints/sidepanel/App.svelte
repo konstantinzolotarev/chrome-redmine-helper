@@ -4,14 +4,12 @@
 
   import IssueCard from '@/components/IssueCard.svelte';
   import IssueDetail from '@/components/IssueDetail.svelte';
-  import LogTimeDialog from '@/components/LogTimeDialog.svelte';
+  import TimerHost from '@/components/TimerHost.svelte';
   import Banner from '@/components/ui/Banner.svelte';
   import Button from '@/components/ui/Button.svelte';
-  import { startTimer, stopTimer, logSession, discardSession } from '@/lib/actions/timer.svelte';
   import { openTabPage } from '@/lib/pages';
   import {
     allIssues,
-    enums,
     isConfigured,
     issues,
     isWatched,
@@ -24,26 +22,15 @@
     timer,
   } from '@/lib/store/app.svelte';
   import { isUnread } from '@/lib/store/derive';
-  import type { UnsentSession } from '@/lib/store/types';
   import { toast } from '@/lib/store/ui.svelte';
   import { useTheme } from '@/lib/theme.svelte';
-  import { elapsedMs, formatDuration } from '@/lib/time';
 
   useTheme();
 
   let query = $state('');
   let selectedId = $state<number | null>(null);
   let refreshing = $state(false);
-  let pendingSession = $state<UnsentSession | null>(null);
-
-  // A clock for the running timer. Only the visible UI ticks — the stored state
-  // is just `startedAt`, so nothing depends on this staying alive.
-  let now = $state(Date.now());
-  $effect(() => {
-    if (!timer.current) return;
-    const handle = setInterval(() => (now = Date.now()), 1000);
-    return () => clearInterval(handle);
-  });
+  let timerHost = $state<TimerHost | null>(null);
 
   const ready = $derived(!issues.loading && !prefs.loading && !secrets.loading);
 
@@ -62,8 +49,6 @@
     Object.values(issues.current).filter((issue) => isUnread(issue, readState.current)).length,
   );
 
-  const runningFor = $derived(timer.current ? elapsedMs(timer.current.startedAt, now) : 0);
-
   async function refresh() {
     refreshing = true;
     try {
@@ -80,14 +65,6 @@
   async function open(id: number) {
     selectedId = id;
     await markIssueRead(id);
-  }
-
-  async function toggleTimer(issueId: number, subject: string) {
-    if (timer.current?.issueId === issueId) {
-      pendingSession = await stopTimer();
-    } else {
-      await startTimer(issueId, subject);
-    }
   }
 </script>
 
@@ -137,19 +114,7 @@
       >
     </header>
 
-    {#if timer.current}
-      <button
-        class="flex items-center justify-between border-b border-border bg-accent/10 px-3 py-1.5
-               text-left text-xs hover:bg-accent/15"
-        onclick={() => open(timer.current!.issueId)}
-      >
-        <span class="truncate">
-          Tracking <span class="font-medium">#{timer.current.issueId}</span>
-          {timer.current.issueSubject}
-        </span>
-        <span class="ml-2 shrink-0 font-mono">{formatDuration(runningFor)}</span>
-      </button>
-    {/if}
+    <TimerHost bind:this={timerHost} onopen={open} />
 
     {#if toast.current}
       <div class="p-2">
@@ -197,7 +162,7 @@
               watched={isWatched(issue)}
               tracking={timer.current?.issueId === issue.id}
               onopen={() => open(issue.id)}
-              ontoggletimer={() => toggleTimer(issue.id, issue.subject)}
+              ontoggletimer={() => timerHost?.toggle(issue.id, issue.subject)}
             />
           {/each}
         </ul>
@@ -217,19 +182,3 @@
     </footer>
   {/if}
 </div>
-
-{#if pendingSession}
-  <!-- Keyed so a different session remounts the form with fresh values. -->
-  {#key pendingSession.id}
-    <LogTimeDialog
-      session={pendingSession}
-      activities={enums.current.activities}
-      onlog={(overrides) => logSession(pendingSession!, overrides)}
-      ondiscard={async () => {
-        await discardSession(pendingSession!.id);
-        pendingSession = null;
-      }}
-      onclose={() => (pendingSession = null)}
-    />
-  {/key}
-{/if}

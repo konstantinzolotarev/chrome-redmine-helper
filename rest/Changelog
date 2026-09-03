@@ -1,8 +1,12 @@
 Changelog
 ---------------------------------
-2.0.0 (in development)
+3.0.0 (in development)
     - Complete rewrite: Svelte 5 + TypeScript on Manifest V3
     - New side panel: the issue list now sits alongside whatever you are working on
+    - Full view: clicking an issue now opens it beside the list rather than
+      leaving for Redmine, which moves to its own icon on each row
+    - Full view: start and stop a timer from the issue list
+    - Copy an issue's link from the list or from the issue itself
     - Time tracking finally reaches Redmine: stopping a timer logs a real time
       entry, and sessions that fail to send are queued rather than lost
     - Time tracked in 1.x is migrated into that queue on upgrade

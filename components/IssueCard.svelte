@@ -1,8 +1,11 @@
 <script lang="ts">
   import { Eye, Pause, Play } from 'lucide-svelte';
 
+  import { issueUrl } from '@/lib/format/markup';
   import type { Issue } from '@/lib/redmine';
+  import { prefs } from '@/lib/store/app.svelte';
 
+  import CopyLinkButton from './CopyLinkButton.svelte';
   import RelativeTime from './RelativeTime.svelte';
 
   interface Props {
@@ -40,6 +43,10 @@
         <RelativeTime value={issue.updated_on} />
       </div>
     </button>
+
+    <div class="mt-0.5 shrink-0">
+      <CopyLinkButton url={issueUrl(prefs.current.host, issue.id)} label="issue {issue.id}" />
+    </div>
 
     <button
       class="mt-0.5 shrink-0 rounded p-1 {tracking

@@ -9,6 +9,7 @@
   import type { Issue } from '@/lib/redmine';
   import { enums, markIssueUnread, members, prefs, projects } from '@/lib/store/app.svelte';
 
+  import CopyLinkButton from './CopyLinkButton.svelte';
   import InlineNumber from './InlineNumber.svelte';
   import InlineSelect from './InlineSelect.svelte';
   import JournalEntry from './JournalEntry.svelte';
@@ -84,6 +85,7 @@
       aria-label="Mark unread"
       onclick={() => markIssueUnread(issue.id)}><MailOpen size={14} /></button
     >
+    <CopyLinkButton url={issueUrl(host, issue.id)} label="issue {issue.id}" size={14} />
     <a
       class="rounded p-1 text-text-muted hover:bg-surface-hover hover:text-text"
       href={issueUrl(host, issue.id)}
