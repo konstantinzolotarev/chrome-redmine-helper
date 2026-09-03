@@ -38,12 +38,12 @@ This is idempotent — re-running it is safe. It:
 
 | Field   | Value                       |
 | ------- | --------------------------- |
-| Host    | `http://localhost:3000`     |
+| Host    | `http://localhost:3001`     |
 | API key | contents of `dev/.api-key`  |
 
 Web login is `admin` / `redminedev123`.
 
-Note that Options must be granted host permission for `http://localhost:3000/*`
+Note that Options must be granted host permission for `http://localhost:3001/*`
 before any request will succeed — Redmine sends no CORS headers, so the browser
 blocks cross-origin requests to origins the extension does not hold permission
 for. The "Test connection" button reports this explicitly.

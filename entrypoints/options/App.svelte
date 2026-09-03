@@ -159,12 +159,16 @@
   const projectList = $derived(
     Object.values(projects.current).sort((a, b) => a.name.localeCompare(b.name)),
   );
+
+  // Single source of truth: the manifest version, which WXT takes from
+  // package.json. Hardcoding it here let it drift once already.
+  const version = browser.runtime.getManifest().version;
 </script>
 
 <div class="mx-auto flex max-w-2xl flex-col gap-4 p-6">
   <header>
     <h1 class="text-lg font-semibold">Redmine Helper</h1>
-    <p class="text-xs text-text-muted">Version 2.0.0</p>
+    <p class="text-xs text-text-muted">Version {version}</p>
   </header>
 
   <Section
