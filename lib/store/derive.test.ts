@@ -135,6 +135,17 @@ describe('mergeIssue', () => {
     expect(mergeIssue(existing, incoming).journals).toHaveLength(2);
   });
 
+  it('treats watchers like the other include-only collections', () => {
+    const existing = issue(1, '2026-09-01T10:00:00Z', {
+      watchers: [{ id: 7, name: 'Ada' }],
+    });
+
+    // A list refetch carries no watchers and must not wipe them…
+    expect(mergeIssue(existing, issue(1, '2026-09-01T10:00:00Z')).watchers).toHaveLength(1);
+    // …but they must not survive as stale data once the issue changed upstream.
+    expect(mergeIssue(existing, issue(1, '2026-09-01T12:00:00Z')).watchers).toBeUndefined();
+  });
+
   it('folds a batch into the cache', () => {
     const cache: IssueCache = { '1': issue(1, '2026-09-01T10:00:00Z') };
     const next = mergeIssues(cache, [issue(1, '2026-09-01T12:00:00Z'), issue(2, '2026-09-01T09:00:00Z')]);

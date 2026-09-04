@@ -74,9 +74,9 @@ export function pruneReadState(readState: ReadState, keepIds: Iterable<number>):
 /**
  * Fold a freshly fetched issue into the cache.
  *
- * `include=`d collections (journals, attachments, relations) only arrive on a
- * detail fetch, so a list-shaped response must not wipe them — but they must
- * also not survive as stale data once the issue has changed upstream.
+ * `include=`d collections (journals, attachments, relations, watchers) only
+ * arrive on a detail fetch, so a list-shaped response must not wipe them — but
+ * they must also not survive as stale data once the issue has changed upstream.
  */
 export function mergeIssue(existing: Issue | undefined, incoming: Issue): Issue {
   if (!existing) return incoming;
@@ -87,6 +87,7 @@ export function mergeIssue(existing: Issue | undefined, incoming: Issue): Issue 
     if (incoming.journals === undefined) delete merged.journals;
     if (incoming.attachments === undefined) delete merged.attachments;
     if (incoming.relations === undefined) delete merged.relations;
+    if (incoming.watchers === undefined) delete merged.watchers;
   }
 
   return merged;

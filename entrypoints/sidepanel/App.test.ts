@@ -50,10 +50,15 @@ describe('Side panel', () => {
     // real DNS lookups for redmine.test, which is slow and network-dependent.
     vi.stubGlobal(
       'fetch',
-      vi.fn(async (input: RequestInfo | URL) => {
-        const match = /\/issues\/(\d+)\.json/.exec(String(input));
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+
+        // Watcher writes answer 204 — which must carry a null body, not ''.
+        if (url.includes('/watchers')) return new Response(null, { status: 204 });
+
+        const match = /\/issues\/(\d+)\.json/.exec(url);
         const body = match
-          ? { issue: { ...issue(Number(match[1])), journals: [], attachments: [] } }
+          ? { issue: { ...issue(Number(match[1])), journals: [], attachments: [], watchers: [] } }
           : {};
         return new Response(JSON.stringify(body), {
           status: 200,
@@ -203,6 +208,62 @@ describe('Side panel', () => {
 
     await userEvent.click(await screen.findByLabelText('Refresh now'));
     expect(send).toHaveBeenCalledWith({ type: 'poll' });
+  });
+
+  it('watches an issue from the detail header, then unwatches it', async () => {
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(await screen.findByText('Issue 1'));
+
+    // The seeded issue has an empty watcher list, so the control offers to add.
+    await userEvent.click(await screen.findByRole('button', { name: 'Watch this issue' }));
+
+    const stop = await screen.findByRole('button', { name: 'Stop watching this issue' });
+    const added = vi
+      .mocked(fetch)
+      .mock.calls.find(
+        ([url, init]) =>
+          String(url).endsWith('/issues/1/watchers.json') && init?.method === 'POST',
+      );
+    expect(added).toBeDefined();
+    expect(JSON.parse(String(added?.[1]?.body))).toEqual({ user_id: 1 });
+
+    await userEvent.click(stop);
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Watch this issue' })).toBeInTheDocument(),
+    );
+    expect(
+      vi
+        .mocked(fetch)
+        .mock.calls.some(
+          ([url, init]) =>
+            String(url).endsWith('/issues/1/watchers/1.json') && init?.method === 'DELETE',
+        ),
+    ).toBe(true);
+  });
+
+  it('hides the watch control when Redmine withholds the watcher list', async () => {
+    // Redmine omits `watchers` from users without view_issue_watchers, and a
+    // toggle would have to guess which of add/remove to send.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ issue: { ...issue(1), journals: [], attachments: [] } }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+      ),
+    );
+    await issuesItem.setValue({ '1': issue(1) });
+    render(App);
+
+    await userEvent.click(await screen.findByText('Issue 1'));
+
+    expect(await screen.findByRole('button', { name: 'Mark unread' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /watching|Watch this issue/ })).not.toBeInTheDocument();
   });
 
   it('copies an issue link from a card', async () => {

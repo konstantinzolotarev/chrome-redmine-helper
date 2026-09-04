@@ -71,13 +71,18 @@ export function isConfigured(): boolean {
 }
 
 /**
- * True when this issue is one the user watches rather than owns.
+ * True when the user watches this issue.
  *
- * Every cached issue arrived via `assigned_to_id=me` or `watcher_id=me`, so
- * "not assigned to me" is sufficient — no extra flag needs storing.
+ * A detail fetch brings the real watcher list, and that is used when present.
+ * Otherwise this falls back to an inference: every cached issue arrived via
+ * `assigned_to_id=me` or `watcher_id=me`, so "not assigned to me" means it can
+ * only have come from the watcher query. That inference is wrong for an issue
+ * both assigned to and watched by the user — which is exactly the case the
+ * real list corrects once it has been loaded.
  */
 export function isWatched(issue: Issue): boolean {
   const me = currentUser.current;
   if (!me) return false;
+  if (issue.watchers) return issue.watchers.some((watcher) => watcher.id === me.id);
   return issue.assigned_to?.id !== me.id;
 }

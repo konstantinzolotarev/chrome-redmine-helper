@@ -1,13 +1,21 @@
 <script lang="ts">
-  import { ArrowLeft, ExternalLink, MailOpen, Paperclip, Send } from 'lucide-svelte';
+  import { ArrowLeft, Eye, ExternalLink, MailOpen, Paperclip, Send } from 'lucide-svelte';
 
   import { attachFile } from '@/lib/actions/attachments.svelte';
   import { applyIssueChange, loadIssueDetail, postComment } from '@/lib/actions/issues.svelte';
   import { loadMembers } from '@/lib/actions/members.svelte';
+  import { toggleWatch } from '@/lib/actions/watchers.svelte';
   import { buildContext } from '@/lib/format/journal';
   import { issueUrl } from '@/lib/format/markup';
   import type { Issue } from '@/lib/redmine';
-  import { enums, markIssueUnread, members, prefs, projects } from '@/lib/store/app.svelte';
+  import {
+    currentUser,
+    enums,
+    markIssueUnread,
+    members,
+    prefs,
+    projects,
+  } from '@/lib/store/app.svelte';
 
   import CopyLinkButton from './CopyLinkButton.svelte';
   import InlineNumber from './InlineNumber.svelte';
@@ -43,6 +51,17 @@
   });
 
   const assignees = $derived(members.current[String(issue.project.id)] ?? []);
+
+  /**
+   * null when the watcher list is unknown — before the detail fetch lands, or
+   * because Redmine omits it from users without `view_issue_watchers`. The
+   * control hides rather than showing a state it cannot back up.
+   */
+  const watching = $derived.by(() => {
+    const me = currentUser.current;
+    if (!me || !issue.watchers) return null;
+    return issue.watchers.some((watcher) => watcher.id === me.id);
+  });
 
   const journalContext = $derived(
     buildContext({
@@ -85,6 +104,24 @@
       aria-label="Mark unread"
       onclick={() => markIssueUnread(issue.id)}><MailOpen size={14} /></button
     >
+    {#if watching !== null}
+      <!-- Labelled, unlike its neighbours: an unlabelled eye among four other
+           muted icons gave no clue that it was the one that starts watching,
+           and a crossed-out eye read as the opposite of what clicking it does.
+           The label carries the state, the tooltip carries the action. -->
+      <button
+        class="flex shrink-0 items-center gap-1 rounded px-1.5 py-1 text-xs {watching
+          ? 'text-accent hover:bg-surface-hover'
+          : 'text-text-muted hover:bg-surface-hover hover:text-text'}"
+        title={watching ? 'Stop watching this issue' : 'Watch this issue'}
+        aria-label={watching ? 'Stop watching this issue' : 'Watch this issue'}
+        aria-pressed={watching}
+        onclick={() => toggleWatch(issue.id)}
+      >
+        <Eye size={14} />
+        {watching ? 'Watching' : 'Watch'}
+      </button>
+    {/if}
     <CopyLinkButton url={issueUrl(host, issue.id)} label="issue {issue.id}" size={14} />
     <a
       class="rounded p-1 text-text-muted hover:bg-surface-hover hover:text-text"

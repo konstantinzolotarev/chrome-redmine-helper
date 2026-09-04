@@ -84,7 +84,7 @@ export function listIssues(
 export async function getIssue(
   client: RedmineClient,
   id: number,
-  include = 'journals,attachments,relations',
+  include = 'journals,attachments,relations,watchers',
   signal?: AbortSignal,
 ): Promise<Issue> {
   const body = await client.get<{ issue: Issue }>(`/issues/${id}.json`, { include }, signal);
