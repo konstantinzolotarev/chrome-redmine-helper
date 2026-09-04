@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Issue } from '@/lib/redmine';
+import type { Issue, Project } from '@/lib/redmine';
 import {
   DEFAULT_ENUMS,
   DEFAULT_PREFS,
@@ -43,6 +43,29 @@ function issue(id: number, over: Partial<Issue> = {}): Issue {
     assigned_to: { id: 1, name: 'Ada' },
     ...over,
   } as Issue;
+}
+
+/** Newest first, so `allIssues()` orders them 1, 2, 3 … */
+function manyIssues(count: number): Record<string, Issue> {
+  const base = Date.UTC(2026, 8, 1, 10);
+  return Object.fromEntries(
+    Array.from({ length: count }, (_, index) => [
+      String(index + 1),
+      issue(index + 1, { updated_on: new Date(base - index * 60_000).toISOString() }),
+    ]),
+  );
+}
+
+function project(id: number, name: string): Project {
+  return {
+    id,
+    name,
+    identifier: name.toLowerCase(),
+    description: null,
+    status: 1,
+    created_on: '2026-01-01T00:00:00Z',
+    updated_on: '2026-01-01T00:00:00Z',
+  };
 }
 
 function session(over: Partial<UnsentSession> = {}): UnsentSession {
@@ -271,6 +294,137 @@ describe('Tab page', () => {
       'href',
       'https://redmine.test/issues/999',
     );
+  });
+
+  it('pages the table, and does not render what is off the page', async () => {
+    await issuesItem.setValue(manyIssues(30));
+    render(App);
+
+    expect(await screen.findByText('1–25 of 30')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Issue 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Issue 30' })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Prev/ }));
+    expect(screen.getByText('1–25 of 30')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Next/ }));
+
+    expect(await screen.findByText('26–30 of 30')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Issue 30' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Issue 1' })).not.toBeInTheDocument();
+  });
+
+  it('hides the pager when everything fits on one page', async () => {
+    await issuesItem.setValue(manyIssues(10));
+    render(App);
+
+    expect(await screen.findByRole('link', { name: 'Issue 1' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Rows per page')).not.toBeInTheDocument();
+  });
+
+  it('remembers the rows-per-page choice in prefs', async () => {
+    await issuesItem.setValue(manyIssues(30));
+    render(App);
+
+    await userEvent.selectOptions(await screen.findByLabelText('Rows per page'), '50');
+
+    await waitFor(async () => expect((await prefsItem.getValue()).pageSize).toBe(50));
+    expect(await screen.findByText('1–30 of 30')).toBeInTheDocument();
+  });
+
+  it('filters the table by project, and counts what survived', async () => {
+    await projectsItem.setValue({ '1': project(1, 'Sandbox'), '2': project(2, 'Website') });
+    await issuesItem.setValue({
+      '1': issue(1),
+      '2': issue(2, { project: { id: 2, name: 'Website' } }),
+    });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Projects/ }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Website' }));
+
+    expect(screen.queryByRole('link', { name: 'Issue 1' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Issue 2' })).toBeInTheDocument();
+    expect(screen.getByText('1 issue')).toBeInTheDocument();
+  });
+
+  it('unions several selections within one filter', async () => {
+    await projectsItem.setValue({
+      '1': project(1, 'Sandbox'),
+      '2': project(2, 'Website'),
+      '3': project(3, 'Archive'),
+    });
+    await issuesItem.setValue({
+      '1': issue(1),
+      '2': issue(2, { project: { id: 2, name: 'Website' } }),
+      '3': issue(3, { project: { id: 3, name: 'Archive' } }),
+    });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Projects/ }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Sandbox' }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Website' }));
+
+    expect(screen.getByRole('link', { name: 'Issue 1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Issue 2' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Issue 3' })).not.toBeInTheDocument();
+
+    // One selection is worth naming; several are only worth counting.
+    expect(screen.getByRole('button', { name: /Projects · 2/ })).toBeInTheDocument();
+  });
+
+  it('clears a filter from inside its dropdown', async () => {
+    await projectsItem.setValue({ '1': project(1, 'Sandbox'), '2': project(2, 'Website') });
+    await issuesItem.setValue({
+      '1': issue(1),
+      '2': issue(2, { project: { id: 2, name: 'Website' } }),
+    });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Projects/ }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Website' }));
+    expect(screen.queryByRole('link', { name: 'Issue 1' })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(await screen.findByRole('link', { name: 'Issue 1' })).toBeInTheDocument();
+    expect(screen.getByText('2 issues')).toBeInTheDocument();
+  });
+
+  it('splits open from closed using the cached status enum', async () => {
+    await enumsItem.setValue({
+      ...DEFAULT_ENUMS,
+      statuses: [
+        { id: 1, name: 'New' },
+        { id: 5, name: 'Closed', is_closed: true },
+      ],
+    });
+    await issuesItem.setValue({
+      '1': issue(1),
+      '2': issue(2, { status: { id: 5, name: 'Closed' } }),
+    });
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Status/ }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Any closed' }));
+
+    expect(screen.queryByRole('link', { name: 'Issue 1' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Issue 2' })).toBeInTheDocument();
+  });
+
+  it('returns to page 1 when a filter narrows the list', async () => {
+    await projectsItem.setValue({ '1': project(1, 'Sandbox'), '2': project(2, 'Website') });
+    await issuesItem.setValue(manyIssues(30));
+    render(App);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Next/ }));
+    expect(await screen.findByText('26–30 of 30')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Projects/ }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Sandbox' }));
+
+    // Page 3 of a filtered list is a different page 3, so narrowing starts at the top.
+    expect(await screen.findByText('1–25 of 30')).toBeInTheDocument();
   });
 
   it('copies an issue link from a row', async () => {

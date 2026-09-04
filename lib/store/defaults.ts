@@ -7,6 +7,7 @@ export const DEFAULT_PREFS: Prefs = {
   notifications: { mode: 'none' },
   projectFilter: { mode: 'all', projectIds: [] },
   columns: { id: true, project: true, author: true, tracker: false, status: true },
+  pageSize: 25,
   pollIntervalMinutes: 5,
   timeRoundingHours: 0.25,
   theme: 'system',

@@ -25,6 +25,8 @@ export interface Prefs {
   notifications: { mode: NotificationMode };
   projectFilter: { mode: ProjectFilterMode; projectIds: number[] };
   columns: ColumnPrefs;
+  /** Rows per page in the full-page issue table. */
+  pageSize: number;
   pollIntervalMinutes: number;
   /** Rounding increment applied to tracked time before logging, in hours. */
   timeRoundingHours: number;

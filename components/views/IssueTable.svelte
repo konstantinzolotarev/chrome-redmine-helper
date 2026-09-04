@@ -3,11 +3,22 @@
 
   import { issueUrl } from '@/lib/format/markup';
   import type { Issue } from '@/lib/redmine';
-  import { allIssues, isWatched, prefs, readState } from '@/lib/store/app.svelte';
+  import { allIssues, enums, isWatched, prefs, projects, readState } from '@/lib/store/app.svelte';
   import { isUnread } from '@/lib/store/derive';
+  import {
+    activeFilterCount,
+    clampPage,
+    filterIssues,
+    pageCount,
+    pageSlice,
+    normalizePageSize,
+    PAGE_SIZES,
+    type StatusFilter,
+  } from '@/lib/table';
 
   import CopyLinkButton from '../CopyLinkButton.svelte';
   import RelativeTime from '../RelativeTime.svelte';
+  import MultiSelect, { type Option } from '../ui/MultiSelect.svelte';
 
   interface Props {
     /** The issue open in the detail pane, from the route. */
@@ -20,18 +31,71 @@
   let { selectedId = null, trackingId = null, ontoggletimer }: Props = $props();
 
   let query = $state('');
+  let projectIds = $state<number[]>([]);
+  let statusChoices = $state<StatusFilter[]>([]);
+  let trackerIds = $state<number[]>([]);
+  let page = $state(1);
 
   const columns = $derived(prefs.current.columns);
   const host = $derived(prefs.current.host);
+  const pageSize = $derived(normalizePageSize(prefs.current.pageSize));
 
-  const rows = $derived.by(() => {
-    const needle = query.trim().toLowerCase();
-    const list = allIssues();
-    if (!needle) return list;
-    return list.filter(
-      (issue) => issue.subject.toLowerCase().includes(needle) || String(issue.id).includes(needle),
+  const projectList = $derived(
+    Object.values(projects.current).sort((a, b) => a.name.localeCompare(b.name)),
+  );
+  const statuses = $derived(enums.current.statuses);
+  const trackers = $derived(enums.current.trackers);
+
+  const projectOptions = $derived<Option[]>(
+    projectList.map((project) => ({ value: String(project.id), label: project.name })),
+  );
+  // "Any open"/"Any closed" rather than "Open"/"Closed": most Redmine
+  // configurations have a status named exactly Closed, and two entries reading
+  // the same in one list is a puzzle rather than a filter.
+  const statusOptions = $derived<Option[]>([
+    { value: 'open', label: 'Any open' },
+    { value: 'closed', label: 'Any closed' },
+    ...statuses.map((option) => ({ value: String(option.id), label: option.name })),
+  ]);
+  const trackerOptions = $derived<Option[]>(
+    trackers.map((tracker) => ({ value: String(tracker.id), label: tracker.name })),
+  );
+
+  const filters = $derived({ query, projectIds, statuses: statusChoices, trackerIds });
+  const filtered = $derived(filterIssues(allIssues(), filters, statuses));
+  const narrowed = $derived(query.trim() !== '' || activeFilterCount(filters) > 0);
+
+  // The page is clamped on read rather than corrected in an effect: the list
+  // shrinks under the user whenever a poll prunes it or a filter narrows it.
+  const currentPage = $derived(clampPage(page, filtered.length, pageSize));
+  const pages = $derived(pageCount(filtered.length, pageSize));
+  const rows = $derived(pageSlice(filtered, currentPage, pageSize));
+  const firstShown = $derived(filtered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1);
+  const lastShown = $derived(Math.min(currentPage * pageSize, filtered.length));
+
+  /** Narrowing starts from the top — page 3 of a filtered list is a different page 3. */
+  function narrow<T>(apply: (value: T) => void): (value: T) => void {
+    return (value) => {
+      apply(value);
+      page = 1;
+    };
+  }
+
+  const setProjects = narrow<string[]>((next) => (projectIds = next.map(Number)));
+  const setTrackers = narrow<string[]>((next) => (trackerIds = next.map(Number)));
+  const setStatuses = narrow<string[]>((next) => {
+    statusChoices = next.map((value) =>
+      value === 'open' || value === 'closed' ? value : Number(value),
     );
   });
+
+  async function setPageSize(next: number) {
+    page = 1;
+    await prefs.update((current) => ({ ...current, pageSize: next }));
+  }
+
+  const selectClass =
+    'rounded-md border border-border bg-bg px-2 py-1.5 text-xs focus:border-accent';
 </script>
 
 <div class="flex flex-col gap-3">
@@ -45,12 +109,36 @@
         class="w-full rounded-md border border-border bg-bg py-1.5 pr-2 pl-7 text-xs focus:border-accent"
       />
     </div>
-    <span class="text-xs text-text-muted">{rows.length} {rows.length === 1 ? 'issue' : 'issues'}</span>
+    <MultiSelect
+      label="Projects"
+      options={projectOptions}
+      selected={projectIds.map(String)}
+      onchange={setProjects}
+    />
+
+    <MultiSelect
+      label="Status"
+      options={statusOptions}
+      selected={statusChoices.map(String)}
+      onchange={setStatuses}
+    />
+
+    <MultiSelect
+      label="Trackers"
+      options={trackerOptions}
+      selected={trackerIds.map(String)}
+      onchange={setTrackers}
+    />
+
+    <span class="text-xs text-text-muted" aria-live="polite">
+      {filtered.length}
+      {filtered.length === 1 ? 'issue' : 'issues'}
+    </span>
   </div>
 
   {#if rows.length === 0}
     <p class="rounded-md border border-border p-6 text-center text-xs text-text-muted">
-      {query ? 'No issues match that search.' : 'Nothing here yet.'}
+      {narrowed ? 'No issues match that search.' : 'Nothing here yet.'}
     </p>
   {:else}
     <div class="overflow-x-auto rounded-md border border-border">
@@ -152,5 +240,39 @@
         </tbody>
       </table>
     </div>
+
+    {#if filtered.length > PAGE_SIZES[0]}
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-text-muted">
+        <label class="flex items-center gap-1.5">
+          Show
+          <select
+            class={selectClass}
+            aria-label="Rows per page"
+            value={String(pageSize)}
+            onchange={(event) => setPageSize(Number(event.currentTarget.value))}
+          >
+            {#each PAGE_SIZES as size (size)}
+              <option value={String(size)}>{size}</option>
+            {/each}
+          </select>
+        </label>
+
+        <div class="flex items-center gap-3">
+          <button
+            class="rounded px-2 py-1 hover:bg-surface-hover hover:text-text disabled:opacity-40
+                   disabled:hover:bg-transparent"
+            disabled={currentPage <= 1}
+            onclick={() => (page = currentPage - 1)}>&lsaquo; Prev</button
+          >
+          <span aria-live="polite">{firstShown}&ndash;{lastShown} of {filtered.length}</span>
+          <button
+            class="rounded px-2 py-1 hover:bg-surface-hover hover:text-text disabled:opacity-40
+                   disabled:hover:bg-transparent"
+            disabled={currentPage >= pages}
+            onclick={() => (page = currentPage + 1)}>Next &rsaquo;</button
+          >
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>

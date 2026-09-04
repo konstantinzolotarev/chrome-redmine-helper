@@ -32,7 +32,12 @@ import type {
 
 export const prefsItem = storage.defineItem<Prefs>('sync:prefs', {
   fallback: DEFAULT_PREFS,
-  version: 1,
+  version: 2,
+  migrations: {
+    // `fallback` only applies when the whole value is missing, so a profile
+    // stored before the table gained paging has no `pageSize` at all.
+    2: (prefs: Prefs): Prefs => ({ ...prefs, pageSize: DEFAULT_PREFS.pageSize }),
+  },
 });
 
 // --- local credentials -------------------------------------------------------
